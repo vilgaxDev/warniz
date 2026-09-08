@@ -1,0 +1,142 @@
+import { QuizCategory, RewardStep, SpeedMode, NotificationItem } from '../types';
+
+export const REWARD_LADDER: RewardStep[] = [
+  { questionNumber: 1, rewardKsh: 2 },
+  { questionNumber: 2, rewardKsh: 3 },
+  { questionNumber: 3, rewardKsh: 5 },
+  { questionNumber: 4, rewardKsh: 8 },
+  { questionNumber: 5, rewardKsh: 12 },
+  { questionNumber: 6, rewardKsh: 20 },
+  { questionNumber: 7, rewardKsh: 35 },
+  { questionNumber: 8, rewardKsh: 50 },
+  { questionNumber: 9, rewardKsh: 75 },
+  { questionNumber: 10, rewardKsh: 100 },
+];
+
+export const SPEED_MODES: SpeedMode[] = [
+  {
+    id: '3min',
+    name: '3 Mins Speed Round',
+    questionsCount: 6,
+    durationSeconds: 12,
+    description: 'Fast-paced, 12s countdown per question. Perfect for quick plays.',
+    badge: '6 QUESTIONS',
+  },
+  {
+    id: '5min',
+    name: '5 Mins Pro Challenge',
+    questionsCount: 8,
+    durationSeconds: 12,
+    description: 'Balanced trivia round with progressive medium difficulty.',
+    badge: '8 QUESTIONS',
+  },
+  {
+    id: '10min',
+    name: '10 Mins Tournament',
+    questionsCount: 10,
+    durationSeconds: 12,
+    description: 'Grand championship quiz with maximum XP multipliers & badges.',
+    badge: '10 QUESTIONS',
+  },
+];
+
+export const QUIZ_CATEGORIES: QuizCategory[] = [
+  {
+    id: 'kenya',
+    name: 'Kenya',
+    icon: '🇰🇪',
+    badge: 'POPULAR',
+    subtitle: 'Heritage, Culture & Wildlife',
+    questions: [],
+  },
+  {
+    id: 'world_cup',
+    name: 'World Cup',
+    icon: '⚽',
+    badge: 'LIVE',
+    subtitle: 'FIFA & Global Football',
+    questions: [],
+  },
+  {
+    id: 'sports',
+    name: 'Sports',
+    icon: '🏆',
+    badge: 'FEATURED',
+    subtitle: 'Premier League & Athletics',
+    questions: [],
+  },
+  {
+    id: 'tech',
+    name: 'Tech',
+    icon: '🤖',
+    badge: 'HOT',
+    subtitle: 'Silicon Savannah & AI',
+    questions: [],
+  },
+  {
+    id: 'finance',
+    name: 'Finance',
+    icon: '📈',
+    badge: 'VERIFIED',
+    subtitle: 'Markets, Banking & CBK',
+    questions: [],
+  },
+  {
+    id: 'geopolitics',
+    name: 'Geopolitics',
+    icon: '🌍',
+    badge: 'GLOBAL',
+    subtitle: 'World Wonders & Treaties',
+    questions: [],
+  },
+  {
+    id: 'crypto',
+    name: 'Crypto',
+    icon: '⚡',
+    badge: 'WEB3',
+    subtitle: 'Blockchain & Digital Assets',
+    questions: [],
+  },
+  {
+    id: 'politics',
+    name: 'Politics',
+    icon: '🏛️',
+    badge: 'GOVERNANCE',
+    subtitle: 'World Leaders & Civic Affairs',
+    questions: [],
+  },
+  {
+    id: 'esports',
+    name: 'Esports',
+    icon: '🎮',
+    badge: 'GAMING',
+    subtitle: 'Competitive Gaming & Consoles',
+    questions: [],
+  },
+  {
+    id: 'entertainment',
+    name: 'Entertainment',
+    icon: '🎬',
+    badge: 'ARTS',
+    subtitle: 'Cinema, Music & Pop Culture',
+    questions: [],
+  },
+  {
+    id: 'general',
+    name: 'General Trivia',
+    icon: '🧠',
+    badge: 'KNOWLEDGE',
+    subtitle: 'Science & World Facts',
+    questions: [],
+  },
+  {
+    id: 'trending',
+    name: 'Trending',
+    icon: '🔥',
+    badge: 'HOT',
+    subtitle: 'Viral Facts & Speed Records',
+    questions: [],
+  },
+];
+
+export const INITIAL_NOTIFICATIONS: NotificationItem[] = [];

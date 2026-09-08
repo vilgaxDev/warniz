@@ -1,0 +1,6 @@
+{
+  "name": "ChezaZone Live Quiz Arena",
+  "description": "Polymarket-style prediction and live trivia arena with M-PESA Daraja integration (Paybill, Till, C2B), multi-channel notification engine, marketing email campaigns, promotional banners, and full authentication with branded email templates.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
