@@ -55,12 +55,12 @@ export const DailyRewardsModal: React.FC<DailyRewardsModalProps> = ({
             exit={{ scale: 0.95, opacity: 0, y: 15 }}
             transition={{ duration: 0.2 }}
             className={`relative z-10 w-full max-w-lg rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
-              isDark ? 'bg-[#121927] border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              isDark ? 'bg-[#080d14] black-net border-emerald-950/60 text-slate-100 shadow-slate-950/80' : 'bg-white border-slate-200 text-slate-900'
             }`}
           >
             {/* Header */}
             <div className={`p-4 sm:p-5 flex items-center justify-between border-b ${
-              isDark ? 'border-slate-800 bg-[#0b101b]' : 'border-slate-100 bg-slate-50'
+              isDark ? 'border-slate-800/80 bg-[#0c131f]/70' : 'border-slate-100 bg-slate-50'
             }`}>
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shadow-md font-bold">
@@ -99,8 +99,8 @@ export const DailyRewardsModal: React.FC<DailyRewardsModalProps> = ({
                     className={`p-2.5 rounded-xl border flex flex-col items-center justify-center relative transition-all ${
                       item.current
                         ? isDark
-                          ? 'bg-[#0070f3]/20 border-[#0070f3] ring-2 ring-[#0070f3]/50 scale-105 text-white'
-                          : 'bg-blue-50 border-blue-500 ring-2 ring-blue-400/50 scale-105 text-blue-950'
+                          ? 'bg-emerald-500/20 border-emerald-500 ring-2 ring-emerald-500/50 scale-105 text-white'
+                          : 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-400/50 scale-105 text-emerald-950'
                         : item.claimed
                         ? isDark
                           ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-400'
@@ -113,7 +113,7 @@ export const DailyRewardsModal: React.FC<DailyRewardsModalProps> = ({
                     <span className="text-[10px] font-bold uppercase tracking-wider">{item.label}</span>
                     <span className="text-xl my-1">{item.icon}</span>
                     <span className={`text-xs font-extrabold ${
-                      item.current ? (isDark ? 'text-blue-300' : 'text-blue-600') : item.claimed ? 'text-emerald-500' : ''
+                      item.current ? (isDark ? 'text-emerald-300' : 'text-emerald-600') : item.claimed ? 'text-emerald-500' : ''
                     }`}>
                       +KSh {item.reward}
                     </span>
@@ -130,7 +130,7 @@ export const DailyRewardsModal: React.FC<DailyRewardsModalProps> = ({
 
             {/* Action Footer */}
             <div className={`p-4 border-t flex items-center justify-between ${
-              isDark ? 'border-slate-800 bg-[#0b101b]' : 'border-slate-100 bg-slate-50'
+              isDark ? 'border-slate-800/80 bg-[#0c131f]/70' : 'border-slate-100 bg-slate-50'
             }`}>
               <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                 Resets every night at 00:00 EAT
@@ -142,7 +142,7 @@ export const DailyRewardsModal: React.FC<DailyRewardsModalProps> = ({
                 className={`py-2.5 px-5 rounded-xl font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md transition-all ${
                   hasClaimed
                     ? isDark ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-slate-200 text-slate-500 cursor-not-allowed'
-                    : 'bg-[#0070f3] hover:bg-[#0060df] text-white active:scale-95'
+                    : 'bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 shadow-emerald-600/20'
                 }`}
               >
                 <Sparkles className="w-4 h-4" />

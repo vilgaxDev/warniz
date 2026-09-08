@@ -89,11 +89,109 @@ export const RewardLadder: React.FC<RewardLadderProps> = ({
         </div>
       </div>
 
-      {/* Ladder Steps Bar - Horizontal scrollable ribbon on mobile with snap, grid on desktop */}
+      {/* Ladder Steps Bar - Mobile: Specific 3-card grid for Q3 (2X), Q4 (3X), Q5 (5X) with Odds. Desktop: Full grid */}
       <div className="relative">
+        {/* Mobile View: Specifically Questions 3, 4, 5 with Odds & 2X, 3X, 5X */}
+        <div className="grid grid-cols-3 gap-2 sm:hidden">
+          {[3, 4, 5].map((qNum) => {
+            const stepIndex = qNum - 1;
+            const step = rewardLadder[stepIndex] || { questionNumber: qNum, rewardKsh: qNum === 3 ? 16 : qNum === 4 ? 30 : 60 };
+            const multiplier = qNum === 3 ? 2 : qNum === 4 ? 3 : 5;
+            const isPassed = currentQuestionIndex > stepIndex;
+            const isCurrent = currentQuestionIndex === stepIndex;
+            const multipliedReward = step.rewardKsh * multiplier;
+
+            const badgeColor =
+              multiplier === 5
+                ? 'bg-emerald-400 text-slate-950'
+                : multiplier === 3
+                ? 'bg-orange-500 text-white'
+                : 'bg-amber-400 text-slate-950';
+
+            const cardBorder = isCurrent
+              ? isDark
+                ? 'bg-[#1E293B] border-slate-200 text-white ring-2 ring-emerald-400 shadow-md scale-[1.03]'
+                : 'bg-slate-900 border-slate-900 text-white ring-2 ring-emerald-500 shadow-md scale-[1.03]'
+              : isPassed
+              ? isDark
+                ? 'bg-emerald-950/30 border-emerald-500/60 text-emerald-300'
+                : 'bg-emerald-50 border-emerald-300 text-emerald-800'
+              : multiplier === 5
+              ? isDark
+                ? 'bg-emerald-950/20 border-emerald-500/40 text-slate-300'
+                : 'bg-emerald-50/50 border-emerald-200 text-slate-700'
+              : multiplier === 3
+              ? isDark
+                ? 'bg-orange-950/20 border-orange-500/40 text-slate-300'
+                : 'bg-orange-50/50 border-orange-200 text-slate-700'
+              : isDark
+              ? 'bg-amber-950/20 border-amber-500/40 text-slate-300'
+              : 'bg-amber-50/50 border-amber-200 text-slate-700';
+
+            return (
+              <div
+                key={qNum}
+                className={`relative flex flex-col items-center justify-between py-2 px-1.5 rounded-xl border text-center transition-all ${cardBorder}`}
+              >
+                {/* Header: Q number + Odds Multiplier */}
+                <div className="w-full flex items-center justify-between gap-1 mb-1">
+                  <span className={`text-[10px] font-black uppercase ${
+                    isCurrent
+                      ? 'text-white'
+                      : isPassed
+                      ? 'text-emerald-400'
+                      : isDark ? 'text-slate-300' : 'text-slate-600'
+                  }`}>
+                    Q{qNum}
+                  </span>
+                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-black tracking-tight shadow-2xs ${badgeColor}`}>
+                    {multiplier}X ODDS
+                  </span>
+                </div>
+
+                {/* Reward Amount */}
+                <div className={`text-xs font-black tracking-tight whitespace-nowrap ${
+                  isCurrent
+                    ? 'text-white'
+                    : isPassed
+                    ? isDark ? 'text-emerald-300' : 'text-emerald-700'
+                    : multiplier === 5
+                    ? 'text-emerald-400'
+                    : multiplier === 3
+                    ? 'text-orange-400'
+                    : 'text-amber-400'
+                }`}>
+                  KSh {multipliedReward.toLocaleString()}
+                </div>
+
+                {/* Subtext: Base reward */}
+                <div className="text-[8.5px] text-slate-400 font-semibold mt-0.5 whitespace-nowrap">
+                  Base KSh {step.rewardKsh}
+                </div>
+
+                {/* Passed Checkmark Icon */}
+                {isPassed && (
+                  <div className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center shadow-xs">
+                    <Check className="w-2.5 h-2.5 stroke-[3]" />
+                  </div>
+                )}
+
+                {/* Active Question Pulse Dot */}
+                {isCurrent && (
+                  <div className="absolute -top-1 -left-1 flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop View: Full Ladder Grid */}
         <div
           ref={containerRef}
-          className="flex sm:grid gap-1.5 sm:gap-2 overflow-x-auto sm:overflow-x-visible no-scrollbar pb-1 sm:pb-0 scroll-smooth snap-x touch-pan-x"
+          className="hidden sm:grid gap-2 overflow-x-visible pb-0"
           style={{
             gridTemplateColumns: `repeat(${activeSteps.length}, minmax(0, 1fr))`,
           }}
@@ -101,12 +199,14 @@ export const RewardLadder: React.FC<RewardLadderProps> = ({
           {activeSteps.map((step, idx) => {
             const isPassed = idx < currentQuestionIndex;
             const isCurrent = idx === currentQuestionIndex;
+            const qNum = step.questionNumber;
+            const multiplier = qNum === 3 ? 2 : qNum === 4 ? 3 : qNum >= 5 ? 5 : 1;
 
             return (
               <div
                 key={step.questionNumber}
                 ref={isCurrent ? activeStepRef : null}
-                className={`shrink-0 sm:shrink min-w-[76px] sm:min-w-0 flex-1 snap-center relative flex flex-col items-center justify-center py-2 px-2.5 sm:p-2 rounded-xl border text-center transition-all ${
+                className={`min-w-0 flex-1 relative flex flex-col items-center justify-center py-2 px-2.5 sm:p-2 rounded-xl border text-center transition-all ${
                   isCurrent
                     ? isDark
                       ? 'bg-[#1E293B] border-slate-300 text-white ring-1 ring-slate-400/40 shadow-sm scale-[1.02]'
@@ -131,6 +231,13 @@ export const RewardLadder: React.FC<RewardLadderProps> = ({
                   }`}>
                     Q{step.questionNumber}
                   </span>
+                  {multiplier > 1 && (
+                    <span className={`text-[8.5px] px-1 rounded font-black ${
+                      multiplier === 5 ? 'bg-emerald-400 text-slate-950' : multiplier === 3 ? 'bg-orange-500 text-white' : 'bg-amber-400 text-slate-950'
+                    }`}>
+                      {multiplier}X
+                    </span>
+                  )}
                 </div>
 
                 <div className={`text-xs font-bold whitespace-nowrap ${
@@ -140,7 +247,7 @@ export const RewardLadder: React.FC<RewardLadderProps> = ({
                     ? isDark ? 'text-emerald-400' : 'text-emerald-700'
                     : isDark ? 'text-slate-300' : 'text-slate-700'
                 }`}>
-                  KSh {step.rewardKsh}
+                  KSh {step.rewardKsh * (multiplier > 1 ? multiplier : 1)}
                 </div>
 
                 {isPassed && (

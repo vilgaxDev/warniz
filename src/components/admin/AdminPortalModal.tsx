@@ -167,7 +167,7 @@ const INITIAL_BANNERS: MarketingBannerItem[] = [
     title: '🔥 KSh 50,000 Kenya Premier Trivia Tournament',
     subtitle: '12-second speed rounds with instant M-Pesa payouts!',
     tag: 'FEATURED TOURNAMENT',
-    bgGradient: 'from-blue-600 via-indigo-600 to-cyan-600',
+    bgGradient: 'from-emerald-700 via-teal-700 to-emerald-900',
     ctaText: 'Enter for KSh 50',
     active: true,
   },
@@ -337,7 +337,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
       case 'super_admin':
         return <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-600 dark:text-purple-400 font-extrabold text-[10px] border border-purple-500/30">👑 SUPER ADMIN</span>;
       case 'admin':
-        return <span className="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-600 dark:text-blue-400 font-extrabold text-[10px] border border-blue-500/30">🛡️ ADMIN</span>;
+        return <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold text-[10px] border border-emerald-500/30">🛡️ ADMIN</span>;
       case 'marketer':
         return <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-600 dark:text-amber-400 font-extrabold text-[10px] border border-amber-500/30">📢 MARKETER</span>;
       default:
@@ -353,8 +353,8 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
         exit={{ opacity: 0, scale: 0.96, y: 15 }}
         className={`w-full max-w-5xl rounded-3xl border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] my-auto ${
           isDark
-            ? 'bg-[#0B0E14] border-[#222C3E] text-[#F8FAFC]'
-            : 'bg-white border-slate-200 text-slate-900 shadow-blue-500/5'
+            ? 'bg-[#070a0e] black-net border-emerald-950/60 text-[#F8FAFC]'
+            : 'bg-white border-slate-200 text-slate-900 shadow-emerald-500/5'
         }`}
       >
         {/* Top Header Bar */}
@@ -363,7 +363,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
             ? 'bg-gradient-to-r from-purple-900/40 via-purple-800/20 to-transparent'
             : isMarketer && !isAdmin
             ? 'bg-gradient-to-r from-amber-900/40 via-amber-800/20 to-transparent'
-            : 'bg-gradient-to-r from-blue-900/40 via-blue-800/20 to-transparent'
+            : 'bg-gradient-to-r from-emerald-950/40 via-teal-900/20 to-transparent'
         }`}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-black/30 border border-white/20 flex items-center justify-center text-xl shadow-xs">
@@ -373,10 +373,10 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
               <div className="flex items-center gap-2">
                 <h3 className="font-black text-sm sm:text-base leading-none">
                   {isSuperAdmin
-                    ? 'Predicta Super Admin Command Center'
+                    ? 'Trivquest Super Admin Command Center'
                     : isMarketer && !isAdmin
-                    ? 'Predicta Marketing & Growth Hub'
-                    : 'Predicta Operations & Quiz Admin Portal'}
+                    ? 'Trivquest Marketing & Growth Hub'
+                    : 'Trivquest Operations & Quiz Admin Portal'}
                 </h3>
                 {getRoleBadge(userRole)}
               </div>
@@ -432,7 +432,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
               onClick={() => setActiveTab('questions')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === 'questions'
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-950'
               }`}
             >
@@ -662,7 +662,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                     onClick={() => setSelectedCategoryForQuestions(cat.id)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                       selectedCategoryForQuestions === cat.id
-                        ? 'bg-blue-600 text-white shadow-xs'
+                        ? 'bg-emerald-600 text-white shadow-xs'
                         : isDark ? 'bg-[#121722] text-slate-300' : 'bg-slate-100 text-slate-700'
                     }`}
                   >
@@ -677,7 +677,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
                 isDark ? 'bg-[#121722] border-[#222C3E]' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-xs sm:text-sm text-blue-500 flex items-center gap-1.5 uppercase">
+                  <h4 className="font-extrabold text-xs sm:text-sm text-emerald-400 flex items-center gap-1.5 uppercase">
                     <Plus className="w-4 h-4" />
                     <span>Add New Question to Bank</span>
                   </h4>
@@ -743,7 +743,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
 
                   <button
                     type="submit"
-                    className="py-2 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs uppercase transition-all shadow-md cursor-pointer"
+                    className="py-2 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase transition-all shadow-md cursor-pointer"
                   >
                     Save to Category Bank
                   </button>
@@ -1042,7 +1042,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
             <ShieldCheck className="w-4 h-4 text-emerald-500" />
             <span>Role-Based Access Control (RBAC) &bull; Audit logs active</span>
           </div>
-          <span>Predicta v2.6 Enterprise</span>
+          <span>Trivquest v2.6 Enterprise</span>
         </div>
       </motion.div>
     </div>

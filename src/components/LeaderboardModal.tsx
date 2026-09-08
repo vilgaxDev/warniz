@@ -95,13 +95,13 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
         className={`w-full max-w-3xl max-h-[92vh] rounded-3xl border flex flex-col overflow-hidden shadow-2xl transition-colors ${
           isDark
-            ? 'bg-[#0f172a] border-slate-800 text-slate-100'
+            ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100'
             : 'bg-white border-slate-200 text-slate-900'
         }`}
       >
         {/* MODAL HEADER */}
         <div className={`p-4 sm:p-6 border-b flex items-center justify-between gap-3 ${
-          isDark ? 'border-slate-800 bg-[#0a0f1d]' : 'border-slate-100 bg-slate-50/70'
+          isDark ? 'border-white/5 bg-[#0a0f16]' : 'border-slate-100 bg-slate-50/70'
         }`}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
@@ -135,7 +135,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         </div>
 
         {/* CONTROLS BAR: TIMEFRAME TABS & SEARCH */}
-        <div className={`p-4 border-b space-y-3 ${isDark ? 'border-slate-800 bg-[#0c1324]' : 'border-slate-100 bg-white'}`}>
+        <div className={`p-4 border-b space-y-3 ${isDark ? 'border-white/5 bg-[#0a0f16]/80' : 'border-slate-100 bg-white'}`}>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             {/* Timeframe Selector Pills */}
             <div className={`p-1 rounded-xl border flex items-center gap-1 w-full sm:w-auto ${
@@ -147,7 +147,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                   onClick={() => setTimeframe(t)}
                   className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer capitalize ${
                     timeframe === t
-                      ? 'bg-blue-600 text-white shadow-xs'
+                      ? 'bg-emerald-600 text-white shadow-xs'
                       : isDark
                         ? 'text-slate-400 hover:text-slate-200'
                         : 'text-slate-600 hover:text-slate-900'
@@ -168,8 +168,8 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                 placeholder="Search player or category..."
                 className={`w-full pl-8 pr-3 py-1.5 rounded-xl text-xs outline-none border transition-all ${
                   isDark
-                    ? 'bg-[#151d2c] border-slate-800 text-white placeholder-slate-500 focus:border-blue-500'
-                    : 'bg-slate-100 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:bg-white'
+                    ? 'bg-[#151d2c] border-slate-800 text-white placeholder-slate-500 focus:border-emerald-500'
+                    : 'bg-slate-100 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:bg-white'
                 }`}
               />
             </div>
@@ -281,7 +281,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                       <div className="flex items-center gap-1.5">
                         <span className={`font-bold text-xs sm:text-sm truncate ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{user.name}</span>
                         {user.badge && (
-                          <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase tracking-wider bg-blue-500/20 text-blue-500 border border-blue-500/30">
+                          <span className="text-[9px] px-1.5 py-0.2 rounded font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                             {user.badge}
                           </span>
                         )}
@@ -313,16 +313,16 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 
         {/* STICKY BOTTOM USER STANDING & ACTION */}
         <div className={`p-4 border-t flex flex-wrap items-center justify-between gap-3 ${
-          isDark ? 'border-slate-800 bg-[#0a0f1d]' : 'border-slate-100 bg-slate-50'
+          isDark ? 'border-white/5 bg-[#0a0f16]' : 'border-slate-100 bg-slate-50'
         }`}>
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center shadow-xs">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center justify-center shadow-xs">
               YOU
             </div>
             <div>
               <div className="font-bold text-xs sm:text-sm flex items-center gap-2">
                 <span className={isDark ? 'text-slate-100' : 'text-slate-900'}>Your Rank: #12</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-500 font-semibold">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold">
                   Top 8%
                 </span>
               </div>
@@ -337,7 +337,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               onClose();
               onPlayArena();
             }}
-            className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
           >
             <Zap className="w-4 h-4 fill-white" />
             <span>Play Arena to Climb</span>

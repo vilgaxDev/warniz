@@ -63,7 +63,7 @@ export default function App() {
     minDepositAmount: number;
     minWithdrawAmount: number;
   }>({
-    siteName: 'Predicta',
+    siteName: 'Trivquest',
     headerAnnouncement: '⚡ Win up to 100,000 KES on live speed trivia games!',
     headerAnnouncementEnabled: true,
     headerBadge: 'SPEED TRIVIA (+100 XP)',
@@ -121,7 +121,7 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPageLoading(false);
-    }, 450);
+    }, 1800);
     return () => clearTimeout(timer);
   }, []);
 
@@ -133,7 +133,7 @@ export default function App() {
       .then(data => {
         setSiteConfig(prev => ({
           ...prev,
-          siteName: data.site_name || 'Predicta',
+          siteName: data.site_name || 'Trivquest',
           headerAnnouncement: data.header_announcement || '⚡ Win up to 100,000 KES on live speed trivia games!',
           headerAnnouncementEnabled: data.header_announcement_enabled === '1' || data.header_announcement_enabled === true,
           headerBadge: data.header_badge || 'SPEED TRIVIA (+100 XP)',
@@ -511,7 +511,7 @@ export default function App() {
             id: c.id || c.name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
             name: c.name,
             icon: c.icon || match?.icon || '🇰🇪',
-            badge: c.badge || match?.badge || 'LIVE',
+            badge: c.badge || match?.badge || '',
             subtitle: c.subtitle || c.description || match?.subtitle || 'Heritage, Culture & Trivia',
             questionsCount: c.questionsCount || 6,
             durationSeconds: 12,
@@ -903,8 +903,8 @@ export default function App() {
   return (
     <div className={`min-h-screen font-sans antialiased w-full max-w-full transition-colors duration-200 ${
       theme === 'dark'
-        ? 'dark bg-[#050507] black-net text-[#F8FAFC] selection:bg-emerald-500/30 selection:text-emerald-300'
-        : 'bg-[#F4F6F8] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-700'
+        ? 'dark bg-[#070a12] black-net text-[#F8FAFC] selection:bg-emerald-500/30 selection:text-emerald-300'
+        : 'bg-[#F6F8FA] light-mesh text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-700'
     }`}>
       {/* Main Content Layout */}
       <div className={`flex flex-col min-h-screen w-full max-w-full ${!isQuizActive ? 'pb-20 lg:pb-0' : 'pb-0'}`}>

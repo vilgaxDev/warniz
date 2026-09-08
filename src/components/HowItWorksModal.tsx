@@ -35,15 +35,15 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
             exit={{ scale: 0.95, opacity: 0, y: 15 }}
             transition={{ duration: 0.2 }}
             className={`relative z-10 w-full max-w-xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ${
-              isDark ? 'bg-[#121927] border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              isDark ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
             }`}
           >
             {/* Header */}
             <div className={`p-4 sm:p-5 flex items-center justify-between border-b ${
-              isDark ? 'border-slate-800 bg-[#0b101b]' : 'border-slate-100 bg-slate-50'
+              isDark ? 'border-white/5 bg-[#0a0f16]' : 'border-slate-100 bg-slate-50'
             }`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#0070f3] text-white flex items-center justify-center shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
                   <HelpCircle className="w-5 h-5" />
                 </div>
                 <div>
@@ -73,11 +73,11 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
               {/* Interactive Demo Callout Banner */}
               <div className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 ${
                 isDark
-                  ? 'bg-gradient-to-r from-blue-950/60 to-indigo-950/40 border-blue-500/30 text-blue-200'
-                  : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 text-blue-950'
+                  ? 'bg-gradient-to-r from-emerald-950/60 to-teal-950/40 border-emerald-500/30 text-emerald-200'
+                  : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 text-emerald-950'
               }`}>
                 <div className="flex items-center gap-2.5">
-                  <Sparkles className="w-4 h-4 text-blue-500 shrink-0" />
+                  <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span className="font-semibold text-xs">
                     Want to test it risk-free? Try our interactive Demo Mode!
                   </span>
@@ -88,7 +88,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
                       onClose();
                       onLaunchDemo();
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-[#0070f3] hover:bg-[#0060df] text-white font-bold text-xs shrink-0 flex items-center gap-1 shadow-sm cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1 shadow-sm cursor-pointer transition-colors"
                   >
                     <Play className="w-3 h-3 fill-white" />
                     <span>Try Demo</span>
@@ -97,9 +97,9 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
               </div>
 
               <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
-                isDark ? 'bg-[#151d2c] border-slate-800' : 'bg-slate-50 border-slate-200'
+                isDark ? 'bg-[#151d2c]/60 border-slate-800' : 'bg-slate-50 border-slate-200'
               }`}>
-                <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-500 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                   <Clock className="w-4 h-4" />
                 </div>
                 <div>
@@ -113,7 +113,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
               </div>
 
               <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
-                isDark ? 'bg-[#151d2c] border-slate-800' : 'bg-slate-50 border-slate-200'
+                isDark ? 'bg-[#151d2c]/60 border-slate-800' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0 mt-0.5">
                   <Zap className="w-4 h-4" />
@@ -129,7 +129,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
               </div>
 
               <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
-                isDark ? 'bg-[#151d2c] border-slate-800' : 'bg-slate-50 border-slate-200'
+                isDark ? 'bg-[#151d2c]/60 border-slate-800' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
                   <DollarSign className="w-4 h-4" />
@@ -145,7 +145,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
               </div>
 
               <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
-                isDark ? 'bg-[#151d2c] border-slate-800' : 'bg-slate-50 border-slate-200'
+                isDark ? 'bg-[#151d2c]/60 border-slate-800' : 'bg-slate-50 border-slate-200'
               }`}>
                 <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-500 flex items-center justify-center shrink-0 mt-0.5">
                   <ShieldCheck className="w-4 h-4" />
@@ -163,7 +163,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
 
             {/* Footer */}
             <div className={`p-4 border-t flex items-center justify-between ${
-              isDark ? 'border-slate-800 bg-[#0b101b]' : 'border-slate-100 bg-slate-50'
+              isDark ? 'border-white/5 bg-[#0a0f16]' : 'border-slate-100 bg-slate-50'
             }`}>
               <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-semibold">
                 <CheckCircle2 className="w-3.5 h-3.5" />
@@ -171,7 +171,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
               </div>
               <button
                 onClick={onClose}
-                className="py-2 px-5 rounded-xl bg-[#0070f3] hover:bg-[#0060df] text-white font-bold text-xs cursor-pointer shadow-md transition-colors"
+                className="py-2 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer shadow-md transition-colors"
               >
                 Got It, Let's Play!
               </button>

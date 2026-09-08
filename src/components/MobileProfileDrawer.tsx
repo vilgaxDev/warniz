@@ -6,6 +6,7 @@ import {
   Sun, Moon, ShieldCheck, FileText, Zap, Flame
 } from 'lucide-react';
 import { UserProfile, UserState } from '../types';
+import { TrivquestIcon } from './TrivquestLogo';
 
 interface MobileProfileDrawerProps {
   isOpen: boolean;
@@ -83,7 +84,7 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={`relative z-10 w-[62%] max-w-[225px] h-full flex flex-col shadow-2xl border-r overflow-hidden ${
               isDark
-                ? 'bg-[#0a0f19] text-slate-100 border-slate-800'
+                ? 'bg-[#080d14] black-net text-slate-100 border-emerald-950/60'
                 : 'bg-white text-slate-900 border-slate-200'
             }`}
           >
@@ -92,14 +93,10 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
               isDark ? 'border-[#262933] bg-[#0f1117]' : 'border-slate-100 bg-slate-50'
             }`}>
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1px] shadow-xs flex items-center justify-center">
-                  <div className="w-full h-full bg-[#050507] rounded-[5px] flex items-center justify-center">
-                    <div className="w-2.5 h-2.5 bg-gradient-to-tr from-emerald-400 to-teal-300 transform rotate-12 rounded-[1.5px]" />
-                  </div>
-                </div>
+                <TrivquestIcon size={24} />
                 <div>
-                  <div className="font-extrabold text-xs tracking-tight leading-none text-emerald-500">
-                    PREDICTA
+                  <div className="font-black text-xs tracking-tight leading-none text-emerald-400">
+                    TRIVQUEST
                   </div>
                   <div className={`text-[9px] font-semibold uppercase tracking-wider ${
                     isDark ? 'text-slate-400' : 'text-slate-500'
@@ -193,7 +190,7 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
                           onOpenAuth('signup');
                           onClose();
                         }}
-                        className="py-1.5 rounded-lg text-xs font-bold bg-[#0070f3] hover:bg-[#0060df] text-white shadow-xs transition-colors cursor-pointer"
+                        className="py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs transition-colors cursor-pointer"
                       >
                         Sign Up
                       </button>

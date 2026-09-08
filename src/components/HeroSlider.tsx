@@ -31,13 +31,13 @@ const FEATURED_SLIDES: FeaturedSlide[] = [
     title: 'Kenya Heritage, Geography & Safari History Trivia',
     subtitle: 'Test your national knowledge on Kenyan geography, currency, independence history, and world-record athletes.',
     badge: '🇰🇪 LIVE ARENA',
-    badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     rewardPool: 'KSh 75,000 Pool',
     volume: '10 Qs Round',
     participants: 1420,
     endsIn: '4h 12m',
     icon: '🇰🇪',
-    gradient: 'from-blue-950/90 via-slate-900 to-slate-950',
+    gradient: 'from-emerald-950/90 via-slate-900 to-slate-950',
     difficulty: 'Medium',
     questionsCount: 10,
     tags: ['Kenya', 'History', 'Safari'],
@@ -198,8 +198,8 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
                   <span className={`text-[11px] font-semibold px-3 py-1 rounded-full border shadow-2xs uppercase tracking-wider ${
                     hasImage 
                       ? (isDark 
-                          ? 'bg-blue-500/20 text-blue-200 border-blue-500/30 backdrop-blur-md'
-                          : 'bg-blue-500/30 text-blue-700 border-blue-500/40 backdrop-blur-md')
+                          ? 'bg-emerald-500/20 text-emerald-200 border-emerald-500/30 backdrop-blur-md'
+                          : 'bg-emerald-500/30 text-emerald-700 border-emerald-500/40 backdrop-blur-md')
                       : slide.badgeColor
                   }`}>
                     {slide.badge}
@@ -245,8 +245,8 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
                         className={`text-[10px] font-medium px-2 py-0.5 rounded-md ${
                           hasImage
                             ? (isDark
-                                ? 'bg-blue-500/10 text-blue-200 border border-blue-500/20 backdrop-blur-md'
-                                : 'bg-blue-500/20 text-blue-700 border border-blue-500/30 backdrop-blur-md')
+                                ? 'bg-emerald-500/10 text-emerald-200 border border-emerald-500/20 backdrop-blur-md'
+                                : 'bg-emerald-500/20 text-emerald-700 border border-emerald-500/30 backdrop-blur-md')
                             : isDark ? 'bg-[#182030] text-[#94A3B8] border border-[#222C3E]' : 'bg-white text-slate-700 border border-slate-200'
                         }`}
                       >
@@ -306,13 +306,9 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
 
                 <button
                   onClick={() => onPlayCategory(slide.categoryId)}
-                  className={`px-5 sm:px-7 py-2.5 rounded-xl font-semibold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95 ${
-                    isDark
-                      ? 'bg-white hover:bg-slate-100 text-slate-950'
-                      : 'bg-slate-900 hover:bg-slate-800 text-white'
-                  }`}
+                  className="px-5 sm:px-7 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95 bg-emerald-500 hover:bg-emerald-400 text-slate-950 border border-emerald-300 animate-blink-play"
                 >
-                  <Play className={`w-4 h-4 ${isDark ? 'fill-slate-950' : 'fill-white'}`} />
+                  <Play className="w-4 h-4 fill-slate-950" />
                   <span>Start Live Quiz</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </button>
@@ -376,7 +372,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
             onClick={() => setCurrentSlideIndex(idx)}
             className={`h-1.5 rounded-full transition-all cursor-pointer ${
               idx === currentSlideIndex
-                ? 'w-6 bg-blue-600'
+                ? 'w-6 bg-emerald-500'
                 : isDark
                   ? 'w-2 bg-[#222C3E] hover:bg-[#94A3B8]'
                   : 'w-2 bg-slate-300 hover:bg-slate-500'

@@ -196,15 +196,15 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 12 }}
           className={`w-full max-w-3xl rounded-2xl border flex flex-col max-h-[92vh] overflow-hidden shadow-2xl relative ${
-            isDark ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header Bar */}
           <div className={`p-4 sm:p-5 border-b flex items-center justify-between shrink-0 ${
-            isDark ? 'border-[#1A2332] bg-[#0E131F]' : 'border-slate-100 bg-slate-50'
+            isDark ? 'border-white/5 bg-[#0a0f16]/90' : 'border-slate-100 bg-slate-50'
           }`}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 text-2xl flex items-center justify-center shrink-0 shadow-md">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-2xl flex items-center justify-center shrink-0 shadow-md">
                 {userProfile.avatar}
               </div>
               <div>
@@ -212,7 +212,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   <h2 className={`font-semibold text-base sm:text-lg leading-tight ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
                     {userProfile.name}
                   </h2>
-                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 font-semibold uppercase">
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold uppercase">
                     RANK #{userProfile.rank}
                   </span>
                 </div>
@@ -247,13 +247,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
           {/* Navigation Tabs */}
           <div className={`grid grid-cols-4 p-1.5 border-b text-xs font-semibold shrink-0 ${
-            isDark ? 'bg-[#0E131F] border-[#1A2332]' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-[#0a0f16] border-white/5' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               onClick={() => setActiveTab('profile')}
               className={`py-2.5 px-2 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'profile'
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -265,7 +265,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               onClick={() => setActiveTab('wallet')}
               className={`py-2.5 px-2 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'wallet'
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -277,7 +277,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               onClick={() => setActiveTab('questions')}
               className={`py-2.5 px-2 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'questions'
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -289,7 +289,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               onClick={() => setActiveTab('edit')}
               className={`py-2.5 px-2 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5 ${
                 activeTab === 'edit'
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -322,7 +322,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
                       onClick={() => setIsDepositOpen(true)}
-                      className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-colors"
+                      className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Deposit
@@ -352,7 +352,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold block mb-1">
                       Win Accuracy
                     </span>
-                    <div className="text-lg sm:text-xl font-semibold text-blue-500 dark:text-blue-400">
+                    <div className="text-lg sm:text-xl font-semibold text-emerald-400">
                       {accuracyPercent}%
                     </div>
                   </div>
@@ -393,7 +393,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         onClick={() => setTxFilter(filter)}
                         className={`px-2.5 py-1 rounded-lg border font-semibold capitalize cursor-pointer transition-colors ${
                           txFilter === filter
-                            ? 'bg-blue-600 text-white border-blue-600'
+                            ? 'bg-emerald-600 text-white border-emerald-600'
                             : isDark ? 'bg-[#111827] border-[#1A2332] text-slate-400 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-600'
                         }`}
                       >
@@ -420,7 +420,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                             tx.type === 'deposit' || tx.type === 'quiz_reward'
                               ? 'bg-[#22C55E]/15 text-[#22C55E]'
-                              : 'bg-blue-500/15 text-blue-500'
+                              : 'bg-emerald-500/15 text-emerald-400'
                           }`}>
                             {tx.type === 'deposit' || tx.type === 'quiz_reward' ? (
                               <ArrowDownLeft className="w-4 h-4" />
@@ -473,7 +473,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-[10px] px-2 py-0.5 rounded-md font-semibold uppercase bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+                          <span className="text-[10px] px-2 py-0.5 rounded-md font-semibold uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                             {item.category}
                           </span>
                           <span className="text-[11px] text-slate-400 font-medium">
@@ -532,7 +532,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setIsCountryPickerOpen(true)}
-                      className={`w-full p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-between gap-2.5 cursor-pointer transition-all hover:border-blue-500 ${
+                      className={`w-full p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-between gap-2.5 cursor-pointer transition-all hover:border-emerald-500 ${
                         isDark
                           ? 'bg-[#111827] border-[#1A2332] text-slate-100'
                           : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
@@ -541,7 +541,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                       <div className="flex items-center gap-2.5 truncate">
                         <span className="text-2xl shrink-0 drop-shadow-xs">{selectedCountry.flag}</span>
                         <span className="font-semibold truncate text-slate-100">{selectedCountry.name}</span>
-                        <span className="text-[11px] font-mono text-sky-400 shrink-0">({selectedCountry.dialCode})</span>
+                        <span className="text-[11px] font-mono text-emerald-400 shrink-0">({selectedCountry.dialCode})</span>
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0 text-slate-400">
@@ -557,7 +557,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setIsCountryPickerOpen(true)}
-                        className="text-blue-500 dark:text-blue-400 font-semibold hover:underline cursor-pointer"
+                        className="text-emerald-400 font-semibold hover:underline cursor-pointer"
                       >
                         Browse 200+ Countries 🌍
                       </button>
@@ -572,7 +572,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                       type="text"
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-blue-500 ${
+                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 ${
                         isDark ? 'bg-[#111827] border-[#1A2332] text-slate-100' : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
                       }`}
                     />
@@ -586,7 +586,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                       type="email"
                       value={editEmail}
                       onChange={(e) => setEditEmail(e.target.value)}
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-blue-500 ${
+                      className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 ${
                         isDark ? 'bg-[#111827] border-[#1A2332] text-slate-100' : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
                       }`}
                     />
@@ -601,7 +601,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setIsCountryPickerOpen(true)}
-                        className={`h-[42px] px-3 rounded-xl border flex items-center gap-1.5 text-xs font-semibold shrink-0 transition-all cursor-pointer hover:border-blue-500 ${
+                        className={`h-[42px] px-3 rounded-xl border flex items-center gap-1.5 text-xs font-semibold shrink-0 transition-all cursor-pointer hover:border-emerald-500 ${
                           isDark
                             ? 'bg-[#111827] border-[#1A2332] text-slate-100 hover:bg-[#151c2d]'
                             : 'bg-slate-100 border-slate-300 text-slate-800 hover:bg-slate-200 shadow-2xs'
@@ -609,7 +609,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         title="Click to change country flag"
                       >
                         <span className="text-lg leading-none">{selectedCountry.flag}</span>
-                        <span className="font-mono text-sky-400">{selectedCountry.dialCode}</span>
+                        <span className="font-mono text-emerald-400">{selectedCountry.dialCode}</span>
                         <ChevronDown className="w-3 h-3 opacity-60" />
                       </button>
 
@@ -617,7 +617,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         type="tel"
                         value={editPhone}
                         onChange={(e) => setEditPhone(e.target.value)}
-                        className={`flex-1 px-3.5 py-2.5 rounded-xl border text-xs font-medium font-mono focus:outline-hidden focus:ring-2 focus:ring-blue-500 ${
+                        className={`flex-1 px-3.5 py-2.5 rounded-xl border text-xs font-medium font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500 ${
                           isDark ? 'bg-[#111827] border-[#1A2332] text-slate-100' : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
                         }`}
                       />
@@ -630,7 +630,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         Avatar Icon
                       </label>
                       <span className="text-[10px] text-slate-400">
-                        Flag: <strong className="text-blue-500 dark:text-blue-400">{selectedCountry.name} ({selectedCountry.flag})</strong>
+                        Flag: <strong className="text-emerald-400">{selectedCountry.name} ({selectedCountry.flag})</strong>
                       </span>
                     </div>
                     <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
@@ -641,7 +641,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                           onClick={() => setEditAvatar(av)}
                           className={`w-9 h-9 rounded-xl border text-lg flex items-center justify-center shrink-0 cursor-pointer ${
                             editAvatar === av
-                              ? 'bg-blue-600/20 border-blue-500 ring-2 ring-blue-500'
+                              ? 'bg-emerald-600/20 border-emerald-500 ring-2 ring-emerald-500'
                               : isDark ? 'bg-[#111827] border-[#1A2332]' : 'bg-slate-100 border-slate-200'
                           }`}
                         >
@@ -747,7 +747,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             {activeTab === 'terms' && (
               <div className="space-y-4 text-xs leading-relaxed max-w-xl mx-auto">
                 <div className={`flex items-center gap-2 pb-2 border-b ${isDark ? 'border-[#1A2332]' : 'border-slate-200'}`}>
-                  <FileText className="w-4 h-4 text-blue-500" />
+                  <FileText className="w-4 h-4 text-emerald-400" />
                   <h3 className={`font-semibold text-sm ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Terms of Service</h3>
                 </div>
                 <p className={isDark ? 'text-slate-400' : 'text-slate-700'}>1. <strong>Fair Play:</strong> Each question is bound to an immutable countdown clock. Results are settled instantly.</p>
@@ -773,11 +773,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           {isDepositOpen && (
             <div className="absolute inset-0 z-30 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
               <div className={`w-full max-w-md p-5 sm:p-6 rounded-2xl border ${
-                isDark ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100' : 'bg-white border-slate-300 text-slate-900'
+                isDark ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
               }`}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-base flex items-center gap-2 text-slate-100">
-                    <Plus className="w-4 h-4 text-blue-500" />
+                    <Plus className="w-4 h-4 text-emerald-400" />
                     <span>Instant Deposit ({selectedCountry.currency})</span>
                   </h3>
                   <button onClick={() => setIsDepositOpen(false)} className="text-slate-400 hover:text-white cursor-pointer">
@@ -802,7 +802,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                           onClick={() => setDepositAmount(val)}
                           className={`py-1.5 text-xs font-semibold rounded-lg border cursor-pointer ${
                             depositAmount === val
-                              ? 'bg-blue-600 text-white border-blue-600'
+                              ? 'bg-emerald-600 text-white border-emerald-600'
                               : isDark ? 'bg-[#111827] border-[#1A2332] text-slate-400' : 'bg-slate-100 border-slate-200'
                           }`}
                         >
@@ -822,7 +822,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                    className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer transition-colors"
                   >
                     <span>Send Payment Prompt</span>
                   </button>
@@ -835,7 +835,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           {isWithdrawOpen && (
             <div className="absolute inset-0 z-30 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
               <div className={`w-full max-w-md p-5 sm:p-6 rounded-2xl border ${
-                isDark ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100' : 'bg-white border-slate-300 text-slate-900'
+                isDark ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
               }`}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-base flex items-center gap-2 text-slate-100">

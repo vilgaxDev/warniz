@@ -338,7 +338,7 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                 <button
                   type="button"
                   onClick={handleConfirm}
-                  className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:brightness-105 active:scale-[0.99] text-slate-950 font-black text-sm sm:text-base shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer border border-emerald-300 ring-2 ring-emerald-400/20"
+                  className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:brightness-105 active:scale-[0.99] text-slate-950 font-black text-sm sm:text-base shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer border border-emerald-300 ring-2 ring-emerald-400/20 animate-blink-play"
                 >
                   <Play className="w-5 h-5 fill-slate-950 shrink-0" />
                   <span className="truncate">START QUIZ NOW · KSh {numericStake.toLocaleString()}</span>
@@ -394,14 +394,22 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
             }`}>
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <div className={`text-xs font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                    Sample Reward Pipeline
+                  <div className={`text-xs font-bold flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
+                    <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Reward Pipeline</span>
                   </div>
                   <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     Scaled to KSh {numericStake || 20} stake
                   </div>
                 </div>
-                <div className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+
+                {/* Mobile badge indicator */}
+                <div className="sm:hidden flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-400">
+                  <span>Q3 · Q4 · Q5 BOOSTS</span>
+                </div>
+
+                {/* Desktop scroll hint */}
+                <div className={`hidden sm:flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
                   isDark ? 'bg-[#182030] border-slate-700 text-amber-400' : 'bg-white border-slate-200 text-amber-700 shadow-2xs'
                 }`}>
                   <span>Scroll questions</span>
@@ -409,8 +417,76 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                 </div>
               </div>
 
-              {/* Horizontal Question Cards Ribbon */}
-              <div className="flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar snap-x snap-mandatory">
+              {/* MOBILE PIPELINE: Specifically Questions 3, 4, 5 with 2X, 3X, 5X Odds shown clearly */}
+              <div className="grid grid-cols-3 gap-2 sm:hidden pt-0.5">
+                {[3, 4, 5].map((qNum) => {
+                  const stepIndex = qNum - 1;
+                  const step = ladderSteps[stepIndex] || {
+                    questionNumber: qNum,
+                    rewardKsh: qNum === 3 ? 16 : qNum === 4 ? 30 : 60,
+                  };
+                  const multiplier = qNum === 3 ? 2 : qNum === 4 ? 3 : 5;
+                  const multipliedReward = step.rewardKsh * multiplier;
+
+                  const badgeBg =
+                    multiplier === 5
+                      ? 'bg-emerald-400 text-slate-950 ring-1 ring-emerald-300'
+                      : multiplier === 3
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-amber-400 text-slate-950';
+
+                  const cardStyle =
+                    multiplier === 5
+                      ? isDark
+                        ? 'bg-emerald-950/30 border-emerald-500/60 ring-1 ring-emerald-500/30'
+                        : 'bg-emerald-50/90 border-emerald-300 shadow-xs'
+                      : multiplier === 3
+                      ? isDark
+                        ? 'bg-orange-950/20 border-orange-500/50'
+                        : 'bg-orange-50/80 border-orange-300 shadow-xs'
+                      : isDark
+                      ? 'bg-amber-950/20 border-amber-500/50'
+                      : 'bg-amber-50/80 border-amber-300 shadow-xs';
+
+                  return (
+                    <div
+                      key={qNum}
+                      className={`p-2 rounded-xl border text-center transition-all flex flex-col justify-between ${cardStyle}`}
+                    >
+                      {/* Top row: Q number + Odds Pill */}
+                      <div className="flex items-center justify-between gap-1 mb-1">
+                        <span className={`text-[10px] font-black px-1.5 py-0.2 rounded ${
+                          isDark ? 'bg-slate-800/80 text-slate-200' : 'bg-slate-200 text-slate-800'
+                        }`}>
+                          Q{qNum}
+                        </span>
+                        <span className={`text-[9px] px-1.5 py-0.2 rounded font-black tracking-tight shadow-2xs ${badgeBg}`}>
+                          {multiplier}X ODDS
+                        </span>
+                      </div>
+
+                      {/* Main Multiplied Reward Amount */}
+                      <div className={`text-xs xs:text-sm font-black tracking-tight my-1 whitespace-nowrap ${
+                        multiplier === 5
+                          ? 'text-emerald-400'
+                          : multiplier === 3
+                          ? 'text-orange-400'
+                          : 'text-amber-400'
+                      }`}>
+                        KSh {multipliedReward.toLocaleString()}
+                      </div>
+
+                      {/* Base Reward Subtext */}
+                      <div className="text-[8.5px] text-slate-400 font-semibold whitespace-nowrap">
+                        Base KSh {step.rewardKsh}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* DESKTOP PIPELINE: Horizontal Question Cards Ribbon */}
+              <div className="hidden sm:flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar snap-x snap-mandatory">
                 {ladderSteps.slice(0, questionsCount).map((step, idx) => {
                   const mult = getStreakMultiplier(idx);
                   const multipliedReward = step.rewardKsh * mult;
@@ -499,7 +575,7 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
               type="button"
               onClick={handleConfirm}
               disabled={!isBalanceSufficient}
-              className="flex-1 py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-slate-950 border border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500 disabled:border-transparent"
+              className="flex-1 py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-slate-950 border border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500 disabled:border-transparent animate-blink-play"
             >
               <Play className="w-4 h-4 fill-slate-950" />
               <span className="truncate">

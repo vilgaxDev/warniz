@@ -58,16 +58,16 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className={`p-3 sm:p-3.5 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
           isDark
             ? 'bg-[#182030] border-[#222C3E]'
-            : 'bg-blue-50/80 border-blue-200 shadow-xs'
+            : 'bg-emerald-50/80 border-emerald-200 shadow-xs'
         }`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-xl shadow-xs shrink-0 text-white">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-xl shadow-xs shrink-0 text-white">
               {activeSubcategoryMeta.icon}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-black uppercase tracking-wider ${
-                  isDark ? 'text-blue-400' : 'text-blue-600'
+                  isDark ? 'text-emerald-400' : 'text-emerald-600'
                 }`}>
                   Active Filter
                 </span>

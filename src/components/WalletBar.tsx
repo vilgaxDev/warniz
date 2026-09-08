@@ -6,6 +6,7 @@ import {
 import { UserState, UserProfile } from '../types';
 import { ProfileDropdown } from './ProfileDropdown';
 import { SquareCategoryFilter } from './SquareCategoryFilter';
+import { TrivquestLogo } from './TrivquestLogo';
 
 export interface PolymarketCategoryItem {
   id: string;
@@ -103,7 +104,7 @@ export const WalletBar: React.FC<WalletBarProps> = ({
 }) => {
   const isDark = theme === 'dark';
   const cfg = siteConfig ?? {
-    siteName: 'Predicta',
+    siteName: 'Trivquest',
     headerAnnouncement: '⚡ Win up to 100,000 KES on live speed trivia games!',
     headerAnnouncementEnabled: true,
     headerBadge: 'SPEED TRIVIA (+100 XP)',
@@ -116,47 +117,30 @@ export const WalletBar: React.FC<WalletBarProps> = ({
     }`}>
       {/* ANNOUNCEMENT BAR */}
       {cfg.headerAnnouncementEnabled && cfg.headerAnnouncement && (
-        <div className={`w-full text-[11px] font-medium tracking-wide text-center py-1 px-4 truncate border-b ${
-          isDark ? 'bg-[#0E121B] text-slate-300 border-[#222C3E]' : 'bg-slate-100 text-slate-700 border-slate-200'
+        <div className={`w-full text-[11px] font-bold tracking-wide text-center py-1.5 px-4 truncate border-b flex items-center justify-center gap-2 ${
+          isDark
+            ? 'bg-gradient-to-r from-emerald-950 via-[#101c2b] to-emerald-950 text-emerald-300 border-emerald-500/25'
+            : 'bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 text-emerald-900 border-emerald-200'
         }`}>
-          {cfg.headerAnnouncement}
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block shrink-0" />
+          <span className="truncate">{cfg.headerAnnouncement}</span>
+          <span className="hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            FAST PAYOUTS
+          </span>
         </div>
       )}
       {/* 1. TOP MAIN HEADER BAR */}
       <div className={`border-b w-full ${isDark ? 'border-[#222C3E] bg-[#0B0E14]/95' : 'border-slate-200 bg-white/95'}`}>
         <div className="max-w-[1440px] mx-auto px-2.5 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4 relative w-full">
           
-          {/* LEFT: Predicta Trivia Brand Logo & Search Input */}
+          {/* LEFT: Trivquest Brand Logo & Search Input */}
           <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
             {/* Logo Mark */}
             <div
               onClick={() => onSelectSubcategory('all')}
               className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 select-none group"
             >
-              {/* Minimalist Geometric Diamond Mark */}
-              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg p-[1px] shadow-xs flex items-center justify-center transition-transform group-hover:scale-105 border ${
-                isDark ? 'bg-[#182030] border-[#2E3B52]' : 'bg-slate-900 border-slate-900'
-              }`}>
-                <div className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transform rotate-45 rounded-[2px] ${
-                  isDark ? 'bg-white' : 'bg-white'
-                }`} />
-              </div>
-
-              {/* Brand Text */}
-              <span className={`font-black text-base sm:text-xl tracking-tight leading-none ${
-                isDark ? 'text-[#F8FAFC]' : 'text-slate-950'
-              }`}>
-                {cfg.siteName}
-              </span>
-
-              {/* Badge */}
-              {cfg.headerBadge && (
-                <span className={`hidden sm:inline-flex text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-tight leading-tight border ${
-                  isDark ? 'bg-[#182030] text-slate-300 border-[#222C3E]' : 'bg-slate-200 text-slate-800 border-slate-300'
-                }`}>
-                  {cfg.headerBadge}
-                </span>
-              )}
+              <TrivquestLogo size="md" theme={theme} />
             </div>
 
             {/* Desktop / Tablet Search Bar */}
@@ -276,14 +260,14 @@ export const WalletBar: React.FC<WalletBarProps> = ({
                 {/* Wallet Balance Chip */}
                 <div
                   onClick={() => onSelectNav('wallet')}
-                  className={`flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs font-bold cursor-pointer transition-colors ${
+                  className={`flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs font-bold cursor-pointer transition-all ${
                     isDark
-                      ? 'bg-[#0f1117] border-[#262933] hover:border-emerald-500/40 text-[#10B981]'
-                      : 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-emerald-700'
+                      ? 'bg-gradient-to-r from-emerald-950/60 to-[#121f2d] border-emerald-500/40 hover:border-emerald-400 text-emerald-400 shadow-sm shadow-emerald-500/20'
+                      : 'bg-emerald-50 border-emerald-300 hover:bg-emerald-100 text-emerald-800'
                   }`}
                 >
-                  <Wallet className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
-                  <span className="truncate max-w-[85px] sm:max-w-none">
+                  <Wallet className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate max-w-[85px] sm:max-w-none font-mono">
                     KSh {userState.walletBalance.toLocaleString()}
                   </span>
                   {onDepositClick && (
@@ -293,7 +277,7 @@ export const WalletBar: React.FC<WalletBarProps> = ({
                         e.stopPropagation();
                         onDepositClick();
                       }}
-                      className="hidden sm:block p-0.5 rounded-md bg-[#10B981] hover:bg-emerald-400 text-slate-950 font-bold transition-colors cursor-pointer ml-0.5"
+                      className="hidden sm:block p-0.5 rounded-md bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold transition-colors cursor-pointer ml-0.5 shadow-xs"
                       title="Deposit"
                     >
                       <Plus className="w-3 h-3 stroke-[3]" />
@@ -342,15 +326,11 @@ export const WalletBar: React.FC<WalletBarProps> = ({
                   Sign In
                 </button>
 
-                {/* Sign Up Solid Button - Polymarket high-contrast monochrome */}
+                {/* Sign Up Solid Button - High-energy vibrant gradient */}
                 <button
                   type="button"
                   onClick={() => onOpenAuth('signup')}
-                  className={`px-2.5 sm:px-4 py-1.5 rounded-xl font-semibold text-xs transition-all shadow-xs active:scale-95 cursor-pointer whitespace-nowrap ${
-                    isDark
-                      ? 'bg-white hover:bg-slate-100 text-slate-950'
-                      : 'bg-slate-900 hover:bg-slate-800 text-white'
-                  }`}
+                  className="px-3 sm:px-4 py-1.5 rounded-xl font-black text-xs transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 text-slate-950 hover:brightness-110 shadow-emerald-500/25"
                 >
                   Sign Up
                 </button>

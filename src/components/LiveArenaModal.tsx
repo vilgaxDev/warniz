@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { QuizCategory, SpeedMode } from '../types';
+import { CategoryTopicBadge, getCategoryTheme } from '../utils/categoryTheme';
 
 interface LiveArenaModalProps {
   isOpen: boolean;
@@ -209,13 +210,13 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className={`relative z-10 w-full max-w-xl max-h-[92vh] flex flex-col rounded-2xl shadow-2xl border overflow-hidden ${
             isDark
-              ? 'bg-[#0f1117] text-slate-100 border-[#262933]'
+              ? 'bg-[#070a0e] black-net text-slate-100 border-emerald-950/60'
               : 'bg-white text-slate-900 border-slate-200'
           }`}
         >
           {/* 1. MODAL HEADER */}
           <div className={`px-3.5 py-3 sm:px-4 sm:py-3.5 border-b flex items-center justify-between gap-2.5 ${
-            isDark ? 'border-[#262933] bg-[#0c0e14]' : 'border-slate-100 bg-slate-50'
+            isDark ? 'border-white/5 bg-[#0a0f16]/90' : 'border-slate-100 bg-slate-50'
           }`}>
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="relative shrink-0">
@@ -373,7 +374,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                     }`}>
                       Featured Topics ({filteredCategories.length})
                     </span>
-                    <span className="text-[10px] sm:text-[11px] text-blue-400 font-semibold flex items-center gap-1">
+                    <span className="text-[10px] sm:text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
                       <Sparkles className="w-3 h-3" />
                       <span>Tap topic to select</span>
                     </span>
@@ -388,7 +389,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                     <p className="text-xs font-medium text-slate-400">No topics found matching "{searchQuery}"</p>
                     <button
                       onClick={() => setSearchQuery('')}
-                      className="text-xs text-blue-400 hover:underline font-bold cursor-pointer"
+                      className="text-xs text-emerald-400 hover:underline font-bold cursor-pointer"
                     >
                       Clear search filter
                     </button>
@@ -397,53 +398,48 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {filteredCategories.map((cat) => {
                       const isSelected = cat.id === selectedCategoryId;
+                      const themeInfo = getCategoryTheme(cat.id);
                       return (
                         <div
                           key={cat.id}
                           onClick={() => {
                             onSelectCategory(cat.id);
                           }}
-                          className={`p-3 rounded-xl border transition-all cursor-pointer relative group flex items-center gap-3 ${
+                          className={`p-3 rounded-2xl border transition-all cursor-pointer relative group flex items-center gap-3 ${
                             isSelected
                               ? isDark
-                                ? 'bg-[#182338] border-blue-500 ring-2 ring-blue-500/30 shadow-md'
-                                : 'bg-blue-50/90 border-blue-500 ring-2 ring-blue-400/30 shadow-md'
+                                ? `${themeInfo.bgActiveDark} ${themeInfo.borderActive} shadow-lg ring-1 ring-emerald-400/50`
+                                : `${themeInfo.bgActiveLight} border-slate-900 shadow-lg ring-1 ring-slate-900/30`
                               : isDark
-                                ? 'bg-[#121927] border-slate-800 hover:border-slate-700 hover:bg-[#152033]'
+                                ? 'bg-[#101624] border-[#1e283c] hover:border-slate-400 hover:bg-[#151d2f]'
                                 : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-white'
                           }`}
                         >
-                          {/* Icon */}
-                          <div className={`w-11 h-11 rounded-xl border flex items-center justify-center text-xl shrink-0 ${
-                            isDark ? 'bg-[#162033] border-slate-700/80' : 'bg-white border-slate-200 shadow-2xs'
-                          }`}>
-                            {cat.icon}
-                          </div>
+                          {/* High-Resolution Vector Topic Badge */}
+                          <CategoryTopicBadge
+                            categoryId={cat.id}
+                            size="sm"
+                            animated={isSelected}
+                          />
 
                           {/* Details */}
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between gap-1">
-                              <h3 className="font-bold text-xs sm:text-sm truncate">
+                              <h3 className={`font-black text-xs sm:text-sm truncate ${
+                                isSelected ? (isDark ? 'text-white' : 'text-slate-950') : (isDark ? 'text-slate-100' : 'text-slate-900')
+                              }`}>
                                 {cat.name}
                               </h3>
-                              {isSelected ? (
-                                <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs shrink-0 shadow-xs">
-                                  <Check className="w-3 h-3 stroke-[3]" />
+                              {isSelected && (
+                                <span className="w-5 h-5 rounded-full bg-emerald-400 text-slate-950 flex items-center justify-center text-xs shrink-0 shadow-md font-black">
+                                  <Check className="w-3 h-3 stroke-[3.5]" />
                                 </span>
-                              ) : cat.badge ? (
-                                <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider shrink-0 ${
-                                  cat.badge === 'LIVE' || cat.badge === 'HOT'
-                                    ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                                    : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                                }`}>
-                                  {cat.badge}
-                                </span>
-                              ) : null}
+                              )}
                             </div>
                             <p className={`text-[11px] truncate mt-0.5 ${
-                              isDark ? 'text-slate-400' : 'text-slate-500'
+                              isSelected ? (isDark ? 'text-slate-300' : 'text-slate-700') : (isDark ? 'text-slate-400' : 'text-slate-500')
                             }`}>
-                              {cat.subtitle || `${cat.questions.length} Live Questions`}
+                              {cat.subtitle || themeInfo.subtitle}
                             </p>
                           </div>
                         </div>
@@ -478,25 +474,25 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                         className={`p-3.5 rounded-xl border transition-all cursor-pointer relative ${
                           isSelected
                             ? isDark
-                              ? 'bg-[#182338] border-blue-500 ring-2 ring-blue-500/30 shadow-md'
-                              : 'bg-blue-50/90 border-blue-500 ring-2 ring-blue-400/30 shadow-md'
+                              ? 'bg-[#0f1f1d] border-emerald-500 ring-2 ring-emerald-500/30 shadow-md'
+                              : 'bg-emerald-50/90 border-emerald-500 ring-2 ring-emerald-400/30 shadow-md'
                             : isDark
-                              ? 'bg-[#121927] border-slate-800 hover:border-slate-700 hover:bg-[#152033]'
+                              ? 'bg-[#0e131d] border-white/5 hover:border-emerald-700/40 hover:bg-[#141b2b]'
                               : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-white'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2 mb-1">
                           <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-blue-400" />
+                            <Clock className="w-4 h-4 text-emerald-400" />
                             <h3 className="font-bold text-sm">{mode.name}</h3>
                           </div>
 
                           <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                               {mode.badge || `${mode.questionsCount} QUESTIONS`}
                             </span>
                             {isSelected && (
-                              <span className="w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs shrink-0 shadow-xs">
+                              <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs shrink-0 shadow-xs">
                                 <Check className="w-3 h-3 stroke-[3]" />
                               </span>
                             )}
@@ -707,7 +703,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                                 <Check className="w-3 h-3 stroke-[3]" />
                               </span>
                             ) : (
-                              <span className="text-[10px] font-bold text-blue-400 hover:underline">
+                              <span className="text-[10px] font-bold text-emerald-400 hover:underline">
                                 Apply
                               </span>
                             )}
@@ -752,11 +748,11 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
 
           {/* 4. MODAL BOTTOM ACTIONS & LAUNCH CTA */}
           <div className={`p-4 border-t space-y-2 ${
-            isDark ? 'border-slate-800 bg-[#0d1424]' : 'border-slate-100 bg-slate-50'
+            isDark ? 'border-white/5 bg-[#0a0f16]' : 'border-slate-100 bg-slate-50'
           }`}>
             <button
               onClick={handleLaunch}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 active:scale-98 text-white font-extrabold text-sm shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 cursor-pointer transition-all"
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 active:scale-98 text-white font-extrabold text-sm shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>
@@ -768,7 +764,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
 
             <div className="flex items-center justify-between text-[11px] px-1 text-slate-400">
               <span className="flex items-center gap-1">
-                <Users className="w-3 h-3 text-blue-400" />
+                <Users className="w-3 h-3 text-emerald-400" />
                 <span>1,420 players active</span>
               </span>
               <span className="flex items-center gap-1 text-emerald-400 font-semibold">

@@ -33,7 +33,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
 
   return (
     <div className={`w-full rounded-2xl p-4 sm:p-5 border transition-colors flex flex-col justify-between space-y-4 font-sans ${
-      isDark ? 'bg-[#121927] border-slate-800/90' : 'bg-white border-slate-200 shadow-xs'
+      isDark ? 'bg-[#080d14] black-net border-emerald-950/60' : 'bg-white border-slate-200 shadow-xs'
     }`}>
       {/* Leaderboard Header */}
       <div className={`flex items-center justify-between pb-3 border-b ${
@@ -126,25 +126,25 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
       {/* Current User Standing Footer Card */}
       <div className={`p-3 rounded-xl border flex items-center justify-between gap-3 ${
         isDark
-          ? 'bg-[#0070f3]/10 border-[#0070f3]/30 text-slate-100'
-          : 'bg-blue-50 border-blue-200 text-slate-900'
+          ? 'bg-emerald-500/10 border-emerald-500/30 text-slate-100'
+          : 'bg-emerald-50 border-emerald-200 text-slate-900'
       }`}>
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#0070f3] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+          <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
             YOU
           </div>
           <div>
             <div className="font-bold text-xs sm:text-sm leading-tight">
               Your Position (#12)
             </div>
-            <div className={`text-[11px] font-medium ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>
+            <div className={`text-[11px] font-medium ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}>
               Top 8% of all players
             </div>
           </div>
         </div>
 
         <div className="text-right">
-          <div className="font-extrabold text-xs sm:text-sm text-[#0070f3] dark:text-blue-400">
+          <div className="font-extrabold text-xs sm:text-sm text-emerald-600 dark:text-emerald-400">
             KSh {currentUserWinnings.toLocaleString()}
           </div>
           <div className="text-[10px] font-medium text-slate-400">

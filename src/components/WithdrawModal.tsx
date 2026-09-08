@@ -164,12 +164,12 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
         className={`w-full max-w-md rounded-3xl border relative overflow-hidden shadow-2xl my-auto ${
           isDark
-            ? 'bg-[#0B0E14] border-[#1A2332] text-[#F8FAFC]'
+            ? 'bg-[#070a0e] black-net border-emerald-950/60 text-[#F8FAFC]'
             : 'bg-white border-slate-200 text-slate-900'
         }`}
       >
-        {/* Modern Gradient Header — Blue/Indigo for Withdraw */}
-        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 px-5 py-4 text-white flex items-center justify-between relative overflow-hidden">
+        {/* Modern Gradient Header — Emerald/Teal for Withdraw */}
+        <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 px-5 py-4 text-white flex items-center justify-between relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDUpIi8+PC9zdmc+')] opacity-50" />
           <div className="flex items-center gap-3 relative z-10">
             <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl shrink-0 border border-white/20">
@@ -177,8 +177,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-300 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-wider text-blue-100">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-100">
                   Instant Cashout
                 </span>
               </div>
@@ -200,7 +200,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
           {/* Available Balance Banner */}
           {status === 'idle' && (
             <div className={`p-3.5 rounded-2xl border mb-4 flex items-center justify-between ${
-              isDark ? 'bg-[#111827] border-[#1A2332]' : 'bg-blue-50/60 border-blue-100'
+              isDark ? 'bg-[#111827] border-[#1A2332]' : 'bg-emerald-50/60 border-emerald-100'
             }`}>
               <div>
                 <span className={`text-[10px] font-bold uppercase tracking-wider block mb-0.5 ${
@@ -208,14 +208,14 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                 }`}>
                   Available to Withdraw
                 </span>
-                <span className="text-base sm:text-lg font-black text-blue-600 dark:text-blue-400">
+                <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
                   KSh {userState.walletBalance.toLocaleString()}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={handleMaxClick}
-                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase transition-all cursor-pointer shadow-sm shadow-blue-600/20"
+                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-black uppercase transition-all cursor-pointer shadow-sm shadow-emerald-600/20"
               >
                 Max
               </button>
@@ -239,7 +239,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                   isDark ? 'text-slate-300' : 'text-slate-600'
                 }`}>
                   <span>Select Country</span>
-                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase">Auto-Detected</span>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase">Auto-Detected</span>
                 </label>
                 <div className="relative">
                   <select
@@ -253,8 +253,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                     }}
                     className={`w-full pl-3.5 pr-8 py-2.5 rounded-2xl border text-xs sm:text-sm font-bold transition-all outline-none appearance-none cursor-pointer ${
                       isDark
-                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-blue-500'
-                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-500'
+                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-emerald-500'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
                     }`}
                   >
                     {COUNTRY_OPTIONS.map((c) => (
@@ -280,7 +280,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                   </span>
                 </div>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-blue-600 dark:text-blue-400">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-emerald-600 dark:text-emerald-400">
                     KSh
                   </span>
                   <input
@@ -295,8 +295,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                     placeholder="200"
                     className={`w-full pl-12 pr-3.5 py-2.5 rounded-2xl border text-sm font-extrabold transition-all outline-none ${
                       isDark
-                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-blue-500'
-                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-500'
+                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-emerald-500'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
                     }`}
                   />
                 </div>
@@ -312,9 +312,9 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                     onClick={() => handleQuickSelect(amt)}
                     className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                       parsedAmount === amt
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm shadow-emerald-600/20'
                         : isDark
-                        ? 'bg-[#111827] border-[#1A2332] text-slate-300 hover:border-blue-500/50'
+                        ? 'bg-[#111827] border-[#1A2332] text-slate-300 hover:border-emerald-500/50'
                         : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
@@ -344,8 +344,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                     placeholder={selectedCountry.placeholder}
                     className={`w-full pl-11 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                       isDark
-                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-blue-500'
-                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-blue-500'
+                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-emerald-500'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
                     }`}
                   />
                 </div>
@@ -365,7 +365,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                 </div>
                 <div className={`flex justify-between pt-1.5 border-t font-black ${isDark ? 'border-white/5' : 'border-black/5'}`}>
                   <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>You Receive</span>
-                  <span className="text-blue-600 dark:text-blue-400">KSh {parsedAmount.toLocaleString()}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">KSh {parsedAmount.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -373,7 +373,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting || parsedAmount <= 0 || parsedAmount > userState.walletBalance}
-                className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all shadow-lg shadow-emerald-600/20 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <RefreshCw className="w-4 h-4 animate-spin text-white" />
@@ -388,12 +388,12 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
           {/* ─── SUCCESS: RECEIPT ─── */}
           {status === 'success' && (
             <div className="py-2 text-center space-y-4">
-              <div className="w-14 h-14 rounded-full bg-blue-500/15 border border-blue-500/40 text-blue-500 flex items-center justify-center mx-auto shadow-md">
+              <div className="w-14 h-14 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-500 flex items-center justify-center mx-auto shadow-md">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
 
               <div>
-                <h3 className="font-black text-lg text-blue-600 dark:text-blue-400">
+                <h3 className="font-black text-lg text-emerald-600 dark:text-emerald-400">
                   Payout Dispatched!
                 </h3>
                 <p className="text-xs text-slate-500">
@@ -405,7 +405,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
               <div className={`p-3.5 rounded-2xl border text-left text-xs font-mono leading-relaxed ${
                 isDark ? 'bg-[#111827] border-[#1A2332] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}>
-                <div className="flex items-center gap-2 mb-1.5 text-blue-600 dark:text-blue-400 font-sans font-bold text-[11px]">
+                <div className="flex items-center gap-2 mb-1.5 text-emerald-600 dark:text-emerald-400 font-sans font-bold text-[11px]">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Payout Confirmation</span>
                 </div>
@@ -417,7 +417,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider cursor-pointer shadow-lg shadow-blue-600/20"
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs uppercase tracking-wider cursor-pointer shadow-lg shadow-emerald-600/20"
               >
                 Done
               </button>
@@ -429,7 +429,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
         <div className={`px-5 py-3 border-t flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${
           isDark ? 'bg-[#0B0E14] border-[#1A2332] text-slate-500' : 'bg-slate-50 border-slate-100 text-slate-400'
         }`}>
-          <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
           <span>End-to-End Encrypted &bull; 256-Bit SSL</span>
         </div>
       </motion.div>

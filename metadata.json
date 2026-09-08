@@ -1,6 +1,6 @@
 {
-  "name": "ChezaZone Live Quiz Arena",
-  "description": "Polymarket-style prediction and live trivia arena with M-PESA Daraja integration (Paybill, Till, C2B), multi-channel notification engine, marketing email campaigns, promotional banners, and full authentication with branded email templates.",
+  "name": "Trivquest",
+  "description": "Trivquest: Speed trivia and live prediction arena with real-time M-PESA multiplier ladder, 2X, 3X, 5X odds pipeline, and instant payout settling.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

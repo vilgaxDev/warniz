@@ -104,7 +104,7 @@ export const PayoutsSideBar: React.FC<PayoutsSideBarProps> = ({ theme = 'dark' }
         isDark ? 'bg-[#141A26]/80 border-[#222C3E] text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'
       }`}>
         <div className="flex items-center gap-1">
-          <ShieldCheck className="w-3 h-3 text-blue-500" />
+          <ShieldCheck className="w-3 h-3 text-emerald-400" />
           <span>User details encrypted & masked</span>
         </div>
         <span className="text-[9px] text-slate-500 font-mono">256-BIT SSL</span>
@@ -137,7 +137,7 @@ export const PayoutsSideBar: React.FC<PayoutsSideBarProps> = ({ theme = 'dark' }
                   transition={{ duration: 0.25 }}
                   className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2.5 ${
                     isDark
-                      ? 'bg-[#141A26] border-[#222C3E] hover:border-blue-500/40 hover:bg-[#182030]'
+                      ? 'bg-[#141A26] border-[#222C3E] hover:border-emerald-500/40 hover:bg-[#182030]'
                       : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
@@ -184,7 +184,7 @@ export const PayoutsSideBar: React.FC<PayoutsSideBarProps> = ({ theme = 'dark' }
       {/* FOOTER BADGE */}
       <div className={`p-3 border-t text-center ${isDark ? 'border-[#222C3E] bg-[#141A26]' : 'border-slate-200 bg-slate-100'}`}>
         <div className="text-[11px] font-medium text-slate-400 flex items-center justify-center gap-1.5">
-          <Zap className="w-3.5 h-3.5 text-blue-500 fill-blue-500" />
+          <Zap className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
           <span>Play live quiz to cash out directly to M-Pesa</span>
         </div>
       </div>

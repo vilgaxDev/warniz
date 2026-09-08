@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { Sparkles, ShieldCheck, Zap, Wifi, Activity } from 'lucide-react';
+import { TrivquestIcon } from './TrivquestLogo';
 
 interface LoadingScreenProps {
   message?: string;
@@ -8,13 +9,15 @@ interface LoadingScreenProps {
   theme?: 'dark' | 'light';
   fullScreen?: boolean;
   siteName?: string;
+  onFinish?: () => void;
 }
 
 const DEFAULT_MESSAGES = [
-  'Connecting to Live Prediction Markets...',
-  'Preparing 12-Second Speed Trivia...',
-  'Syncing Kenya 254 High-Stakes Arenas...',
-  'Calculating Real-Time M-Pesa Multipliers...',
+  'Initializing Trivquest speed engine...',
+  'Preparing 12-second live arena questions...',
+  'Configuring 2X · 3X · 5X multiplier pipeline...',
+  'Syncing Kenya 254 M-PESA instant payouts...',
+  'Finalizing arena connection...',
 ];
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({
@@ -22,132 +25,154 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
   subMessage,
   theme = 'dark',
   fullScreen = true,
-  siteName = 'CHEZAQUIZ',
+  siteName = 'Trivquest',
 }) => {
   const isDark = theme === 'dark';
   const [activeMessageIndex, setActiveMessageIndex] = useState(0);
+  const [progress, setProgress] = useState(12);
 
+  // Progressive loading simulation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 98) return 98;
+        const jump = Math.floor(Math.random() * 14) + 6;
+        return Math.min(prev + jump, 98);
+      });
+    }, 280);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Cycling status messages
   useEffect(() => {
     if (message) return;
     const interval = setInterval(() => {
       setActiveMessageIndex((prev) => (prev + 1) % DEFAULT_MESSAGES.length);
-    }, 1800);
+    }, 1200);
     return () => clearInterval(interval);
   }, [message]);
 
   const currentStatus = message || DEFAULT_MESSAGES[activeMessageIndex];
 
   const content = (
-    <div className="flex flex-col items-center justify-center p-6 text-center select-none font-sans max-w-sm mx-auto">
-      {/* 1. ANIMATED CHEZAQUIZ LOGO WITH GLOWING ENERGY RINGS */}
-      <div className="relative flex items-center justify-center mb-6">
-        {/* Outer Pulsing Ambient Aura */}
+    <div className="flex flex-col items-center justify-center p-6 text-center select-none font-sans max-w-md mx-auto relative z-10">
+      {/* 1. ANIMATED TRIVQUEST BRAND LOGO CREST */}
+      <div className="relative flex items-center justify-center mb-6 sm:mb-7">
+        {/* Outer Pulsing Emerald Ambient Aura */}
         <motion.div
-          animate={{ scale: [1, 1.25, 1], opacity: [0.3, 0.6, 0.3] }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.35, 0.7, 0.35] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-tr from-blue-600/30 via-indigo-500/30 to-sky-400/20 blur-xl pointer-events-none"
+          className="absolute w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-emerald-600/30 via-teal-500/30 to-emerald-400/20 blur-2xl pointer-events-none"
         />
 
-        {/* Rotating Geometric Energy Ring */}
+        {/* Precision Orbital Ring */}
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-dashed border-blue-500/40 pointer-events-none"
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+          className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-dashed border-emerald-500/40 pointer-events-none"
         />
 
-        {/* Inner Counter-Rotating Ring */}
+        {/* Counter-Rotating Secondary Ring with Radar Notch */}
         <motion.div
           animate={{ rotate: -360 }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-indigo-400/30 pointer-events-none"
-        />
+          transition={{ duration: 14, repeat: Infinity, ease: 'linear' }}
+          className="absolute w-20 h-20 sm:w-22 sm:h-22 rounded-full border border-teal-400/30 pointer-events-none flex items-start justify-center"
+        >
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 -mt-1 shadow-sm shadow-emerald-400" />
+        </motion.div>
 
-        {/* Core Rhombus Logo Box */}
+        {/* Core Trivquest Emblem Box */}
         <motion.div
           animate={{
-            scale: [1, 1.05, 1],
-            rotate: [0, 4, -4, 0],
+            scale: [1, 1.04, 1],
           }}
           transition={{
-            duration: 2.8,
+            duration: 2.4,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 p-[2px] shadow-2xl relative z-10 flex items-center justify-center"
+          className="relative z-10 p-1.5 rounded-2xl bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-emerald-400/20 border border-emerald-400/30 shadow-2xl backdrop-blur-sm"
         >
-          <div className={`w-full h-full rounded-[14px] flex items-center justify-center overflow-hidden ${
-            isDark ? 'bg-[#0B0E14]' : 'bg-white'
-          }`}>
-            <motion.div
-              animate={{ rotate: [12, 24, 12] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 rounded-[4px] shadow-md flex items-center justify-center"
-            >
-              <Zap className="w-3.5 h-3.5 text-white fill-white" />
-            </motion.div>
-          </div>
+          <TrivquestIcon size={56} animated />
         </motion.div>
       </div>
 
-      {/* 2. BRAND TITLE */}
-      <h2 className={`font-black text-lg sm:text-xl tracking-tight uppercase leading-none mb-1.5 ${
-        isDark ? 'text-white' : 'text-slate-950'
-      }`}>
-        {siteName.toUpperCase()}
-      </h2>
+      {/* 2. TRIVQUEST WORDMARK & TAGLINE */}
+      <div className="mb-4">
+        <h1 className="font-black text-2xl sm:text-3xl tracking-tight uppercase leading-none mb-1 flex items-center justify-center">
+          <span className={isDark ? 'text-white' : 'text-slate-950'}>TRIV</span>
+          <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent ml-0.5">
+            QUEST
+          </span>
+        </h1>
 
-      <p className={`text-[11px] font-bold uppercase tracking-widest mb-4 flex items-center justify-center gap-1.5 ${
-        isDark ? 'text-blue-400' : 'text-blue-600'
-      }`}>
-        <Sparkles className="w-3.5 h-3.5 animate-spin" />
-        <span>Instant Knowledge Arena</span>
-      </p>
+        <p className="text-[11px] sm:text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1.5 text-emerald-400">
+          <Sparkles className="w-3.5 h-3.5 animate-spin" />
+          <span>Speed Trivia & Live Prediction Arena</span>
+        </p>
+      </div>
 
-      {/* 3. DYNAMIC STATUS MESSAGE WITH FADE TRANSITION */}
-      <div className="h-8 flex items-center justify-center mb-4">
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={currentStatus}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.25 }}
-            className={`text-xs sm:text-sm font-semibold max-w-xs ${
-              isDark ? 'text-slate-300' : 'text-slate-700'
-            }`}
+      {/* 3. DYNAMIC STATUS & PERCENTAGE TRACKER */}
+      <div className="w-full max-w-xs space-y-2 mb-4">
+        <div className="flex items-center justify-between text-[11px] font-bold px-1">
+          <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Loading Arena</span>
+          <span className="text-emerald-400 font-mono font-black">{progress}%</span>
+        </div>
+
+        {/* Active Progress Bar */}
+        <div className="w-full h-2 rounded-full overflow-hidden bg-black/40 border border-white/10 relative p-0.5">
+          <motion.div
+            style={{ width: `${progress}%` }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 relative shadow-sm shadow-emerald-500/50"
           >
-            {currentStatus}
-          </motion.p>
-        </AnimatePresence>
+            {/* Shimmer light sweep */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-[pulse_1s_infinite]" />
+          </motion.div>
+        </div>
+
+        {/* Active Stage Status with Smooth Fade */}
+        <div className="h-6 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={currentStatus}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.2 }}
+              className={`text-xs font-medium truncate ${
+                isDark ? 'text-slate-300' : 'text-slate-700'
+              }`}
+            >
+              {currentStatus}
+            </motion.p>
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* 4. PROGRESS BAR */}
-      <div className="w-48 sm:w-56 h-1.5 rounded-full overflow-hidden bg-black/20 border border-white/10 relative">
-        <motion.div
-          animate={{
-            x: ['-100%', '100%'],
-          }}
-          transition={{
-            duration: 1.4,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          className="w-1/2 h-full rounded-full bg-gradient-to-r from-transparent via-blue-500 to-emerald-400"
-        />
-      </div>
-
+      {/* Sub message if provided */}
       {subMessage && (
-        <p className={`text-[10px] mt-3 font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p className={`text-[11px] font-medium mb-3 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
           {subMessage}
         </p>
       )}
 
-      {/* 5. FOOTER TRUST BADGE */}
-      <div className={`mt-6 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${
-        isDark ? 'text-slate-400' : 'text-slate-600'
-      }`}>
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-        <span>100% Verified M-Pesa Real-Time Settled</span>
+      {/* 4. FOOTER STATUS & TRUST BADGES */}
+      <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2 border-t border-white/5">
+        <div className={`flex items-center gap-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
+          isDark ? 'bg-[#121722] border-[#222C3E] text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+        }`}>
+          <ShieldCheck className="w-3 h-3 text-emerald-400" />
+          <span>M-PESA Instant Settled</span>
+        </div>
+
+        <div className={`flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+          isDark ? 'bg-[#121722] border-[#222C3E] text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+        }`}>
+          <Activity className="w-3 h-3 text-emerald-400 animate-pulse" />
+          <span>24ms • Live</span>
+        </div>
       </div>
     </div>
   );
@@ -158,9 +183,10 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
 
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center transition-colors backdrop-blur-md ${
-      isDark ? 'bg-[#0B0E14]/95 text-[#F8FAFC]' : 'bg-[#F8FAFC]/95 text-slate-900'
+      isDark ? 'bg-[#050507]/98 black-net text-[#F8FAFC]' : 'bg-[#F8FAFC]/98 text-slate-900'
     }`}>
       {content}
     </div>
   );
 };
+
