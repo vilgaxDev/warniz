@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'motion/react';
-import { UserState, QuizSessionState, NotificationItem, UserProfile, TransactionRecord, QuestionHistoryItem } from './types';
-import { QUIZ_CATEGORIES, SPEED_MODES, REWARD_LADDER, INITIAL_NOTIFICATIONS } from './data/quizData';
+import { UserState, QuizSessionState, NotificationItem, UserProfile, TransactionRecord, QuestionHistoryItem, QuizCategory } from './types';
+import { QUIZ_CATEGORIES, SPEED_MODES, REWARD_LADDER, INITIAL_NOTIFICATIONS, generateRewardLadder, getStreakMultiplier } from './data/quizData';
+import { DEMO_QUESTIONS_BY_CATEGORY } from './data/demoQuestions';
 import { INITIAL_USER_PROFILE, INITIAL_TRANSACTIONS, INITIAL_QUESTION_HISTORY } from './data/userProfileData';
 import { WalletBar } from './components/WalletBar';
 import { HomePage } from './components/HomePage';
@@ -13,8 +14,8 @@ import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { HowItWorksModal } from './components/HowItWorksModal';
 import { DailyRewardsModal } from './components/DailyRewardsModal';
-import { BotTraderModal } from './components/BotTraderModal';
 import { LiveArenaModal } from './components/LiveArenaModal';
+import { QuizEntryModal } from './components/QuizEntryModal';
 import { MobileProfileDrawer } from './components/MobileProfileDrawer';
 import { MobileCategoriesDrawer } from './components/MobileCategoriesDrawer';
 import { DepositModal } from './components/DepositModal';
@@ -27,8 +28,21 @@ export default function App() {
   const [isPageLoading, setIsPageLoading] = useState<boolean>(true);
   const [loadingMessage, setLoadingMessage] = useState<string>('Connecting to Live Prediction Markets...');
 
-  // Theme state ('dark' | 'light') - Default to bright light mode unless user activates dark mode
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  // Theme state ('dark' | 'light') - Default to dark mode or user stored choice, with authentic Polymarket styling
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('player_theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return 'dark';
+  });
+
+  // Synchronize document root classes and colorScheme with theme
+  useEffect(() => {
+    const isDark = theme === 'dark';
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle('light', !isDark);
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
+  }, [theme]);
 
   // Remote site branding/config from admin backend
   const [siteConfig, setSiteConfig] = useState<{
@@ -73,7 +87,6 @@ export default function App() {
   // Polymarket Header Modal States
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState<boolean>(false);
   const [isDailyRewardsOpen, setIsDailyRewardsOpen] = useState<boolean>(false);
-  const [isBotTraderOpen, setIsBotTraderOpen] = useState<boolean>(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState<boolean>(false);
   const [isLiveArenaOpen, setIsLiveArenaOpen] = useState<boolean>(false);
 
@@ -154,7 +167,7 @@ export default function App() {
                 participants: s.participants || 0,
                 endsIn: s.endsIn || '',
                 icon: s.icon || '🎯',
-                gradient: s.gradient || 'from-blue-950/80 via-[#0f172a] to-[#0a0f19]',
+                gradient: s.gradient || 'from-neutral-950 via-zinc-900 to-black',
                 difficulty: s.difficulty || 'Medium',
                 questionsCount: s.questionsCount || 10,
                 tags: Array.isArray(s.tags) ? s.tags : (s.tags ? s.tags.split(',').map((t: string) => t.trim()) : []),
@@ -245,6 +258,10 @@ export default function App() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('kenya');
   const [selectedSpeedModeId, setSelectedSpeedModeId] = useState<string>('3min');
 
+  // Quiz Entry Stake Modal State
+  const [isEntryModalOpen, setIsEntryModalOpen] = useState<boolean>(false);
+  const [entryCategory, setEntryCategory] = useState<QuizCategory>(QUIZ_CATEGORIES[0]);
+
   // Active Quiz Session State
   const [isQuizActive, setIsQuizActive] = useState<boolean>(false);
   const [quizSession, setQuizSession] = useState<QuizSessionState>({
@@ -261,6 +278,8 @@ export default function App() {
     isGameOver: false,
     gameOverReason: null,
     floatingEarnings: [],
+    stakeAmount: 20,
+    rewardLadder: REWARD_LADDER,
   });
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -531,8 +550,20 @@ export default function App() {
     return cat.id === selectedSubcategory;
   });
 
+  // Open the Stake Confirmation Modal before starting a game
+  const handleOpenStakeModal = (catId?: string) => {
+    const targetId = catId || selectedCategoryId;
+    const cat = activeCategoriesList.find((c) => c.id === targetId || c.name.toLowerCase() === targetId.toLowerCase() || c.id.includes(targetId) || targetId.includes(c.id))
+             || QUIZ_CATEGORIES.find((c) => c.id === targetId || c.name.toLowerCase() === targetId.toLowerCase() || c.id.includes(targetId) || targetId.includes(c.id))
+             || QUIZ_CATEGORIES[0];
+
+    setSelectedCategoryId(cat.id);
+    setEntryCategory(cat);
+    setIsEntryModalOpen(true);
+  };
+
   // Start a new Speed Quiz Session - Fetches real questions directly from DB Generator
-  const startQuizSession = async (targetCategoryId?: string, targetSpeedModeId?: string, _stakeTier?: string) => {
+  const startQuizSession = async (targetCategoryId?: string, targetSpeedModeId?: string, stakeAmount: number = 20) => {
     const catId = targetCategoryId || selectedCategoryId;
     const modeId = targetSpeedModeId || selectedSpeedModeId;
 
@@ -544,6 +575,29 @@ export default function App() {
 
     setSelectedCategoryId(cat.id);
     setSelectedSpeedModeId(modeId);
+
+    // Deduct stake from wallet balance if greater than 0
+    if (stakeAmount > 0) {
+      setUserState((prev) => ({
+        ...prev,
+        walletBalance: Math.max(0, prev.walletBalance - stakeAmount),
+        currentWinnings: 0,
+        streak: 0,
+      }));
+
+      const entryTx: TransactionRecord = {
+        id: `tx_${Date.now()}`,
+        type: 'entry_fee',
+        amount: stakeAmount,
+        title: `${cat.name} Speed Quiz Stake`,
+        timestamp: 'Just now',
+        status: 'completed',
+      };
+      setTransactions((prev) => [entryTx, ...prev]);
+    }
+
+    // Dynamic reward ladder scaled to the stake amount!
+    const sessionLadder = generateRewardLadder(stakeAmount, mode.questionsCount);
 
     setLoadingMessage(`Loading ${cat.name} Questions from Database...`);
     setIsPageLoading(true);
@@ -569,7 +623,18 @@ export default function App() {
       clearTimeout(timeoutId);
     }
 
-    // If category has no questions in DB, show 'No questions available at the moment' alert
+    // Fallback to local curated demo questions pool if remote questions are empty
+    if (dbQuestions.length === 0) {
+      if (cat.questions && cat.questions.length > 0) {
+        dbQuestions = cat.questions;
+      } else if (DEMO_QUESTIONS_BY_CATEGORY[cat.id] && DEMO_QUESTIONS_BY_CATEGORY[cat.id].length > 0) {
+        dbQuestions = DEMO_QUESTIONS_BY_CATEGORY[cat.id];
+      } else {
+        dbQuestions = DEMO_QUESTIONS_BY_CATEGORY['kenya'] || [];
+      }
+    }
+
+    // If still no questions available, alert user
     if (dbQuestions.length === 0) {
       setIsPageLoading(false);
       setNoQuestionsCategory(cat.name);
@@ -595,6 +660,8 @@ export default function App() {
         isGameOver: false,
         gameOverReason: null,
         floatingEarnings: [],
+        stakeAmount: stakeAmount,
+        rewardLadder: sessionLadder,
       });
 
       setIsQuizActive(true);
@@ -642,10 +709,17 @@ export default function App() {
     const currentQ = quizSession.questions[quizSession.currentQuestionIndex];
     const isCorrect = index === currentQ.correctIndex;
 
-    const currentLadderStep = REWARD_LADDER[quizSession.currentQuestionIndex] || {
+    const activeLadder = (quizSession.rewardLadder && quizSession.rewardLadder.length > 0)
+      ? quizSession.rewardLadder
+      : REWARD_LADDER;
+
+    const currentLadderStep = activeLadder[quizSession.currentQuestionIndex] || {
       rewardKsh: (quizSession.currentQuestionIndex + 1) * 3,
     };
-    const questionReward = isCorrect ? currentLadderStep.rewardKsh : 0;
+
+    // Calculate streak multiplier: 2 in a row = 2x, 3-4 = 3x, 5+ = 5x
+    const activeMultiplier = getStreakMultiplier(quizSession.streakCount);
+    const questionReward = isCorrect ? Math.round(currentLadderStep.rewardKsh * activeMultiplier) : 0;
 
     const newAccumulated = isCorrect
       ? quizSession.accumulatedWinnings + questionReward
@@ -716,9 +790,17 @@ export default function App() {
         isAnswered: true,
         isCorrect: false,
         streakCount: 0,
-        isGameOver: true,
+        isGameOver: false,
         gameOverReason: 'wrong_answer',
       }));
+
+      // Allow player 1.8s to see feedback & review explanation before opening game-over modal
+      setTimeout(() => {
+        setQuizSession((prev) => ({
+          ...prev,
+          isGameOver: true,
+        }));
+      }, 1800);
     }
   };
 
@@ -765,25 +847,46 @@ export default function App() {
   };
 
   const handleClaimAndContinue = () => {
-    if (quizSession.accumulatedWinnings > 0) {
+    if (quizSession.accumulatedWinnings > 0 && quizSession.gameOverReason !== 'cashed_out') {
       setUserState((prev) => ({
         ...prev,
         walletBalance: prev.walletBalance + quizSession.accumulatedWinnings,
         currentWinnings: 0,
       }));
+
+      const tx: TransactionRecord = {
+        id: `tx_${Date.now()}`,
+        type: 'quiz_reward',
+        amount: quizSession.accumulatedWinnings,
+        title: `Round Payout: ${quizSession.categoryName}`,
+        timestamp: 'Just now',
+        status: 'completed',
+      };
+      setTransactions((prev) => [tx, ...prev]);
     }
     setIsQuizActive(false);
   };
 
   const handlePlayAgain = () => {
-    if (quizSession.accumulatedWinnings > 0) {
+    if (quizSession.accumulatedWinnings > 0 && quizSession.gameOverReason !== 'cashed_out') {
       setUserState((prev) => ({
         ...prev,
         walletBalance: prev.walletBalance + quizSession.accumulatedWinnings,
         currentWinnings: 0,
       }));
+
+      const tx: TransactionRecord = {
+        id: `tx_${Date.now()}`,
+        type: 'quiz_reward',
+        amount: quizSession.accumulatedWinnings,
+        title: `Round Payout: ${quizSession.categoryName}`,
+        timestamp: 'Just now',
+        status: 'completed',
+      };
+      setTransactions((prev) => [tx, ...prev]);
     }
-    startQuizSession();
+    setIsQuizActive(false);
+    handleOpenStakeModal(quizSession.categoryId);
   };
 
   const handleOpenAuthModal = (mode: 'signin' | 'signup' = 'signin') => {
@@ -800,8 +903,8 @@ export default function App() {
   return (
     <div className={`min-h-screen font-sans antialiased w-full max-w-full transition-colors duration-200 ${
       theme === 'dark'
-        ? 'bg-[#0B0E14] text-[#F8FAFC] selection:bg-[#F55129]/30 selection:text-[#F55129]'
-        : 'bg-[#F8FAFC] text-slate-900 selection:bg-[#F55129]/20'
+        ? 'dark bg-[#050507] black-net text-[#F8FAFC] selection:bg-emerald-500/30 selection:text-emerald-300'
+        : 'bg-[#F4F6F8] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-700'
     }`}>
       {/* Main Content Layout */}
       <div className={`flex flex-col min-h-screen w-full max-w-full ${!isQuizActive ? 'pb-20 lg:pb-0' : 'pb-0'}`}>
@@ -821,7 +924,6 @@ export default function App() {
             unreadCount={unreadCount}
             onOpenLeaderboard={handleOpenLeaderboard}
             onOpenHowItWorks={() => setIsHowItWorksOpen(true)}
-            onOpenBotTrader={() => setIsBotTraderOpen(true)}
             onOpenDailyRewards={() => setIsDailyRewardsOpen(true)}
             onDepositClick={handleOpenDepositModal}
             onWithdrawClick={handleOpenWithdrawModal}
@@ -855,7 +957,7 @@ export default function App() {
               onSelectSubcategory={setSelectedSubcategory}
               onSelectCategory={setSelectedCategoryId}
               onSelectSpeedMode={setSelectedSpeedModeId}
-              onPlayCategory={(catId) => startQuizSession(catId)}
+              onPlayCategory={(catId) => handleOpenStakeModal(catId)}
               onOpenLeaderboard={handleOpenLeaderboard}
               onOpenDailyRewards={() => setIsDailyRewardsOpen(true)}
               currentUserWinnings={userState.walletBalance}
@@ -880,7 +982,7 @@ export default function App() {
               accumulatedWinnings={quizSession.accumulatedWinnings}
               streakCount={quizSession.streakCount}
               floatingEarnings={quizSession.floatingEarnings}
-              rewardLadder={REWARD_LADDER}
+              rewardLadder={quizSession.rewardLadder || REWARD_LADDER}
               walletBalance={userState.walletBalance}
               soundEnabled={userState.soundEnabled}
               onToggleSound={handleToggleSound}
@@ -922,6 +1024,7 @@ export default function App() {
           onClaimAndContinue={handleClaimAndContinue}
           onPlayAgain={handlePlayAgain}
           theme={theme}
+          stakeAmount={quizSession.stakeAmount}
         />
       )}
 
@@ -1000,14 +1103,6 @@ export default function App() {
         theme={theme}
       />
 
-      {/* Bot Trader Modal */}
-      <BotTraderModal
-        isOpen={isBotTraderOpen}
-        onClose={() => setIsBotTraderOpen(false)}
-        onRunBotRound={() => startQuizSession('tech_savannah')}
-        theme={theme}
-      />
-
       {/* Login & Registration Modal */}
       <AuthModal
         isOpen={isAuthOpen}
@@ -1076,7 +1171,6 @@ export default function App() {
         onOpenDailyRewards={() => setIsDailyRewardsOpen(true)}
         onOpenLeaderboard={handleOpenLeaderboard}
         onOpenHowItWorks={() => setIsHowItWorksOpen(true)}
-        onOpenBotTrader={() => setIsBotTraderOpen(true)}
         unreadCount={unreadCount}
         theme={theme}
         onToggleTheme={toggleTheme}
@@ -1096,7 +1190,8 @@ export default function App() {
         }}
         onSelectSpeedMode={setSelectedSpeedModeId}
         onPlayCategory={(catId) => {
-          startQuizSession(catId);
+          setIsMobileCategoriesOpen(false);
+          handleOpenStakeModal(catId);
         }}
         theme={theme}
       />
@@ -1115,9 +1210,31 @@ export default function App() {
         }}
         onSelectSpeedMode={setSelectedSpeedModeId}
         onStartQuiz={(catId, modeId, stakeTier) => {
-          startQuizSession(catId, modeId, stakeTier);
+          setIsLiveArenaOpen(false);
+          let stakeVal = 20;
+          if (stakeTier === 'free') stakeVal = 0;
+          else if (stakeTier === 'casual_20') stakeVal = 20;
+          else if (stakeTier === 'pro_50') stakeVal = 50;
+          else if (stakeTier === 'high_100') stakeVal = 100;
+          startQuizSession(catId, modeId, stakeVal);
         }}
         walletBalance={userState.walletBalance}
+        theme={theme}
+      />
+
+      {/* PRE-QUIZ STAKE ENTRY & SPEED MODES MODAL */}
+      <QuizEntryModal
+        isOpen={isEntryModalOpen}
+        onClose={() => setIsEntryModalOpen(false)}
+        category={entryCategory}
+        speedModes={SPEED_MODES}
+        selectedSpeedModeId={selectedSpeedModeId}
+        onSelectSpeedMode={setSelectedSpeedModeId}
+        onConfirmStart={(catId, modeId, stakeAmount) => {
+          startQuizSession(catId, modeId, stakeAmount);
+        }}
+        walletBalance={userState.walletBalance}
+        onOpenDeposit={handleOpenDepositModal}
         theme={theme}
       />
 
@@ -1126,7 +1243,7 @@ export default function App() {
         <nav
           className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden w-full border-t transition-colors backdrop-blur-xl pb-[env(safe-area-inset-bottom)] ${
             theme === 'dark'
-              ? 'bg-[#0B0E14]/95 border-[#222C3E] text-[#F8FAFC]'
+              ? 'bg-[#070709]/95 border-[#262933] text-[#F8FAFC]'
               : 'bg-white/95 border-slate-200 text-slate-900 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]'
           }`}
         >
@@ -1136,14 +1253,14 @@ export default function App() {
               onClick={() => setIsMobileProfileOpen(true)}
               className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-colors cursor-pointer ${
                 theme === 'dark'
-                  ? 'hover:bg-[#182030] text-[#94A3B8] active:text-white'
+                  ? 'hover:bg-zinc-800 text-slate-400 active:text-white'
                   : 'hover:bg-slate-100 text-slate-700 active:text-black'
               }`}
             >
               <div className="relative flex items-center justify-center">
-                <User className="w-4 h-4 text-[#F55129]" />
+                <User className="w-4 h-4 text-slate-400 dark:text-slate-300" />
                 {userProfile.isLoggedIn && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#22C55E] ring-1 ring-[#0B0E14]" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#10B981] ring-1 ring-[#050507]" />
                 )}
               </div>
               <span className="text-[11px] font-bold tracking-tight">Profile</span>
@@ -1155,9 +1272,9 @@ export default function App() {
                 onClick={() => {
                   setIsLiveArenaOpen(true);
                 }}
-                className="w-full max-w-[120px] py-2 px-2.5 rounded-xl text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer bg-[#F55129] hover:bg-[#DB3211] active:scale-95 shadow-[#F55129]/30"
+                className="w-full max-w-[120px] py-2 px-2.5 rounded-xl text-slate-950 font-black text-xs flex items-center justify-center gap-1.5 shadow-md transition-all cursor-pointer bg-emerald-500 hover:bg-emerald-400 active:scale-95 shadow-emerald-500/25 border border-emerald-300"
               >
-                <Play className="w-3.5 h-3.5 fill-white shrink-0" />
+                <Play className="w-3.5 h-3.5 fill-slate-950 shrink-0" />
                 <span className="truncate">Live Arena</span>
               </button>
             </div>
@@ -1167,11 +1284,11 @@ export default function App() {
               onClick={() => setIsMobileCategoriesOpen(true)}
               className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-colors cursor-pointer ${
                 theme === 'dark'
-                  ? 'hover:bg-[#182030] text-[#F55129] active:text-[#E28C6D]'
-                  : 'hover:bg-orange-50 text-[#F55129] active:text-orange-700'
+                  ? 'hover:bg-zinc-800 text-emerald-400 active:text-emerald-300'
+                  : 'hover:bg-emerald-50 text-emerald-600 active:text-emerald-800'
               }`}
             >
-              <Sparkles className="w-4 h-4 text-[#F55129]" />
+              <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
               <span className="text-[11px] font-bold tracking-tight">Topics</span>
             </button>
           </div>
@@ -1192,18 +1309,18 @@ export default function App() {
       {noQuestionsCategory && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs select-none">
           <div className={`w-full max-w-sm p-6 rounded-2xl border shadow-xl text-center font-sans ${
-            theme === 'dark' ? 'bg-[#12100F] border-[#292524] text-[#F5F5F5]' : 'bg-white border-slate-200 text-slate-900'
+            theme === 'dark' ? 'bg-[#0f1117] border-[#262933] text-[#F5F5F5]' : 'bg-white border-slate-200 text-slate-900'
           }`}>
-            <div className="w-12 h-12 rounded-full bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/15 text-emerald-500 flex items-center justify-center mx-auto mb-3">
               <AlertCircle className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold tracking-tight mb-1">No Questions Available</h3>
             <p className="text-xs text-slate-400 mb-5 leading-relaxed">
-              No questions available for <span className="font-semibold text-amber-500">{noQuestionsCategory}</span> at the moment. Please select another category or check back soon!
+              No questions available for <span className="font-semibold text-emerald-400">{noQuestionsCategory}</span> at the moment. Please select another category or check back soon!
             </p>
             <button
               onClick={() => setNoQuestionsCategory(null)}
-              className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-[#F55129] text-white hover:bg-[#d9431f] transition-all shadow-md cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-emerald-500 text-slate-950 font-black hover:bg-emerald-400 transition-all shadow-md cursor-pointer"
             >
               Got It
             </button>

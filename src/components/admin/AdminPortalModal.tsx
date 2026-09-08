@@ -167,7 +167,7 @@ const INITIAL_BANNERS: MarketingBannerItem[] = [
     title: '🔥 KSh 50,000 Kenya Premier Trivia Tournament',
     subtitle: '12-second speed rounds with instant M-Pesa payouts!',
     tag: 'FEATURED TOURNAMENT',
-    bgGradient: 'from-orange-600 via-red-600 to-amber-600',
+    bgGradient: 'from-blue-600 via-indigo-600 to-cyan-600',
     ctaText: 'Enter for KSh 50',
     active: true,
   },
@@ -354,7 +354,7 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
         className={`w-full max-w-5xl rounded-3xl border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] my-auto ${
           isDark
             ? 'bg-[#0B0E14] border-[#222C3E] text-[#F8FAFC]'
-            : 'bg-white border-slate-200 text-slate-900 shadow-orange-500/10'
+            : 'bg-white border-slate-200 text-slate-900 shadow-blue-500/5'
         }`}
       >
         {/* Top Header Bar */}

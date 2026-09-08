@@ -105,6 +105,8 @@ export interface QuizSessionState {
   isGameOver: boolean;
   gameOverReason: 'wrong_answer' | 'timeout' | 'cashed_out' | 'completed' | null;
   floatingEarnings: { id: number; amount: number }[];
+  stakeAmount: number;
+  rewardLadder: RewardStep[];
 }
 
 export interface NotificationItem {

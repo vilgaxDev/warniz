@@ -135,22 +135,32 @@ export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all shrink-0 cursor-pointer relative ${
                   isSelected
                     ? isDark
-                      ? 'bg-[#182030] text-[#F55129] border border-[#F55129]/30 shadow-xs'
-                      : 'bg-orange-50 text-[#F55129] border border-orange-200 shadow-xs'
+                      ? 'bg-[#182030] text-white border border-[#2E3B52] shadow-xs'
+                      : 'bg-slate-900 text-white border border-slate-900 shadow-xs'
                     : isDark
                       ? 'hover:bg-[#182030]/60 hover:text-white text-[#94A3B8]'
-                      : 'hover:bg-slate-100 hover:text-slate-900 text-slate-600'
+                      : 'hover:bg-slate-200 hover:text-slate-950 text-slate-600'
                 }`}
               >
                 {item.icon && <span className="text-sm">{item.icon}</span>}
                 <span>{item.name}</span>
                 {item.badge && (
-                  <span className="text-[9px] px-1.5 py-0.2 rounded-full font-extrabold bg-[#F55129] text-white uppercase tracking-wider">
+                  <span className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold uppercase tracking-wider ${
+                    isSelected
+                      ? isDark
+                        ? 'bg-white/20 text-white'
+                        : 'bg-white/20 text-white'
+                      : isDark
+                        ? 'bg-slate-800 text-slate-300 border border-slate-700'
+                        : 'bg-slate-200 text-slate-700'
+                  }`}>
                     {item.badge}
                   </span>
                 )}
                 {isSelected && (
-                  <span className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#F55129] rounded-full" />
+                  <span className={`absolute bottom-0 left-3 right-3 h-[2px] rounded-full ${
+                    isDark ? 'bg-white' : 'bg-slate-900'
+                  }`} />
                 )}
               </button>
             );

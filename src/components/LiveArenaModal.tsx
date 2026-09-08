@@ -209,18 +209,18 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className={`relative z-10 w-full max-w-xl max-h-[92vh] flex flex-col rounded-2xl shadow-2xl border overflow-hidden ${
             isDark
-              ? 'bg-[#0a0f19] text-slate-100 border-slate-800'
+              ? 'bg-[#0f1117] text-slate-100 border-[#262933]'
               : 'bg-white text-slate-900 border-slate-200'
           }`}
         >
           {/* 1. MODAL HEADER */}
           <div className={`px-3.5 py-3 sm:px-4 sm:py-3.5 border-b flex items-center justify-between gap-2.5 ${
-            isDark ? 'border-slate-800 bg-[#0d1424]' : 'border-slate-100 bg-slate-50'
+            isDark ? 'border-[#262933] bg-[#0c0e14]' : 'border-slate-100 bg-slate-50'
           }`}>
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="relative shrink-0">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-sky-400 p-[1.5px] shadow-sm flex items-center justify-center">
-                  <div className="w-full h-full bg-[#0a0f19] rounded-[10px] flex items-center justify-center">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-400 p-[1.5px] shadow-sm flex items-center justify-center">
+                  <div className="w-full h-full bg-[#050507] rounded-[10px] flex items-center justify-center">
                     <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 fill-amber-400/30" />
                   </div>
                 </div>
@@ -250,7 +250,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
               aria-label="Close Live Arena modal"
               className={`p-1.5 sm:p-2 rounded-xl border transition-colors cursor-pointer shrink-0 ${
                 isDark
-                  ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700'
+                  ? 'bg-zinc-800/80 border-zinc-700 text-slate-300 hover:text-white hover:bg-zinc-700'
                   : 'bg-slate-200 border-slate-300 text-slate-700 hover:text-black hover:bg-slate-300'
               }`}
             >
@@ -260,15 +260,15 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
 
           {/* 2. TAB NAVIGATOR (Topics, Speed Modes, Stakes, Promo Code) */}
           <div className={`px-2 sm:px-3 pt-2 pb-1.5 border-b grid grid-cols-4 gap-1 sm:gap-1.5 ${
-            isDark ? 'border-slate-800 bg-[#090d16]' : 'border-slate-100 bg-slate-50/50'
+            isDark ? 'border-[#262933] bg-[#0c0e14]' : 'border-slate-100 bg-slate-50/50'
           }`}>
             <button
               onClick={() => setActiveTab('topics')}
               className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
                 activeTab === 'topics'
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
                   : isDark
-                    ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    ? 'text-slate-400 hover:text-slate-200 hover:bg-zinc-800/50'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -282,9 +282,9 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
               onClick={() => setActiveTab('modes')}
               className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
                 activeTab === 'modes'
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
                   : isDark
-                    ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    ? 'text-slate-400 hover:text-slate-200 hover:bg-zinc-800/50'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -298,9 +298,9 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
               onClick={() => setActiveTab('stakes')}
               className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
                 activeTab === 'stakes'
-                  ? 'bg-blue-600 text-white shadow-xs'
+                  ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
                   : isDark
-                    ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    ? 'text-slate-400 hover:text-slate-200 hover:bg-zinc-800/50'
                     : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -314,11 +314,11 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
               onClick={() => setActiveTab('promo')}
               className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 relative ${
                 activeTab === 'promo'
-                  ? 'bg-emerald-600 text-white shadow-xs'
+                  ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
                   : appliedPromo
                     ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                     : isDark
-                      ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                      ? 'text-slate-400 hover:text-slate-200 hover:bg-zinc-800/50'
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
@@ -340,7 +340,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
               <div className="space-y-3">
                 {/* STICKY SEARCH INPUT BAR & TOPIC COUNTER */}
                 <div className={`sticky -top-4 -mt-4 pt-4 pb-2.5 z-20 backdrop-blur-md space-y-2 border-b ${
-                  isDark ? 'bg-[#0a0f19]/95 border-slate-800/80' : 'bg-white/95 border-slate-200/80'
+                  isDark ? 'bg-[#0f1117]/95 border-[#262933]' : 'bg-white/95 border-slate-200/80'
                 }`}>
                   <div className="relative">
                     <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
@@ -353,8 +353,8 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                       placeholder="Search topics (e.g., Kenya, EPL, Crypto, AI, Politics)..."
                       className={`w-full pl-9 pr-8 py-2 rounded-xl text-xs sm:text-sm font-medium border outline-hidden transition-colors ${
                         isDark
-                          ? 'bg-[#121927] border-slate-800 text-slate-100 focus:border-blue-500 placeholder-slate-500'
-                          : 'bg-slate-100 border-slate-200 text-slate-900 focus:border-blue-500 placeholder-slate-400'
+                          ? 'bg-[#16181f] border-[#262933] text-slate-100 focus:border-emerald-500 placeholder-slate-500'
+                          : 'bg-slate-100 border-slate-200 text-slate-900 focus:border-emerald-500 placeholder-slate-400'
                       }`}
                     />
                     {searchQuery && (

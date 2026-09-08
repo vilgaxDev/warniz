@@ -351,7 +351,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             className={`w-full max-w-4xl rounded-3xl border shadow-2xl relative overflow-hidden my-auto grid grid-cols-1 md:grid-cols-12 ${
               isDark
                 ? 'bg-[#0B0E14] border-[#222C3E] text-[#F8FAFC]'
-                : 'bg-white border-slate-200 text-slate-900 shadow-orange-500/10'
+                : 'bg-white border-slate-200 text-slate-900 shadow-blue-500/10'
             }`}
           >
             {/* Close Button */}
@@ -421,7 +421,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     }}
                     className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                       mode === 'register'
-                        ? 'bg-[#F55129] text-white shadow-sm'
+                        ? 'bg-blue-600 text-white shadow-sm'
                         : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-950'
                     }`}
                   >
@@ -458,7 +458,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       }}
                       className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         loginInputMode === 'phone'
-                          ? 'bg-[#F55129]/15 text-[#F55129] border border-[#F55129]/30 font-extrabold'
+                          ? 'bg-blue-500/15 text-blue-500 border border-blue-500/30 font-extrabold'
                           : isDark ? 'bg-[#121722] text-slate-400 border border-[#222C3E]' : 'bg-slate-100 text-slate-600 border border-slate-200'
                       }`}
                     >
@@ -473,7 +473,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       }}
                       className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         loginInputMode === 'email'
-                          ? 'bg-[#F55129]/15 text-[#F55129] border border-[#F55129]/30 font-extrabold'
+                          ? 'bg-blue-500/15 text-blue-500 border border-blue-500/30 font-extrabold'
                           : isDark ? 'bg-[#121722] text-slate-400 border border-[#222C3E]' : 'bg-slate-100 text-slate-600 border border-slate-200'
                       }`}
                     >
@@ -513,8 +513,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                             placeholder="712 345 678"
                             className={`w-full pl-10 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                               isDark
-                                ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-[#F55129]'
-                                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#F55129]'
+                                ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-blue-500'
+                                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500'
                             }`}
                           />
                         </div>
@@ -536,8 +536,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           placeholder="Username or Email address"
                           className={`w-full pl-10 pr-3.5 py-3 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                             isDark
-                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-[#F55129]'
-                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#F55129] focus:ring-2 focus:ring-[#F55129]/20'
+                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-blue-500'
+                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
                           }`}
                         />
                       </div>
@@ -560,8 +560,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         placeholder="Password"
                         className={`w-full pl-10 pr-10 py-3 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                           isDark
-                            ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-[#F55129]'
-                            : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#F55129] focus:ring-2 focus:ring-[#F55129]/20'
+                            ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-blue-500'
+                            : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
                         }`}
                       />
                       <button
@@ -579,7 +579,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <label className={`flex items-center gap-2 cursor-pointer font-medium ${
                       isDark ? 'text-slate-400' : 'text-slate-600'
                     }`}>
-                      <input type="checkbox" defaultChecked className="rounded accent-[#F55129]" />
+                      <input type="checkbox" defaultChecked className="rounded accent-blue-600" />
                       <span>Remember me</span>
                     </label>
                     <button
@@ -590,7 +590,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         setErrorMsg('');
                         setSuccessMsg('');
                       }}
-                      className="text-[#F55129] hover:underline font-bold cursor-pointer"
+                      className="text-blue-600 hover:underline font-bold cursor-pointer"
                     >
                       Forgot password?
                     </button>
@@ -662,11 +662,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       onClick={handleQuickDemoLogin}
                       className={`w-full py-2 px-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                         isDark
-                          ? 'bg-[#121722] border-[#222C3E] text-slate-300 hover:border-[#F55129]/50'
-                          : 'bg-orange-50/70 border-orange-200 text-[#F55129] hover:bg-orange-100'
+                          ? 'bg-[#121722] border-[#222C3E] text-slate-300 hover:border-blue-500/50'
+                          : 'bg-blue-50/70 border-blue-200 text-blue-600 hover:bg-blue-100'
                       }`}
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-[#F55129]" />
+                      <Sparkles className="w-3.5 h-3.5 text-blue-500" />
                       <span>⚡ 1-Click Instant Demo Login</span>
                     </button>
                   </div>
@@ -688,8 +688,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           placeholder="Your Full Name / Username"
                           className={`w-full pl-10 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                             isDark
-                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-[#F55129]'
-                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#F55129]'
+                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-blue-500'
+                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500'
                           }`}
                         />
                       </div>
@@ -709,8 +709,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           placeholder="Email Address"
                           className={`w-full pl-10 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                             isDark
-                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-[#F55129]'
-                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#F55129]'
+                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-blue-500'
+                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500'
                           }`}
                         />
                       </div>
@@ -745,8 +745,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                             placeholder="712 345 678 (M-Pesa)"
                             className={`w-full pl-10 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                               isDark
-                                ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-[#F55129]'
-                                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#F55129]'
+                                ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-blue-500'
+                                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500'
                             }`}
                           />
                         </div>
@@ -767,8 +767,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           placeholder="Password (Min 4 chars)"
                           className={`w-full pl-10 pr-10 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                             isDark
-                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-[#F55129]'
-                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-[#F55129]'
+                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-blue-500'
+                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-blue-500'
                           }`}
                         />
                         <button
@@ -784,7 +784,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     {/* Submit Register Button */}
                     <button
                       type="submit"
-                      className="w-full py-3.5 px-4 rounded-2xl bg-[#F55129] hover:bg-[#DB3211] active:bg-[#BA391F] text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md active:scale-98 cursor-pointer mt-2"
+                      className="w-full py-3.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md active:scale-98 cursor-pointer mt-2"
                     >
                       CREATE PREDICTA ACCOUNT
                     </button>
@@ -821,19 +821,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       setErrorMsg('');
                       setSuccessMsg('');
                     }}
-                    className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-[#F55129] font-bold cursor-pointer transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-blue-600 font-bold cursor-pointer transition-colors"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back to Sign In</span>
                   </button>
 
                   <div className="text-center py-4">
-                    <Mail className="w-12 h-12 mx-auto mb-3 text-[#F55129]" />
+                    <Mail className="w-12 h-12 mx-auto mb-3 text-blue-600" />
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
                       Verify Your Email
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                      We've sent a verification link to <span className="font-semibold text-[#F55129]">{regEmail}</span>
+                      We've sent a verification link to <span className="font-semibold text-blue-600">{regEmail}</span>
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-500 mb-6">
                       Please check your inbox and click the link to verify your account. If you don't see it, check your spam folder.
@@ -843,7 +843,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={handleResendVerification}
-                    className="w-full py-3.5 px-4 rounded-2xl border-2 border-[#F55129] text-[#F55129] hover:bg-[#F55129] hover:text-white font-extrabold text-xs tracking-wider uppercase transition-all cursor-pointer"
+                    className="w-full py-3.5 px-4 rounded-2xl border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-extrabold text-xs tracking-wider uppercase transition-all cursor-pointer"
                   >
                     Resend Verification Email
                   </button>
@@ -851,7 +851,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setMode('login')}
-                    className="w-full py-2 px-4 rounded-2xl text-xs text-slate-500 hover:text-[#F55129] font-semibold cursor-pointer transition-colors"
+                    className="w-full py-2 px-4 rounded-2xl text-xs text-slate-500 hover:text-blue-600 font-semibold cursor-pointer transition-colors"
                   >
                     Already verified? Sign In
                   </button>
@@ -866,7 +866,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       setErrorMsg('');
                       setSuccessMsg('');
                     }}
-                    className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-[#F55129] font-bold cursor-pointer transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-blue-600 font-bold cursor-pointer transition-colors"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back to Sign In</span>
@@ -876,7 +876,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <form onSubmit={handleRequestPasswordReset} className="space-y-3.5">
                       <div>
                         <div className="relative">
-                          <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-[#F55129]" />
+                          <Mail className="w-4 h-4 absolute left-3.5 top-3.5 text-blue-600" />
                           <input
                             type="email"
                             value={forgotEmail}
@@ -918,7 +918,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                       <button
                         type="submit"
-                        className="w-full py-3 rounded-2xl bg-[#F55129] text-white font-extrabold text-xs uppercase"
+                        className="w-full py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs uppercase"
                       >
                         Update Password
                       </button>
@@ -933,7 +933,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                           setMode('login');
                           setForgotStep('enter_email');
                         }}
-                        className="text-xs text-[#F55129] font-bold underline"
+                        className="text-xs text-blue-600 font-bold underline"
                       >
                         Sign in with new password
                       </button>
@@ -945,8 +945,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             {/* RIGHT COLUMN: VIBRANT 3D TRIVIA HERO ARTWORK (5 Cols on MD+) */}
             <div className="hidden md:flex md:col-span-5 p-4 sm:p-5 flex-col items-center justify-between relative overflow-hidden">
-              {/* Outer Vibrant Orange Canvas Container */}
-              <div className="w-full h-full rounded-3xl bg-gradient-to-br from-[#DB3211] via-[#F55129] to-[#E28C6D] p-5 text-white flex flex-col justify-between relative overflow-hidden shadow-xl">
+              {/* Outer Vibrant Blue/Indigo Canvas Container */}
+              <div className="w-full h-full rounded-3xl bg-gradient-to-br from-blue-700 via-indigo-600 to-sky-500 p-5 text-white flex flex-col justify-between relative overflow-hidden shadow-xl">
                 
                 {/* Floating Cosmic Geometrics & Stars in Background */}
                 <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-white/10 blur-xl pointer-events-none" />
@@ -973,7 +973,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   >
                     {/* Glowing Aura Ring */}
                     <div className="w-28 h-28 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center p-2 shadow-2xl border border-white/30">
-                      <div className="w-full h-full rounded-full bg-gradient-to-tr from-orange-400 to-amber-200 flex items-center justify-center text-4xl shadow-inner">
+                      <div className="w-full h-full rounded-full bg-gradient-to-tr from-blue-500 to-indigo-400 flex items-center justify-center text-4xl shadow-inner">
                         🧑‍🚀
                       </div>
                     </div>

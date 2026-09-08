@@ -2,19 +2,36 @@
 
 @layer base {
   :root {
-    --bg-main: #0B0E14;
-    --card-surface: #121722;
-    --card-elevated: #182030;
-    --card-hover: #1E283C;
+    --bg-main: #F4F6F8;
+    --card-surface: #FFFFFF;
+    --card-elevated: #F8FAFC;
+    --card-hover: #F1F5F9;
+    --text-primary: #0E1118;
+    --text-muted: #64748B;
+    --text-secondary: #475569;
+    --border-color: #E2E8F0;
+    --primary-bright: #10B981;
+    --primary-dark: #059669;
+    --primary-muted: #047857;
+    --primary-soft: #34D399;
+    --correct-green: #00B074;
+    --wrong-red: #EF4444;
+  }
+
+  .dark, html.dark {
+    --bg-main: #050507;
+    --card-surface: #0f1117;
+    --card-elevated: #16181f;
+    --card-hover: #1c1f28;
     --text-primary: #F8FAFC;
     --text-muted: #94A3B8;
     --text-secondary: #CBD5E1;
-    --border-color: #222C3E;
-    --primary-bright: #F55129;
-    --primary-dark: #DB3211;
-    --primary-muted: #BA391F;
-    --primary-soft: #E28C6D;
-    --correct-green: #22C55E;
+    --border-color: #262933;
+    --primary-bright: #10B981;
+    --primary-dark: #059669;
+    --primary-muted: #047857;
+    --primary-soft: #34D399;
+    --correct-green: #10B981;
     --wrong-red: #EF4444;
   }
 
@@ -26,6 +43,16 @@
     max-width: 100%;
     overflow-x: clip;
   }
+}
+
+/* Authentic Black Net Dark Mesh Pattern */
+.black-net {
+  background-color: #050507;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-attachment: fixed;
 }
 
 /* Predicta / Polymarket Trivia Typographic Hierarchy */

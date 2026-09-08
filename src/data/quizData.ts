@@ -1,17 +1,58 @@
 import { QuizCategory, RewardStep, SpeedMode, NotificationItem } from '../types';
+import { DEMO_QUESTIONS_BY_CATEGORY } from './demoQuestions';
 
 export const REWARD_LADDER: RewardStep[] = [
-  { questionNumber: 1, rewardKsh: 2 },
-  { questionNumber: 2, rewardKsh: 3 },
-  { questionNumber: 3, rewardKsh: 5 },
-  { questionNumber: 4, rewardKsh: 8 },
-  { questionNumber: 5, rewardKsh: 12 },
-  { questionNumber: 6, rewardKsh: 20 },
-  { questionNumber: 7, rewardKsh: 35 },
-  { questionNumber: 8, rewardKsh: 50 },
-  { questionNumber: 9, rewardKsh: 75 },
-  { questionNumber: 10, rewardKsh: 100 },
+  { questionNumber: 1, rewardKsh: 4 },
+  { questionNumber: 2, rewardKsh: 8 },
+  { questionNumber: 3, rewardKsh: 16 },
+  { questionNumber: 4, rewardKsh: 30 },
+  { questionNumber: 5, rewardKsh: 60 },
+  { questionNumber: 6, rewardKsh: 120 },
+  { questionNumber: 7, rewardKsh: 200 },
+  { questionNumber: 8, rewardKsh: 320 },
+  { questionNumber: 9, rewardKsh: 500 },
+  { questionNumber: 10, rewardKsh: 800 },
 ];
+
+/**
+ * Returns the streak multiplier based on consecutive correct answers.
+ * 2 in a row = 2x, 3-4 in a row = 3x, 5+ in a row = 5x.
+ */
+export function getStreakMultiplier(streakCount: number): number {
+  if (streakCount >= 5) return 5;
+  if (streakCount >= 3) return 3;
+  if (streakCount >= 2) return 2;
+  return 1;
+}
+
+/**
+ * Generates dynamic reward ladder steps scaled to the user's entered stake amount.
+ */
+export function generateRewardLadder(stakeKsh: number, totalQuestions: number = 6): RewardStep[] {
+  const safeStake = Math.max(1, stakeKsh || 20);
+  const baseRatios = [0.20, 0.40, 0.80, 1.50, 3.00, 6.00, 10.00, 16.00, 25.00, 40.00];
+
+  return Array.from({ length: totalQuestions }, (_, i) => {
+    const ratio = baseRatios[i] ?? (i + 1) * 3;
+    const rewardKsh = Math.max(1, Math.round(safeStake * ratio));
+    return {
+      questionNumber: i + 1,
+      rewardKsh,
+    };
+  });
+}
+
+/**
+ * Calculates the maximum potential winnings if all questions are answered with consecutive streak multipliers.
+ */
+export function calculatePotentialWinnings(stakeKsh: number, totalQuestions: number = 6): number {
+  const ladder = generateRewardLadder(stakeKsh, totalQuestions);
+  return ladder.reduce((total, step, idx) => {
+    const streak = idx; // 0 for Q1, 1 for Q2, 2 for Q3, 3 for Q4, etc.
+    const mult = getStreakMultiplier(streak);
+    return total + (step.rewardKsh * mult);
+  }, 0);
+}
 
 export const SPEED_MODES: SpeedMode[] = [
   {
@@ -47,7 +88,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🇰🇪',
     badge: 'POPULAR',
     subtitle: 'Heritage, Culture & Wildlife',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.kenya || [],
   },
   {
     id: 'world_cup',
@@ -55,7 +96,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '⚽',
     badge: 'LIVE',
     subtitle: 'FIFA & Global Football',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.world_cup || [],
   },
   {
     id: 'sports',
@@ -63,7 +104,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🏆',
     badge: 'FEATURED',
     subtitle: 'Premier League & Athletics',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.sports || [],
   },
   {
     id: 'tech',
@@ -71,7 +112,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🤖',
     badge: 'HOT',
     subtitle: 'Silicon Savannah & AI',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.tech || [],
   },
   {
     id: 'finance',
@@ -79,7 +120,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '📈',
     badge: 'VERIFIED',
     subtitle: 'Markets, Banking & CBK',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.finance || [],
   },
   {
     id: 'geopolitics',
@@ -87,7 +128,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🌍',
     badge: 'GLOBAL',
     subtitle: 'World Wonders & Treaties',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.geopolitics || [],
   },
   {
     id: 'crypto',
@@ -95,7 +136,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '⚡',
     badge: 'WEB3',
     subtitle: 'Blockchain & Digital Assets',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.crypto || [],
   },
   {
     id: 'politics',
@@ -103,7 +144,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🏛️',
     badge: 'GOVERNANCE',
     subtitle: 'World Leaders & Civic Affairs',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.politics || [],
   },
   {
     id: 'esports',
@@ -111,7 +152,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🎮',
     badge: 'GAMING',
     subtitle: 'Competitive Gaming & Consoles',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.esports || [],
   },
   {
     id: 'entertainment',
@@ -119,7 +160,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🎬',
     badge: 'ARTS',
     subtitle: 'Cinema, Music & Pop Culture',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.entertainment || [],
   },
   {
     id: 'general',
@@ -127,7 +168,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🧠',
     badge: 'KNOWLEDGE',
     subtitle: 'Science & World Facts',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.general || [],
   },
   {
     id: 'trending',
@@ -135,7 +176,7 @@ export const QUIZ_CATEGORIES: QuizCategory[] = [
     icon: '🔥',
     badge: 'HOT',
     subtitle: 'Viral Facts & Speed Records',
-    questions: [],
+    questions: DEMO_QUESTIONS_BY_CATEGORY.trending || [],
   },
 ];
 

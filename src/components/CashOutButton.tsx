@@ -5,21 +5,27 @@ interface CashOutButtonProps {
   currentWinnings: number;
   onCashOut: () => void;
   disabled?: boolean;
+  theme?: 'dark' | 'light';
 }
 
 export const CashOutButton: React.FC<CashOutButtonProps> = ({
   currentWinnings,
   onCashOut,
   disabled = false,
+  theme = 'dark',
 }) => {
+  const isDark = theme === 'dark';
+
   return (
     <button
       onClick={onCashOut}
       disabled={disabled}
       className={`w-full py-3.5 px-4 rounded-xl font-semibold text-xs sm:text-sm transition-all flex items-center justify-between gap-2 border cursor-pointer font-sans shadow-md ${
         currentWinnings > 0
-          ? 'bg-[#22C55E] hover:bg-[#22C55E]/90 text-[#080403] border-[#22C55E] active:scale-[0.99]'
-          : 'bg-[#181513] hover:bg-[#1A1715] text-[#9CA3AF] border-[#292524]'
+          ? 'bg-[#10B981] hover:bg-emerald-400 text-slate-950 border-[#10B981] active:scale-[0.99]'
+          : isDark
+          ? 'bg-[#121722] hover:bg-[#182030] text-slate-400 border-[#222C3E]'
+          : 'bg-slate-100 hover:bg-slate-200 text-slate-500 border-slate-200'
       } disabled:opacity-50 disabled:cursor-not-allowed`}
     >
       <div className="flex items-center gap-2">

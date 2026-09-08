@@ -58,20 +58,20 @@ export const HomePage: React.FC<HomePageProps> = ({
         <div className={`p-3 sm:p-3.5 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
           isDark
             ? 'bg-[#182030] border-[#222C3E]'
-            : 'bg-orange-50/80 border-orange-200 shadow-xs'
+            : 'bg-blue-50/80 border-blue-200 shadow-xs'
         }`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F55129] to-[#E28C6D] flex items-center justify-center text-xl shadow-xs shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-xl shadow-xs shrink-0 text-white">
               {activeSubcategoryMeta.icon}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-black uppercase tracking-wider ${
-                  isDark ? 'text-[#F55129]' : 'text-[#F55129]'
+                  isDark ? 'text-blue-400' : 'text-blue-600'
                 }`}>
                   Active Filter
                 </span>
-                <span className="text-[10px] px-2 py-0.2 rounded-full font-bold bg-[#22C55E]/15 text-[#22C55E] border border-[#22C55E]/30">
+                <span className="text-[10px] px-2 py-0.2 rounded-full font-bold bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30">
                   {categories.length} {categories.length === 1 ? 'Category' : 'Categories'} Matching
                 </span>
               </div>
@@ -106,7 +106,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <MarketSlider
             title="Featured Quiz Challenges"
             subtitle="High-stakes speed trivia with live prize pools"
-            icon={<Flame className="w-4.5 h-4.5 fill-[#DB3211] text-[#F55129]" />}
+            icon={<Flame className="w-4.5 h-4.5 fill-rose-500 text-rose-500" />}
             markets={TRENDING_QUIZZES}
             onPlayMarket={onPlayCategory}
             theme={theme}
@@ -115,7 +115,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           <MarketSlider
             title="Sports & Premier League Tournaments"
             subtitle="Test your football history, records, and club knowledge"
-            icon={<Trophy className="w-4.5 h-4.5 text-[#E28C6D]" />}
+            icon={<Trophy className="w-4.5 h-4.5 text-amber-500" />}
             markets={SPORTS_QUIZZES}
             onPlayMarket={onPlayCategory}
             theme={theme}

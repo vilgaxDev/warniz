@@ -9,6 +9,7 @@ import { QuizTimer } from './QuizTimer';
 import { RewardLadder } from './RewardLadder';
 import { AnswerOption } from './AnswerOption';
 import { CashOutButton } from './CashOutButton';
+import { getStreakMultiplier } from '../data/quizData';
 
 interface QuestionCardProps {
   categoryName: string;
@@ -58,7 +59,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   const isDark = theme === 'dark';
   const optionLabels = ['A', 'B', 'C', 'D'];
   const progressPercent = Math.min(100, Math.max(0, ((currentQuestionIndex + 1) / totalQuestions) * 100));
-  const currentReward = rewardLadder[currentQuestionIndex]?.rewardKsh || (currentQuestionIndex + 1) * 3;
+  const currentStreakMultiplier = getStreakMultiplier(streakCount);
+  const baseReward = rewardLadder[currentQuestionIndex]?.rewardKsh || (currentQuestionIndex + 1) * 3;
+  const currentReward = Math.round(baseReward * currentStreakMultiplier);
   const totalLivePurse = walletBalance + accumulatedWinnings;
 
   // Local state to show confirmation if user clicks leave
@@ -180,8 +183,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400">
                   <span>Live Wallet Purse</span>
                   {streakCount > 1 && (
-                    <span className="flex items-center gap-0.5 px-1.5 py-0.2 rounded-full bg-orange-500/20 text-orange-400 font-extrabold border border-orange-500/30 animate-pulse">
-                      <Flame className="w-3 h-3 fill-orange-400 text-orange-400" />
+                    <span className="flex items-center gap-0.5 px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold border border-emerald-500/30 animate-pulse">
+                      <Flame className="w-3 h-3 fill-emerald-400 text-emerald-400" />
                       <span>{streakCount}X STREAK</span>
                     </span>
                   )}
@@ -216,6 +219,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               }`}>
                 <Zap className="w-3.5 h-3.5 fill-current" />
                 <span>+KSh {currentReward}</span>
+                {currentStreakMultiplier > 1 && (
+                  <span className="ml-1 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-black border border-amber-500/40">
+                    {currentStreakMultiplier}X MULT
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -223,7 +231,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           {/* Micro Progress Bar */}
           <div className="w-full mt-3 rounded-full h-1.5 overflow-hidden bg-black/20 border border-white/5">
             <div
-              className="bg-gradient-to-r from-[#F55129] to-emerald-500 h-1.5 rounded-full transition-all duration-300 ease-out"
+              className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300 ease-out"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -237,6 +245,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           streakCount={streakCount}
           totalQuestions={totalQuestions}
           rewardLadder={rewardLadder}
+          theme={theme}
         />
       </div>
 
@@ -248,18 +257,21 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             secondsLeft={timerSeconds}
             totalSeconds={12}
             soundEnabled={soundEnabled}
+            theme={theme}
           />
         </div>
 
         {/* Question Text Box */}
         <div className={`w-full p-4 sm:p-6 rounded-2xl border flex flex-col items-center justify-center text-center shadow-lg transition-all ${
           isDark
-            ? 'bg-gradient-to-b from-[#182030] to-[#121722] border-[#222C3E]'
+            ? 'bg-[#121722] border-[#222C3E]'
             : 'bg-white border-slate-200 shadow-md'
         }`}>
-          <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-[#F55129] mb-1.5 flex items-center gap-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Question {currentQuestionIndex + 1}</span>
+          <span className={`text-[10px] sm:text-xs font-semibold uppercase tracking-widest mb-1.5 flex items-center gap-1 ${
+            isDark ? 'text-slate-400' : 'text-slate-500'
+          }`}>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>Question {currentQuestionIndex + 1} of {totalQuestions}</span>
           </span>
 
           <h2 className={`text-base sm:text-xl font-bold leading-snug tracking-tight max-w-xl mx-auto ${
@@ -321,6 +333,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           currentWinnings={accumulatedWinnings}
           onCashOut={onCashOut}
           disabled={isAnswered}
+          theme={theme}
         />
       </footer>
 

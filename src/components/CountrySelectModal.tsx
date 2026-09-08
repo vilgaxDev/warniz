@@ -389,16 +389,16 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
           exit={{ opacity: 0, scale: 0.96, y: 10 }}
           className={`w-full max-w-2xl rounded-3xl border shadow-2xl overflow-hidden flex flex-col max-h-[85vh] transition-all ${
             isDark
-              ? 'bg-[#0E121B] border-[#222C3E] text-[#F8FAFC] shadow-orange-500/5'
-              : 'bg-white border-orange-200 text-slate-900 shadow-2xl shadow-orange-500/10'
+              ? 'bg-[#0E121B] border-[#222C3E] text-[#F8FAFC] shadow-blue-500/5'
+              : 'bg-white border-slate-200 text-slate-900 shadow-2xl shadow-slate-900/10'
           }`}
         >
           {/* Header */}
           <div className={`p-4 border-b flex items-center justify-between gap-3 ${
-            isDark ? 'border-[#222C3E] bg-[#141A26]' : 'border-orange-200 bg-orange-50/80'
+            isDark ? 'border-[#222C3E] bg-[#141A26]' : 'border-slate-200 bg-slate-50'
           }`}>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-[#F55129] text-white flex items-center justify-center text-sm font-bold shadow-md shadow-[#F55129]/30">
+              <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-md shadow-blue-600/30">
                 <Globe className="w-4 h-4" />
               </div>
               <div>
@@ -414,8 +414,8 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
               onClick={onClose}
               className={`p-1.5 rounded-xl border transition-all cursor-pointer active:scale-95 ${
                 isDark
-                  ? 'bg-[#1E2638] border-[#222C3E] text-slate-400 hover:text-white hover:border-[#F55129]'
-                  : 'bg-white border-orange-200 text-slate-500 hover:text-slate-900 hover:border-[#F55129]'
+                  ? 'bg-[#1E2638] border-[#222C3E] text-slate-400 hover:text-white hover:border-blue-500'
+                  : 'bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:border-blue-500'
               }`}
             >
               <X className="w-4 h-4" />
@@ -423,25 +423,25 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
           </div>
 
           {/* Search Bar */}
-          <div className={`p-3 border-b ${isDark ? 'border-[#222C3E] bg-[#0E121B]' : 'border-orange-200 bg-white'}`}>
+          <div className={`p-3 border-b ${isDark ? 'border-[#222C3E] bg-[#0E121B]' : 'border-slate-200 bg-white'}`}>
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#F55129]" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-500" />
               <input
                 type="text"
                 autoFocus
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search country, dial code or currency (e.g. Kenya, +254, XOF, KES, NGN)..."
-                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs font-semibold focus:outline-none focus:border-[#F55129] focus:ring-2 focus:ring-[#F55129]/20 transition-all ${
+                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs font-semibold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all ${
                   isDark
                     ? 'bg-[#141A26] border-[#222C3E] text-white placeholder-slate-500'
-                    : 'bg-orange-50/40 border-orange-200 text-slate-900 placeholder-slate-400 focus:bg-white'
+                    : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white'
                 }`}
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#F55129] hover:underline"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-blue-600 hover:underline"
                 >
                   Clear
                 </button>
@@ -451,8 +451,8 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
             {/* Quick Popular Pills */}
             {!searchQuery && (
               <div className="mt-2.5">
-                <div className="text-[10px] font-extrabold uppercase tracking-wider text-[#F55129] mb-1.5 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-[#F55129]" />
+                <div className="text-[10px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1.5 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3 text-blue-500" />
                   <span>Popular Regions</span>
                 </div>
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
@@ -465,10 +465,10 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
                       }}
                       className={`px-2.5 py-1 rounded-xl border text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer active:scale-95 ${
                         selectedCountryCode === c.code
-                          ? 'bg-[#F55129] text-white border-[#F55129] shadow-sm shadow-[#F55129]/30'
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/30'
                           : isDark
-                          ? 'bg-[#141A26] border-[#222C3E] text-slate-300 hover:text-white hover:border-[#F55129]/50'
-                          : 'bg-orange-50/60 border-orange-200 text-slate-700 hover:bg-orange-100 hover:border-[#F55129]'
+                          ? 'bg-[#141A26] border-[#222C3E] text-slate-300 hover:text-white hover:border-blue-500/50'
+                          : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-blue-50 hover:border-blue-300'
                       }`}
                     >
                       <span className="text-sm">{c.flag}</span>
@@ -483,11 +483,11 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
 
           {/* Table Header Columns */}
           <div className={`px-4 py-2.5 border-b grid grid-cols-12 gap-2 text-[11px] font-black uppercase tracking-wider ${
-            isDark ? 'border-[#222C3E] bg-[#141A26] text-orange-400' : 'border-orange-200 bg-orange-100/70 text-orange-950'
+            isDark ? 'border-[#222C3E] bg-[#141A26] text-blue-400' : 'border-slate-200 bg-slate-100 text-slate-700'
           }`}>
             <div className="col-span-5 flex items-center gap-1">
               <span>Country</span>
-              <span className="text-[10px] text-[#F55129] font-black">↑</span>
+              <span className="text-[10px] text-blue-600 font-black">↑</span>
             </div>
             <div className="col-span-2 text-center">
               <span>Currency</span>
@@ -501,7 +501,7 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
           <div className="p-2.5 overflow-y-auto flex-1 space-y-2 custom-scrollbar">
             {filteredCountries.length === 0 ? (
               <div className="p-8 text-center text-xs text-slate-400">
-                <Globe className="w-8 h-8 mx-auto mb-2 opacity-40 text-[#F55129]" />
+                <Globe className="w-8 h-8 mx-auto mb-2 opacity-40 text-blue-500" />
                 <p className="font-semibold">No countries matching "{searchQuery}"</p>
                 <p className="text-[11px] mt-1 opacity-70">Try searching by country name, currency or dial code.</p>
               </div>
@@ -521,11 +521,11 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
                     className={`w-full p-3 rounded-xl border grid grid-cols-12 gap-2 items-center text-left transition-all cursor-pointer active:scale-[0.99] ${
                       isSelected
                         ? isDark
-                          ? 'bg-[#F55129]/20 border-[#F55129] text-white ring-1 ring-[#F55129]/50 shadow-md shadow-[#F55129]/10'
-                          : 'bg-orange-50 border-[#F55129] text-orange-950 ring-1 ring-[#F55129]/50 shadow-sm'
+                          ? 'bg-blue-600/20 border-blue-500 text-white ring-1 ring-blue-500/50 shadow-md shadow-blue-500/10'
+                          : 'bg-blue-50 border-blue-600 text-slate-950 ring-1 ring-blue-500/50 shadow-sm'
                         : isDark
-                        ? 'bg-[#141A26]/90 border-[#222C3E] hover:bg-[#1E2638] hover:border-[#F55129]/50 text-white'
-                        : 'bg-white border-slate-200 hover:bg-orange-50/60 hover:border-orange-300 text-slate-900 shadow-2xs'
+                        ? 'bg-[#141A26]/90 border-[#222C3E] hover:bg-[#1E2638] hover:border-blue-500/50 text-white'
+                        : 'bg-white border-slate-200 hover:bg-blue-50/60 hover:border-blue-300 text-slate-900 shadow-2xs'
                     }`}
                   >
                     {/* Country Flag & Name */}
@@ -542,14 +542,14 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
                       )}
                       <div className="min-w-0">
                         <span className="font-extrabold text-xs sm:text-sm truncate block">{country.name}</span>
-                        <span className="text-[10px] font-mono font-bold opacity-75 block text-[#F55129]">{country.dialCode}</span>
+                        <span className="text-[10px] font-mono font-bold opacity-75 block text-blue-600 dark:text-blue-400">{country.dialCode}</span>
                       </div>
                     </div>
 
                     {/* Currency */}
                     <div className="col-span-2 text-center">
                       <span className={`px-2.5 py-1 rounded-lg border text-[11px] sm:text-xs font-mono font-black inline-block ${
-                        isDark ? 'bg-[#F55129]/15 border-[#F55129]/30 text-[#F55129]' : 'bg-orange-100 border-orange-300 text-[#F55129]'
+                        isDark ? 'bg-blue-500/15 border-blue-500/30 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-600'
                       }`}>
                         {country.currencyCode || country.currency}
                       </span>
@@ -567,9 +567,9 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
 
           {/* Footer */}
           <div className={`p-3 border-t text-center text-[11px] font-bold flex items-center justify-center gap-2 ${
-            isDark ? 'border-[#222C3E] bg-[#141A26] text-slate-400' : 'border-orange-200 bg-orange-50/80 text-slate-600'
+            isDark ? 'border-[#222C3E] bg-[#141A26] text-slate-400' : 'border-slate-200 bg-slate-50 text-slate-600'
           }`}>
-            <Globe className="w-3.5 h-3.5 text-[#F55129]" />
+            <Globe className="w-3.5 h-3.5 text-blue-500" />
             <span>Supported across all African regions and global payment gateways</span>
           </div>
         </motion.div>

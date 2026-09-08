@@ -57,8 +57,8 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
           {icon && (
             <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shrink-0 border shadow-xs ${
               isDark
-                ? 'bg-[#182030] border-[#222C3E] text-[#F55129]'
-                : 'bg-white border-slate-200 text-[#F55129] shadow-2xs'
+                ? 'bg-[#16181f] border-[#262933] text-emerald-400'
+                : 'bg-emerald-50 border-emerald-100 text-emerald-600 shadow-2xs'
             }`}>
               {icon}
             </div>
@@ -84,7 +84,7 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
             aria-label="Scroll left"
             className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
               isDark
-                ? 'bg-[#121722] border-[#222C3E] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#182030]'
+                ? 'bg-[#0f1117] border-[#262933] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#16181f]'
                 : 'bg-white border-slate-200 text-slate-700 hover:text-black hover:bg-slate-100 shadow-2xs'
             }`}
           >
@@ -95,7 +95,7 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
             aria-label="Scroll right"
             className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
               isDark
-                ? 'bg-[#121722] border-[#222C3E] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#182030]'
+                ? 'bg-[#0f1117] border-[#262933] text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#16181f]'
                 : 'bg-white border-slate-200 text-slate-700 hover:text-black hover:bg-slate-100 shadow-2xs'
             }`}
           >
@@ -110,10 +110,10 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
         className="grid grid-flow-col auto-cols-[minmax(260px,1fr)] sm:auto-cols-[minmax(280px,1fr)] lg:grid-flow-row lg:grid-cols-4 gap-3 sm:gap-3.5 overflow-x-auto lg:overflow-visible pb-1.5 pt-0.5 px-0.5 no-scrollbar scroll-smooth snap-x"
       >
         {markets.map((m) => {
-          let badgeStyles = 'bg-[#F55129]/15 text-[#F55129] border-[#F55129]/30';
-          if (m.badgeType === 'hot') badgeStyles = 'bg-[#DB3211]/15 text-[#F55129] border-[#DB3211]/30';
+          let badgeStyles = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+          if (m.badgeType === 'hot') badgeStyles = 'bg-rose-500/15 text-rose-400 border-rose-500/30';
           if (m.badgeType === 'jackpot') badgeStyles = 'bg-amber-500/15 text-amber-400 border-amber-500/30';
-          if (m.badgeType === 'live') badgeStyles = 'bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/30';
+          if (m.badgeType === 'live') badgeStyles = 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/30';
 
           return (
             <div
@@ -121,8 +121,8 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
               onClick={() => onPlayMarket(m.categoryId)}
               className={`w-full snap-start p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between group relative ${
                 isDark
-                  ? 'bg-[#121722] border-[#222C3E] hover:border-[#F55129]/40 hover:bg-[#182030]'
-                  : 'bg-white border-slate-200 hover:border-orange-400/60 hover:shadow-md'
+                  ? 'bg-[#0f1117] border-[#262933] hover:border-emerald-500/40 hover:bg-[#16181f]'
+                  : 'bg-white border-slate-200 hover:border-emerald-500/50 hover:shadow-md'
               }`}
             >
               {/* Card Top: Icon Tile, Tag & Badges */}
@@ -131,7 +131,7 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
                   <div className="flex items-center gap-2">
                     {/* Consistent Rounded Icon Container Tile */}
                     <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-base shrink-0 border transition-transform group-hover:scale-105 shadow-2xs ${
-                      isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-slate-100 border-slate-200'
+                      isDark ? 'bg-[#16181f] border-[#262933]' : 'bg-slate-100 border-slate-200'
                     }`}>
                       {m.icon}
                     </div>
@@ -148,7 +148,7 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
                 </div>
 
                 {/* Challenge Title */}
-                <h4 className={`font-semibold text-xs sm:text-sm leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover:text-[#F55129] transition-colors ${
+                <h4 className={`font-semibold text-xs sm:text-sm leading-snug line-clamp-2 min-h-[2.5rem] mb-3 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors ${
                   isDark ? 'text-[#F8FAFC]' : 'text-slate-900'
                 }`}>
                   {m.title}
@@ -156,9 +156,9 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
 
                 {/* Info Bar */}
                 <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs mb-3 ${
-                  isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-[#16181f] border-[#262933]' : 'bg-slate-50 border-slate-200'
                 }`}>
-                  <span className="text-[#E28C6D] font-semibold">{m.pool}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">{m.pool}</span>
                   <span className={`flex items-center gap-1 ${isDark ? 'text-[#94A3B8]' : 'text-slate-500'}`}>
                     <Clock className="w-3 h-3 text-[#94A3B8]" />
                     <span>{m.endsIn}</span>
@@ -173,9 +173,13 @@ export const MarketSlider: React.FC<MarketSliderProps> = ({
                     e.stopPropagation();
                     onPlayMarket(m.categoryId);
                   }}
-                  className="w-full py-2 px-3 rounded-xl bg-[#F55129] hover:bg-[#DB3211] active:scale-[0.98] text-white font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  className={`w-full py-2 px-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-[0.98] ${
+                    isDark
+                      ? 'bg-[#16181f] hover:bg-[#20242e] text-slate-100 border border-[#262933]'
+                      : 'bg-slate-900 hover:bg-slate-800 text-white'
+                  }`}
                 >
-                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <Play className={`w-3.5 h-3.5 ${isDark ? 'fill-slate-100' : 'fill-white'}`} />
                   <span>Play Live Quiz</span>
                 </button>
               </div>

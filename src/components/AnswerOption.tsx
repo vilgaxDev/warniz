@@ -30,8 +30,8 @@ export const AnswerOption: React.FC<AnswerOptionProps> = ({
 
   // Base Styling
   let buttonStyle = isDark
-    ? 'bg-[#182030] border-[#222C3E] text-slate-100 hover:border-[#F55129]/60 hover:bg-[#1f2a40]'
-    : 'bg-white border-slate-200 text-slate-900 hover:border-orange-400 hover:bg-orange-50/50 shadow-xs';
+    ? 'bg-[#182030] border-[#222C3E] text-slate-100 hover:border-slate-400 hover:bg-[#1f2a40]'
+    : 'bg-white border-slate-200 text-slate-900 hover:border-slate-400 hover:bg-slate-50 shadow-xs';
   
   let badgeStyle = isDark
     ? 'bg-[#121722] text-slate-300 border-[#222C3E]'

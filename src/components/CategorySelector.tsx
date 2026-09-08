@@ -37,7 +37,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           isDark ? 'border-[#222C3E]' : 'border-slate-100'
         }`}>
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-[#F55129]" />
+            <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <h2 className={`font-bold text-sm sm:text-base tracking-tight ${
               isDark ? 'text-[#F8FAFC]' : 'text-slate-900'
             }`}>
@@ -61,10 +61,10 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 className={`p-3.5 rounded-xl border transition-all cursor-pointer relative ${
                   isSelected
                     ? isDark
-                      ? 'bg-[#182030] border-[#F55129] ring-2 ring-[#F55129]/30'
-                      : 'bg-orange-50/80 border-[#F55129] ring-2 ring-orange-400/30'
+                      ? 'bg-[#182030] border-slate-300 ring-1 ring-slate-400/40 shadow-xs'
+                      : 'bg-slate-50 border-slate-900 ring-1 ring-slate-900/30 shadow-xs'
                     : isDark
-                      ? 'bg-[#182030]/60 border-[#222C3E] hover:border-[#F55129]/40 hover:bg-[#182030]'
+                      ? 'bg-[#182030]/60 border-[#222C3E] hover:border-slate-400 hover:bg-[#182030]'
                       : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
                 }`}
               >
@@ -72,12 +72,14 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                   <span className={`font-semibold text-xs sm:text-sm flex items-center gap-1.5 ${
                     isDark ? 'text-[#F8FAFC]' : 'text-slate-900'
                   }`}>
-                    <Zap className="w-3.5 h-3.5 text-[#E28C6D]" />
+                    <Zap className="w-3.5 h-3.5 text-amber-500" />
                     {mode.name}
                   </span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-md font-semibold uppercase tracking-wider ${
                     isSelected
-                      ? 'bg-[#F55129] text-white'
+                      ? isDark
+                        ? 'bg-white text-slate-950 font-bold'
+                        : 'bg-slate-900 text-white font-bold'
                       : isDark
                         ? 'bg-[#121722] border border-[#222C3E] text-[#94A3B8]'
                         : 'bg-slate-200 text-slate-700'
@@ -104,7 +106,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           isDark ? 'border-[#222C3E]' : 'border-slate-100'
         }`}>
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#F55129]" />
+            <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <h2 className={`font-bold text-sm sm:text-base tracking-tight ${
               isDark ? 'text-[#F8FAFC]' : 'text-slate-900'
             }`}>
@@ -133,16 +135,18 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between relative group ${
                   isSelected
                     ? isDark
-                      ? 'bg-[#182030] border-[#F55129] ring-2 ring-[#F55129]/40 shadow-lg -translate-y-0.5'
-                      : 'bg-orange-50/90 border-[#F55129] ring-2 ring-orange-400/40 shadow-lg -translate-y-0.5'
+                      ? 'bg-[#182030] border-slate-300 ring-1 ring-slate-400/40 shadow-md -translate-y-0.5'
+                      : 'bg-white border-slate-900 ring-1 ring-slate-900/30 shadow-md -translate-y-0.5'
                     : isDark
-                      ? 'bg-[#182030]/60 border-[#222C3E] hover:border-[#F55129]/40 hover:bg-[#182030]'
+                      ? 'bg-[#182030]/60 border-[#222C3E] hover:border-slate-400 hover:bg-[#182030]'
                       : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-slate-100'
                 }`}
               >
                 {/* Active Indicator Badge */}
                 {isSelected && (
-                  <div className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-md font-extrabold uppercase tracking-wider bg-[#F55129] text-white shadow-xs flex items-center gap-1">
+                  <div className={`absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider shadow-xs flex items-center gap-1 ${
+                    isDark ? 'bg-white text-slate-950' : 'bg-slate-900 text-white'
+                  }`}>
                     <Check className="w-3 h-3 stroke-[3]" />
                     <span>SELECTED</span>
                   </div>
@@ -151,9 +155,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                 <div>
                   <div className="flex items-center gap-3 mb-3">
                     {/* Square App Icon Tile */}
-                    <div className={`w-14 h-14 rounded-2xl relative flex items-center justify-center shrink-0 shadow-md overflow-hidden group-hover:scale-105 transition-transform ${
-                      isSelected ? 'ring-2 ring-[#F55129]' : ''
-                    }`}>
+                    <div className="w-14 h-14 rounded-2xl relative flex items-center justify-center shrink-0 shadow-md overflow-hidden group-hover:scale-105 transition-transform">
                       <div className={`absolute inset-0 bg-gradient-to-br ${gradient}`} />
                       <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
                       <div className="absolute inset-0 rounded-2xl border border-white/20 pointer-events-none" />
@@ -196,7 +198,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                     isDark ? 'bg-[#121722] border-[#222C3E] text-[#94A3B8]' : 'bg-white border-slate-200 text-slate-700'
                   }`}>
                     <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-[#E28C6D]" />
+                      <Clock className="w-3 h-3 text-slate-400" />
                       <span>{activeSpeed.questionsCount} Qs</span>
                     </span>
                     <span className="font-semibold text-[#22C55E]">12s Countdown</span>
@@ -209,9 +211,11 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                     }}
                     className={`w-full py-2.5 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
                       isSelected
-                        ? 'bg-[#F55129] hover:bg-[#DB3211] active:bg-[#BA391F] text-white'
+                        ? isDark
+                          ? 'bg-white hover:bg-slate-100 text-slate-950'
+                          : 'bg-slate-900 hover:bg-slate-800 text-white'
                         : isDark
-                          ? 'bg-[#121722] border border-[#222C3E] text-[#F8FAFC] hover:border-[#F55129]/40 hover:bg-[#182030]'
+                          ? 'bg-[#121722] border border-[#222C3E] text-[#F8FAFC] hover:border-slate-400 hover:bg-[#182030]'
                           : 'bg-white border border-slate-200 text-slate-800 hover:bg-slate-100'
                     }`}
                   >

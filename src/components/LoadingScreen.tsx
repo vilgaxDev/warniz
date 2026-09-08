@@ -45,21 +45,21 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
         <motion.div
           animate={{ scale: [1, 1.25, 1], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-tr from-[#DB3211]/30 via-[#F55129]/30 to-[#E28C6D]/20 blur-xl pointer-events-none"
+          className="absolute w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-tr from-blue-600/30 via-indigo-500/30 to-sky-400/20 blur-xl pointer-events-none"
         />
 
         {/* Rotating Geometric Energy Ring */}
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-dashed border-[#F55129]/40 pointer-events-none"
+          className="absolute w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-dashed border-blue-500/40 pointer-events-none"
         />
 
         {/* Inner Counter-Rotating Ring */}
         <motion.div
           animate={{ rotate: -360 }}
           transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-[#E28C6D]/30 pointer-events-none"
+          className="absolute w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-indigo-400/30 pointer-events-none"
         />
 
         {/* Core Rhombus Logo Box */}
@@ -73,7 +73,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-[#DB3211] via-[#F55129] to-[#E28C6D] p-[2px] shadow-2xl relative z-10 flex items-center justify-center"
+          className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 p-[2px] shadow-2xl relative z-10 flex items-center justify-center"
         >
           <div className={`w-full h-full rounded-[14px] flex items-center justify-center overflow-hidden ${
             isDark ? 'bg-[#0B0E14]' : 'bg-white'
@@ -81,7 +81,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
             <motion.div
               animate={{ rotate: [12, 24, 12] }}
               transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-              className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-tr from-[#F55129] via-[#DB3211] to-[#E28C6D] rounded-[4px] shadow-md flex items-center justify-center"
+              className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 rounded-[4px] shadow-md flex items-center justify-center"
             >
               <Zap className="w-3.5 h-3.5 text-white fill-white" />
             </motion.div>
@@ -97,7 +97,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
       </h2>
 
       <p className={`text-[11px] font-bold uppercase tracking-widest mb-4 flex items-center justify-center gap-1.5 ${
-        isDark ? 'text-[#F55129]' : 'text-orange-600'
+        isDark ? 'text-blue-400' : 'text-blue-600'
       }`}>
         <Sparkles className="w-3.5 h-3.5 animate-spin" />
         <span>Instant Knowledge Arena</span>
@@ -132,7 +132,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          className="w-1/2 h-full rounded-full bg-gradient-to-r from-transparent via-[#F55129] to-emerald-400"
+          className="w-1/2 h-full rounded-full bg-gradient-to-r from-transparent via-blue-500 to-emerald-400"
         />
       </div>
 

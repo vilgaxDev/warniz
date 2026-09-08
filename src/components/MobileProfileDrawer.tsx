@@ -20,7 +20,6 @@ interface MobileProfileDrawerProps {
   onOpenDailyRewards: () => void;
   onOpenLeaderboard: () => void;
   onOpenHowItWorks: () => void;
-  onOpenBotTrader: () => void;
   unreadCount: number;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
@@ -39,7 +38,6 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
   onOpenDailyRewards,
   onOpenLeaderboard,
   onOpenHowItWorks,
-  onOpenBotTrader,
   unreadCount,
   theme,
   onToggleTheme,
@@ -91,16 +89,16 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
           >
             {/* 1. TOP HEADER */}
             <div className={`p-3 border-b flex items-center justify-between gap-2 ${
-              isDark ? 'border-slate-800 bg-[#0d1424]' : 'border-slate-100 bg-slate-50'
+              isDark ? 'border-[#262933] bg-[#0f1117]' : 'border-slate-100 bg-slate-50'
             }`}>
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-blue-600 to-sky-400 p-[1px] shadow-xs flex items-center justify-center">
-                  <div className="w-full h-full bg-[#0a0f19] rounded-[5px] flex items-center justify-center">
-                    <div className="w-2.5 h-2.5 bg-gradient-to-tr from-blue-500 to-sky-300 transform rotate-12 rounded-[1.5px]" />
+                <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1px] shadow-xs flex items-center justify-center">
+                  <div className="w-full h-full bg-[#050507] rounded-[5px] flex items-center justify-center">
+                    <div className="w-2.5 h-2.5 bg-gradient-to-tr from-emerald-400 to-teal-300 transform rotate-12 rounded-[1.5px]" />
                   </div>
                 </div>
                 <div>
-                  <div className="font-extrabold text-xs tracking-tight leading-none text-[#F55129]">
+                  <div className="font-extrabold text-xs tracking-tight leading-none text-emerald-500">
                     PREDICTA
                   </div>
                   <div className={`text-[9px] font-semibold uppercase tracking-wider ${
@@ -116,7 +114,7 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
                 aria-label="Close Profile Menu"
                 className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
                   isDark
-                    ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:text-white'
+                    ? 'bg-zinc-800/80 border-zinc-700 text-slate-300 hover:text-white'
                     : 'bg-slate-200 border-slate-300 text-slate-700 hover:text-black'
                 }`}
               >
@@ -128,16 +126,16 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
             <div className="flex-1 overflow-y-auto p-3 space-y-3">
               {/* User Identity Card */}
               <div className={`p-3 rounded-xl border transition-colors ${
-                isDark ? 'bg-[#121927] border-slate-800' : 'bg-slate-50 border-slate-200 shadow-2xs'
+                isDark ? 'bg-[#16181f] border-[#262933]' : 'bg-slate-50 border-slate-200 shadow-2xs'
               }`}>
                 {userProfile.isLoggedIn ? (
                   <div className="space-y-2.5">
                     <div className="flex items-center gap-2.5">
                       <div className="relative shrink-0">
-                        <div className="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 shadow-xs">
+                        <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-xs">
                           <User className="w-4.5 h-4.5" />
                         </div>
-                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0a0f19]" />
+                        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#050507]" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1">
@@ -154,7 +152,7 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
 
                     {/* Streak & Level Bar */}
                     <div className={`p-2 rounded-lg border flex items-center justify-between text-[11px] ${
-                      isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-white border-slate-200'
+                      isDark ? 'bg-[#0f1117] border-[#262933]' : 'bg-white border-slate-200'
                     }`}>
                       <div className="flex items-center gap-1 text-amber-400 font-bold">
                         <Flame className="w-3.5 h-3.5 fill-amber-400" />
@@ -167,7 +165,7 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
                   </div>
                 ) : (
                   <div className="text-center py-1.5 space-y-2">
-                    <div className="w-9 h-9 mx-auto rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                    <div className="w-9 h-9 mx-auto rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                       <User className="w-4.5 h-4.5" />
                     </div>
                     <div>
@@ -309,28 +307,12 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
                     onClose();
                   }}
                   className={`w-full p-2.5 flex items-center justify-between text-xs font-semibold transition-colors cursor-pointer ${
-                    isDark ? 'hover:bg-slate-800/60' : 'hover:bg-slate-50'
+                    isDark ? 'hover:bg-zinc-800/60' : 'hover:bg-slate-50'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <HelpCircle className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                    <HelpCircle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span className="truncate">How It Works</span>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    onOpenBotTrader();
-                    onClose();
-                  }}
-                  className={`w-full p-2.5 flex items-center justify-between text-xs font-semibold transition-colors cursor-pointer ${
-                    isDark ? 'hover:bg-slate-800/60' : 'hover:bg-slate-50'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Zap className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                    <span className="truncate">Bot Trader AI</span>
                   </div>
                   <ChevronRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                 </button>
@@ -338,17 +320,17 @@ export const MobileProfileDrawer: React.FC<MobileProfileDrawerProps> = ({
 
               {/* Theme & Preferences */}
               <div className={`p-2.5 rounded-xl border flex items-center justify-between ${
-                isDark ? 'bg-[#121927] border-slate-800' : 'bg-white border-slate-200'
+                isDark ? 'bg-[#16181f] border-[#262933]' : 'bg-white border-slate-200'
               }`}>
                 <div className="flex items-center gap-2">
-                  {isDark ? <Moon className="w-3.5 h-3.5 text-indigo-400" /> : <Sun className="w-3.5 h-3.5 text-amber-500" />}
+                  {isDark ? <Moon className="w-3.5 h-3.5 text-amber-400" /> : <Sun className="w-3.5 h-3.5 text-amber-500" />}
                   <span className="text-xs font-semibold">{isDark ? 'Dark' : 'Light'}</span>
                 </div>
                 <button
                   onClick={onToggleTheme}
                   className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer ${
                     isDark
-                      ? 'bg-slate-800 border-slate-700 text-amber-400 hover:bg-slate-700'
+                      ? 'bg-zinc-800 border-zinc-700 text-amber-400 hover:bg-zinc-700'
                       : 'bg-slate-100 border-slate-200 text-slate-800 hover:bg-slate-200'
                   }`}
                 >

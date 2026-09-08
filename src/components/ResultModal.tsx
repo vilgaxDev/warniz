@@ -12,6 +12,7 @@ interface ResultModalProps {
   onClaimAndContinue: () => void;
   onPlayAgain: () => void;
   theme?: 'dark' | 'light';
+  stakeAmount?: number;
 }
 
 export const ResultModal: React.FC<ResultModalProps> = ({
@@ -24,6 +25,7 @@ export const ResultModal: React.FC<ResultModalProps> = ({
   onClaimAndContinue,
   onPlayAgain,
   theme = 'dark',
+  stakeAmount = 0,
 }) => {
   const isDark = theme === 'dark';
   const isVictory = reason === 'completed' || reason === 'cashed_out';
@@ -122,31 +124,61 @@ export const ResultModal: React.FC<ResultModalProps> = ({
         </div>
 
         {/* Mini Performance Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 w-full mb-6">
-          <div className={`p-3 rounded-xl border ${
+        <div className={`grid ${stakeAmount > 0 ? 'grid-cols-4' : 'grid-cols-2'} gap-2 w-full mb-6 text-center`}>
+          {stakeAmount > 0 && (
+            <div className={`p-2.5 rounded-xl border ${
+              isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className={`text-[10px] uppercase tracking-wider font-semibold ${
+                isDark ? 'text-slate-400' : 'text-slate-600'
+              }`}>Stake</div>
+              <div className={`text-sm font-bold mt-0.5 ${
+                isDark ? 'text-slate-200' : 'text-slate-900'
+              }`}>
+                KSh {stakeAmount}
+              </div>
+            </div>
+          )}
+
+          <div className={`p-2.5 rounded-xl border ${
             isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className={`text-[10px] uppercase tracking-wider font-semibold ${
               isDark ? 'text-slate-400' : 'text-slate-600'
             }`}>Correct</div>
-            <div className={`text-lg font-bold mt-0.5 ${
+            <div className={`text-sm font-bold mt-0.5 ${
               isDark ? 'text-slate-100' : 'text-slate-900'
             }`}>
-              {questionsCorrect} <span className={`text-xs font-normal ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>/ {totalQuestions}</span>
+              {questionsCorrect}/{totalQuestions}
             </div>
           </div>
 
-          <div className={`p-3 rounded-xl border ${
+          <div className={`p-2.5 rounded-xl border ${
             isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}>
             <div className={`text-[10px] uppercase tracking-wider font-semibold ${
               isDark ? 'text-slate-400' : 'text-slate-600'
-            }`}>Best Streak</div>
-            <div className="text-lg font-bold text-amber-500 mt-0.5 flex items-center justify-center gap-1">
-              <Flame className="w-4 h-4 fill-amber-500" />
-              <span>{maxStreak}</span>
+            }`}>Peak Mult</div>
+            <div className="text-sm font-bold text-amber-500 mt-0.5 flex items-center justify-center gap-0.5">
+              <Flame className="w-3.5 h-3.5 fill-amber-500" />
+              <span>{maxStreak >= 5 ? '5x' : maxStreak >= 3 ? '3x' : maxStreak >= 2 ? '2x' : '1x'}</span>
             </div>
           </div>
+
+          {stakeAmount > 0 && (
+            <div className={`p-2.5 rounded-xl border ${
+              isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <div className={`text-[10px] uppercase tracking-wider font-semibold ${
+                isDark ? 'text-slate-400' : 'text-slate-600'
+              }`}>Net P&L</div>
+              <div className={`text-sm font-extrabold mt-0.5 ${
+                totalWon >= stakeAmount ? 'text-emerald-400' : 'text-rose-400'
+              }`}>
+                {totalWon >= stakeAmount ? `+${(totalWon - stakeAmount)}` : `-${(stakeAmount - totalWon)}`}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* CTA Buttons */}
@@ -165,7 +197,11 @@ export const ResultModal: React.FC<ResultModalProps> = ({
 
           <button
             onClick={onClaimAndContinue}
-            className="flex-1 py-3 px-4 rounded-xl bg-[#0070f3] hover:bg-[#0060df] text-white font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
+            className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md ${
+              isDark
+                ? 'bg-white hover:bg-slate-100 text-slate-950'
+                : 'bg-slate-900 hover:bg-slate-800 text-white'
+            }`}
           >
             <span>Claim & Lobby</span>
             <ArrowRight className="w-3.5 h-3.5" />
