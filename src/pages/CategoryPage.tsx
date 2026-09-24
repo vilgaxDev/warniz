@@ -187,10 +187,13 @@ export default function CategoryPage({
         }));
 
         setSubcategories(filteredCategories);
-      } catch (err) {
-        console.error('Error fetching subcategories:', err);
-        setError('Failed to load categories. Please try again.');
-        setSubcategories([]);
+      } catch {
+        // Fallback to static quiz categories gracefully
+        const fallback = QUIZ_CATEGORIES.map((c) => ({
+          ...c,
+          questionCount: c.questions?.length || 10,
+        }));
+        setSubcategories(fallback);
       } finally {
         setLoading(false);
       }
@@ -221,47 +224,49 @@ export default function CategoryPage({
 
   return (
     <div className={`min-h-screen flex flex-col ${isDark ? 'bg-[#0B0E14]' : 'bg-slate-50'}`}>
-      {/* Header */}
-      <WalletBar
-        userState={userState}
-        userProfile={actualUserProfile}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        selectedSubcategory={selectedCategory || 'all'}
-        onSelectSubcategory={handleCategorySelect}
-        onOpenNotifications={() => {}}
-        unreadCount={0}
-        onOpenHowItWorks={() => {}}
-        onOpenDailyRewards={() => {}}
-        onOpenProfile={() => {}}
-        onOpenAuth={() => {}}
-        isProfileDropdownOpen={false}
-        onToggleProfileDropdown={() => {}}
-        onCloseProfileDropdown={() => {}}
-        onSelectNav={() => {}}
-        onLogout={() => {}}
-        onOpenMobileProfile={() => {}}
-        onOpenMobileCategories={() => {}}
-        onOpenQuizBets={() => {}}
-        theme={theme}
-        onToggleTheme={() => {}}
-        siteConfig={{
-          siteName: 'Trivquest',
-          headerAnnouncement: '⚡ Win up to 100,000 KES on live speed trivia games!',
-          headerAnnouncementEnabled: true,
-          headerBadge: 'SPEED TRIVIA (+100 XP)',
-          headerCtaText: 'PLAY NOW',
-        }}
-        onCategoryClick={handleCategorySelect}
-        selectedCategoryId={selectedCategory}
-        categoryItems={categories.map(c => ({
-          id: c.id,
-          name: c.name,
-          icon: c.icon,
-          badge: c.badge,
-          gradient: 'from-violet-500 to-purple-600',
-        }))}
-      />
+      {/* Header - Increased z-index to ensure visibility */}
+      <div className="relative z-50">
+        <WalletBar
+          userState={userState}
+          userProfile={actualUserProfile}
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          selectedSubcategory={selectedCategory || 'all'}
+          onSelectSubcategory={handleCategorySelect}
+          onOpenNotifications={() => {}}
+          unreadCount={0}
+          onOpenHowItWorks={() => {}}
+          onOpenDailyRewards={() => {}}
+          onOpenProfile={() => {}}
+          onOpenAuth={() => {}}
+          isProfileDropdownOpen={false}
+          onToggleProfileDropdown={() => {}}
+          onCloseProfileDropdown={() => {}}
+          onSelectNav={() => {}}
+          onLogout={() => {}}
+          onOpenMobileProfile={() => {}}
+          onOpenMobileCategories={() => {}}
+          onOpenQuizBets={() => {}}
+          theme={theme}
+          onToggleTheme={() => {}}
+          siteConfig={{
+            siteName: 'Trivquest',
+            headerAnnouncement: '⚡ Win up to 100,000 KES on live speed trivia games!',
+            headerAnnouncementEnabled: true,
+            headerBadge: 'SPEED TRIVIA (+100 XP)',
+            headerCtaText: 'PLAY NOW',
+          }}
+          onCategoryClick={handleCategorySelect}
+          selectedCategoryId={selectedCategory}
+          categoryItems={categories.map(c => ({
+            id: c.id,
+            name: c.name,
+            icon: c.icon,
+            badge: c.badge,
+            gradient: 'from-violet-500 to-purple-600',
+          }))}
+        />
+      </div>
 
       {/* Main Content */}
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-3 sm:px-6 py-4 sm:py-6">
@@ -279,9 +284,7 @@ export default function CategoryPage({
           {/* Main Content Area */}
           <div className="lg:col-span-3 space-y-6">
             {/* Category Header */}
-            <div className={`p-6 rounded-2xl border ${
-              isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'
-            }`}>
+            <div className={`p-6 rounded-2xl border ${isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'}`}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-16 h-16 rounded-2xl bg-emerald-600 flex items-center justify-center text-3xl shadow-lg">
                   {currentCategory?.icon}
@@ -299,26 +302,18 @@ export default function CategoryPage({
               {/* Search and Filter Bar */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 relative">
-                  <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-                    isDark ? 'text-slate-500' : 'text-slate-400'
-                  }`} />
+                  <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDark ? 'text-slate-500' : 'text-slate-400'}`} />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => handleSearchChange(e.target.value)}
                     placeholder={`Search ${currentCategory?.name || 'all'} categories...`}
-                    className={`w-full pl-10 pr-10 py-2.5 rounded-xl text-sm ${
-                      isDark
-                        ? 'bg-[#121722] border border-[#222C3E] text-white placeholder-slate-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30'
-                        : 'bg-slate-100 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30'
-                    } outline-none transition-all`}
+                    className={`w-full pl-10 pr-10 py-2.5 rounded-xl text-sm ${isDark ? 'bg-[#121722] border border-[#222C3E] text-white placeholder-slate-500 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30' : 'bg-slate-100 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30'} outline-none transition-all`}
                   />
                   {searchQuery && (
                     <button
                       onClick={() => handleSearchChange('')}
-                      className={`absolute right-3 top-1/2 -translate-y-1/2 ${
-                        isDark ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'
-                      }`}
+                      className={`absolute right-3 top-1/2 -translate-y-1/2 ${isDark ? 'text-slate-500 hover:text-white' : 'text-slate-400 hover:text-slate-900'}`}
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -327,11 +322,7 @@ export default function CategoryPage({
 
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all ${
-                    isDark
-                      ? 'bg-[#121722] border border-[#222C3E] text-slate-300 hover:bg-[#222C3E] hover:text-white'
-                      : 'bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200'
-                  }`}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all ${isDark ? 'bg-[#121722] border border-[#222C3E] text-slate-300 hover:bg-[#222C3E] hover:text-white' : 'bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200'}`}
                 >
                   <Filter className="w-4 h-4" />
                   Filters
@@ -344,9 +335,7 @@ export default function CategoryPage({
                   <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                     Active filter:
                   </span>
-                  <span className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 ${
-                    isDark ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 ${isDark ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'}`}>
                     {currentCategory?.name}
                     <button
                       onClick={() => handleCategorySelect('all')}
@@ -361,18 +350,14 @@ export default function CategoryPage({
 
             {/* Questions Grid */}
             {loading ? (
-              <div className={`p-8 rounded-2xl border text-center ${
-                isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'
-              }`}>
+              <div className={`p-8 rounded-2xl border text-center ${isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'}`}>
                 <div className="animate-spin w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full mx-auto mb-4" />
                 <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
                   Loading questions...
                 </p>
               </div>
             ) : error ? (
-              <div className={`p-8 rounded-2xl border text-center ${
-                isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'
-              }`}>
+              <div className={`p-8 rounded-2xl border text-center ${isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'}`}>
                 <p className="text-red-500 mb-4">{error}</p>
                 <button
                   onClick={() => window.location.reload()}
@@ -382,9 +367,7 @@ export default function CategoryPage({
                 </button>
               </div>
             ) : subcategories.length === 0 ? (
-              <div className={`p-8 rounded-2xl border text-center ${
-                isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'
-              }`}>
+              <div className={`p-8 rounded-2xl border text-center ${isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'}`}>
                 <Sparkles className={`w-12 h-12 mx-auto mb-4 ${isDark ? 'text-slate-600' : 'text-slate-400'}`} />
                 <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
                   No categories found
@@ -411,11 +394,7 @@ export default function CategoryPage({
                 {subcategories.map((subcategory) => (
                   <div
                     key={subcategory.id}
-                    className={`p-5 rounded-2xl border transition-all hover:shadow-lg cursor-pointer ${
-                      isDark 
-                        ? 'bg-[#182030] border-[#222C3E] hover:border-emerald-500/50' 
-                        : 'bg-white border-slate-200 hover:border-emerald-500'
-                    }`}
+                    className={`p-5 rounded-2xl border transition-all hover:shadow-lg cursor-pointer ${isDark ? 'bg-[#182030] border-[#222C3E] hover:border-emerald-500/50' : 'bg-white border-slate-200 hover:border-emerald-500'}`}
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-xl bg-emerald-500/20 flex items-center justify-center text-2xl shrink-0">
@@ -438,9 +417,7 @@ export default function CategoryPage({
                           Questions Available
                         </span>
                       </div>
-                      <div className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                        isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'
-                      }`}>
+                      <div className={`px-2 py-1 rounded-lg text-xs font-medium ${isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700'}`}>
                         2X-5X Multipliers
                       </div>
                     </div>
@@ -452,11 +429,7 @@ export default function CategoryPage({
                         // Store selected category in localStorage so App.tsx can pick it up
                         localStorage.setItem('selected_category_for_quiz', subcategory.id);
                       }}
-                      className={`w-full py-2.5 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-                        isDark
-                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                          : 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                      }`}
+                      className={`w-full py-2.5 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${isDark ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-emerald-600 hover:bg-emerald-500 text-white'}`}
                     >
                       <Play className="w-4 h-4 fill-current" />
                       Play {subcategory.name}

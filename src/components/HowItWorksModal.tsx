@@ -34,35 +34,28 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 15 }}
             transition={{ duration: 0.2 }}
-            className={`relative z-10 w-full max-w-xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ${
-              isDark ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100' : 'bg-white border-slate-200 text-slate-900'
-            }`}
+            className="relative z-10 w-full max-w-xl rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] bg-[var(--card)] text-[var(--text-primary)] triv-card"
           >
             {/* Header */}
-            <div className={`p-4 sm:p-5 flex items-center justify-between border-b ${
-              isDark ? 'border-white/5 bg-[#0a0f16]' : 'border-slate-100 bg-slate-50'
-            }`}>
+            <div className="p-4 sm:p-5 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)]">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+                <div className="w-9 h-9 rounded-xl bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)] flex items-center justify-center">
                   <HelpCircle className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className={`font-bold text-base sm:text-lg leading-tight ${
-                    isDark ? 'text-white' : 'text-slate-900'
-                  }`}>
-                    How Trivquest Trivia Works
+                  <h3 className="font-bold text-base sm:text-lg leading-tight text-[var(--text-primary)]">
+                    How TrivQuest Trivia Works
                   </h3>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Speed trivia, instant cash prizes, and M-PESA cashouts
+                  <p className="text-xs text-[var(--text-muted)]">
+                    Speed trivia, streak multipliers, and instant M-PESA cashouts
                   </p>
                 </div>
               </div>
 
               <button
+                type="button"
                 onClick={onClose}
-                className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                  isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                }`}
+                className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -71,24 +64,21 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
             {/* Content Body */}
             <div className="p-4 sm:p-6 overflow-y-auto space-y-3.5 text-xs leading-relaxed custom-scrollbar">
               {/* Interactive Demo Callout Banner */}
-              <div className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 ${
-                isDark
-                  ? 'bg-[#121722] border-[#222C3E] text-slate-200'
-                  : 'bg-emerald-50 border-emerald-200 text-emerald-950'
-              }`}>
+              <div className="p-3.5 rounded-xl border border-[var(--border)] bg-[var(--accent-soft)] flex items-center justify-between gap-3 text-[var(--text-primary)]">
                 <div className="flex items-center gap-2.5">
-                  <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Sparkles className="w-4 h-4 text-[var(--accent-text)] shrink-0" />
                   <span className="font-semibold text-xs">
                     Want to test it risk-free? Try our interactive Demo Mode!
                   </span>
                 </div>
                 {onLaunchDemo && (
                   <button
+                    type="button"
                     onClick={() => {
                       onClose();
                       onLaunchDemo();
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1 shadow-sm cursor-pointer transition-colors"
+                    className="px-3 py-1.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold text-xs shrink-0 flex items-center gap-1 shadow-xs cursor-pointer transition-colors"
                   >
                     <Play className="w-3 h-3 fill-white" />
                     <span>Try Demo</span>
@@ -96,65 +86,57 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
                 )}
               </div>
 
-              <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
-                isDark ? 'bg-[#151d2c]/60 border-slate-800' : 'bg-slate-50 border-slate-200'
-              }`}>
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-lg bg-[var(--accent-soft)] text-[var(--accent-text)] flex items-center justify-center shrink-0 mt-0.5">
                   <Clock className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className={`font-bold text-sm mb-1 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+                  <h4 className="font-bold text-sm mb-1 text-[var(--text-primary)]">
                     1. Pick Your Speed & Topic
                   </h4>
-                  <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  <p className="text-[var(--text-secondary)]">
                     Select a trivia speed mode (3 min, 5 min, or 10 min) and enter a category like Football EPL, Tech Safari, or Kenyan News.
                   </p>
                 </div>
               </div>
 
-              <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
-                isDark ? 'bg-[#151d2c]/60 border-slate-800' : 'bg-slate-50 border-slate-200'
-              }`}>
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-lg bg-[var(--warning-soft)] text-[var(--warning)] flex items-center justify-center shrink-0 mt-0.5">
                   <Zap className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className={`font-bold text-sm mb-1 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+                  <h4 className="font-bold text-sm mb-1 text-[var(--text-primary)]">
                     2. 12-Second Decision Clock
                   </h4>
-                  <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  <p className="text-[var(--text-secondary)]">
                     Each live question gives you 12 seconds. Consecutive correct answers stack streak multipliers (2x, 3x, up to 5x) for rapid reward growth.
                   </p>
                 </div>
               </div>
 
-              <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
-                isDark ? 'bg-[#151d2c]/60 border-slate-800' : 'bg-slate-50 border-slate-200'
-              }`}>
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-lg bg-[var(--success-soft)] text-[var(--success)] flex items-center justify-center shrink-0 mt-0.5">
                   <DollarSign className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className={`font-bold text-sm mb-1 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+                  <h4 className="font-bold text-sm mb-1 text-[var(--text-primary)]">
                     3. Lock In & Cash Out Anytime
                   </h4>
-                  <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  <p className="text-[var(--text-secondary)]">
                     You do not need to finish every question! Hit the <strong>Lock In & Cash Out</strong> button anytime to secure your accumulated earnings.
                   </p>
                 </div>
               </div>
 
-              <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
-                isDark ? 'bg-[#151d2c]/60 border-slate-800' : 'bg-slate-50 border-slate-200'
-              }`}>
-                <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-500 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-lg bg-[var(--accent-soft)] text-[var(--accent-text)] flex items-center justify-center shrink-0 mt-0.5">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className={`font-bold text-sm mb-1 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
+                  <h4 className="font-bold text-sm mb-1 text-[var(--text-primary)]">
                     4. Instant M-PESA Payouts
                   </h4>
-                  <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  <p className="text-[var(--text-secondary)]">
                     Withdraw directly to your Safaricom M-PESA wallet with 0% processing fee.
                   </p>
                 </div>
@@ -162,16 +144,15 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
             </div>
 
             {/* Footer */}
-            <div className={`p-4 border-t flex items-center justify-between ${
-              isDark ? 'border-white/5 bg-[#0a0f16]' : 'border-slate-100 bg-slate-50'
-            }`}>
-              <div className="flex items-center gap-1 text-[11px] text-emerald-500 font-semibold">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+            <div className="p-4 border-t border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs text-[var(--success)] font-semibold">
+                <CheckCircle2 className="w-4 h-4" />
                 <span>Instant STK & B2C Verified</span>
               </div>
               <button
+                type="button"
                 onClick={onClose}
-                className="py-2 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer shadow-md transition-colors"
+                className="py-2 px-5 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold text-xs cursor-pointer shadow-xs transition-colors"
               >
                 Got It, Let's Play!
               </button>

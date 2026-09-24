@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
-  X, ArrowUpRight, AlertCircle, RefreshCw, CheckCircle2, Lock, ShieldCheck, LogIn
+  X, ArrowUpRight, AlertCircle, RefreshCw, CheckCircle2, Lock, ShieldCheck, LogIn,
+  ArrowUpFromLine
 } from 'lucide-react';
 import { UserProfile, UserState } from '../types';
 import { paymentSettingsService } from '../services/paymentSettingsService';
@@ -204,10 +205,10 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                 onClose();
                 onOpenAuth?.();
               }}
-              className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm tracking-wide uppercase transition-all shadow-md active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-extrabold text-xs sm:text-sm tracking-wide uppercase transition-all shadow-md shadow-rose-600/25 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Sign In to Continue</span>
+              <ArrowUpFromLine className="w-4 h-4 stroke-[2.5]" />
+              <span>Sign In to Withdraw</span>
             </button>
           </div>
           <div className={`px-5 py-3 border-t flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${
@@ -312,30 +313,22 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        className={`w-full max-w-md rounded-3xl border relative overflow-hidden shadow-2xl my-auto ${
-          isDark
-            ? 'bg-[#0B0E14] border-[#1A2332] text-[#F8FAFC]'
-            : 'bg-white border-slate-200 text-slate-900'
-        }`}
+        className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)] relative overflow-hidden shadow-xl my-auto triv-card"
       >
         {/* Clean Modern Header */}
-        <div className={`px-5 py-4 flex items-center justify-between border-b ${
-          isDark ? 'bg-[#121722] border-[#222C3E] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-        }`}>
+        <div className="px-5 py-4 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)]">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border ${
-              isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200 shadow-2xs'
-            }`}>
-              {selectedCountry.flag}
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black shrink-0 border border-rose-500/30 bg-rose-500/15 text-rose-500">
+              <ArrowUpFromLine className="w-4 h-4 stroke-[2.5]" />
             </div>
             <div>
               <div className="flex items-center gap-1.5 mb-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-500">
-                  Instant Cashout
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-500">
+                  Instant M-PESA Cashout
                 </span>
               </div>
-              <h3 className="font-bold text-base tracking-tight leading-none">
+              <h3 className="font-bold text-sm sm:text-base tracking-tight leading-none text-[var(--text-primary)]">
                 Mobile Money Withdraw
               </h3>
             </div>
@@ -343,9 +336,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close modal"
-            className={`p-2 rounded-full border transition-colors cursor-pointer ${
-              isDark ? 'border-[#222C3E] text-slate-400 hover:text-white hover:bg-[#182030]' : 'border-slate-200 text-slate-600 hover:bg-slate-100'
-            }`}
+            className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -355,7 +346,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
           {/* Available Balance Banner */}
           {status === 'idle' && (
             <div className={`p-3.5 rounded-2xl border mb-4 flex items-center justify-between ${
-              isDark ? 'bg-[#111827] border-[#1A2332]' : 'bg-emerald-50/60 border-emerald-100'
+              isDark ? 'bg-[#111827] border-[#1A2332]' : 'bg-slate-50 border-slate-200'
             }`}>
               <div>
                 <span className={`text-[10px] font-bold uppercase tracking-wider block mb-0.5 ${
@@ -363,14 +354,14 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                 }`}>
                   Available to Withdraw
                 </span>
-                <span className="text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400">
+                <span className="text-base sm:text-lg font-black text-rose-600 dark:text-rose-400">
                   KES {userState.walletBalance.toLocaleString()}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={handleMaxClick}
-                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-black uppercase transition-all cursor-pointer shadow-sm shadow-emerald-600/20"
+                className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white text-[11px] font-black uppercase transition-all cursor-pointer shadow-sm shadow-rose-600/20 active:scale-95"
               >
                 Max
               </button>
@@ -432,8 +423,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                     placeholder={String(currentMinWithdraw)}
                     className={`w-full pl-12 pr-3.5 py-2.5 rounded-2xl border text-sm font-extrabold transition-all outline-none ${
                       isDark
-                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-emerald-500'
-                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
+                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-rose-500'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-rose-500'
                     }`}
                   />
                 </div>
@@ -449,9 +440,9 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                     onClick={() => handleQuickSelect(amt)}
                     className={`py-1.5 text-[11px] font-bold rounded-xl border transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                       parsedAmount === amt
-                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm shadow-emerald-600/20'
+                        ? 'bg-rose-600 border-rose-600 text-white shadow-sm shadow-rose-600/20'
                         : isDark
-                        ? 'bg-[#111827] border-[#1A2332] text-slate-300 hover:border-emerald-500/50'
+                        ? 'bg-[#111827] border-[#1A2332] text-slate-300 hover:border-rose-500/50'
                         : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
@@ -481,8 +472,8 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                     placeholder="0712 345 678"
                     className={`w-full pl-11 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                       isDark
-                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-emerald-500'
-                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-emerald-500'
+                        ? 'bg-[#111827] border-[#1A2332] text-white focus:border-rose-500'
+                        : 'bg-slate-50 border-slate-200 text-slate-900 focus:border-rose-500'
                     }`}
                   />
                 </div>
@@ -502,7 +493,7 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
                 </div>
                 <div className={`flex justify-between pt-1.5 border-t font-black ${isDark ? 'border-white/5' : 'border-black/5'}`}>
                   <span className={isDark ? 'text-slate-300' : 'text-slate-700'}>You Receive</span>
-                  <span className="text-emerald-600 dark:text-emerald-400">KES {parsedAmount.toLocaleString()}</span>
+                  <span className="text-rose-600 dark:text-rose-400 font-extrabold">KES {parsedAmount.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -510,14 +501,14 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting || parsedAmount <= 0 || parsedAmount > userState.walletBalance}
-                className="w-full py-3.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm tracking-wide uppercase transition-all shadow-xs active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-extrabold text-xs sm:text-sm tracking-wide uppercase transition-all shadow-md shadow-rose-600/25 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <RefreshCw className="w-4 h-4 animate-spin text-white" />
                 ) : (
-                  <ArrowUpRight className="w-4 h-4" />
+                  <ArrowUpFromLine className="w-4 h-4 stroke-[2.5]" />
                 )}
-                <span>{isSubmitting ? 'Processing Request...' : 'Instant Withdraw'}</span>
+                <span>{isSubmitting ? 'Processing Request...' : `Instant Withdraw KES ${parsedAmount ? parsedAmount.toLocaleString() : ''}`}</span>
               </button>
             </form>
           )}

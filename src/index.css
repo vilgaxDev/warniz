@@ -2,145 +2,119 @@
 
 @layer base {
   :root {
-    --bg-main: #F4F6F8;
-    --card-surface: #FFFFFF;
-    --card-elevated: #F8FAFC;
-    --card-hover: #F1F5F9;
-    --text-primary: #0E1118;
-    --text-muted: #64748B;
-    --text-secondary: #475569;
-    --border-color: #E2E8F0;
-    --primary-bright: #10B981;
-    --primary-dark: #059669;
-    --primary-muted: #047857;
-    --primary-soft: #34D399;
-    --correct-green: #00B074;
-    --wrong-red: #EF4444;
+    --bg-main: #ffffff;
+    --text-primary: #111111;
+    --text-secondary: #666666;
+    --text-muted: #929292;
+    --surface: #f8f8f8;
+    --surface-hover: #f3f3f3;
+    --surface-active: #eeeeee;
+    --card: #ffffff;
+    --border: #e6e6e6;
+    --border-strong: #d4d4d4;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-soft: #eff6ff;
+    --accent-text: #2563eb;
+    --success: #16a34a;
+    --success-soft: #ecfdf3;
+    --danger: #dc2626;
+    --danger-soft: #fef2f2;
+    --warning: #d97706;
+    --warning-soft: #fffbeb;
   }
 
   .dark, html.dark {
-    --bg-main: #050507;
-    --card-surface: #0f1117;
-    --card-elevated: #16181f;
-    --card-hover: #1c1f28;
-    --text-primary: #F8FAFC;
-    --text-muted: #94A3B8;
-    --text-secondary: #CBD5E1;
-    --border-color: #262933;
-    --primary-bright: #10B981;
-    --primary-dark: #059669;
-    --primary-muted: #047857;
-    --primary-soft: #34D399;
-    --correct-green: #10B981;
-    --wrong-red: #EF4444;
+    --bg-main: #0b0b0b;
+    --text-primary: #f5f5f5;
+    --text-secondary: #a3a3a3;
+    --text-muted: #737373;
+    --surface: #111111;
+    --surface-hover: #181818;
+    --surface-active: #202020;
+    --card: #111111;
+    --border: #272727;
+    --border-strong: #363636;
+    --accent: #3b82f6;
+    --accent-hover: #60a5fa;
+    --accent-soft: #172554;
+    --accent-text: #60a5fa;
+    --success: #22c55e;
+    --success-soft: #052e16;
+    --danger: #ef4444;
+    --danger-soft: #450a0a;
+    --warning: #f59e0b;
+    --warning-soft: #451a03;
+  }
+
+  *, ::before, ::after {
+    box-sizing: border-box;
   }
 
   html, body, #root {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     width: 100%;
     max-width: 100%;
     overflow-x: clip;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
-/* Real Production Matte Surfaces - No AI Green Radial Glowing Hazes */
-.black-net {
-  background-color: #090D15;
+/* Trivquest Clean Design Tokens */
+.bg-app-main { background-color: var(--bg-main); }
+.bg-app-card { background-color: var(--card); }
+.bg-app-surface { background-color: var(--surface); }
+.bg-app-surface-hover:hover { background-color: var(--surface-hover); }
+.bg-app-accent { background-color: var(--accent); }
+.bg-app-accent-soft { background-color: var(--accent-soft); }
+
+.text-app-primary { color: var(--text-primary); }
+.text-app-secondary { color: var(--text-secondary); }
+.text-app-muted { color: var(--text-muted); }
+.text-app-accent { color: var(--accent-text); }
+
+.border-app { border-color: var(--border); }
+.border-app-strong { border-color: var(--border-strong); }
+
+/* Trivquest Card Standard */
+.triv-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
 }
 
-.light-mesh {
-  background-color: #F8FAFC;
+.triv-card-interactive:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
 }
 
-/* Trivquest Speed Trivia Typographic Hierarchy */
-.hero-title {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.15;
-}
-
-.heading-primary {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.heading-secondary {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.question-text {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.45;
-}
-
-.answer-text {
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1.4;
-}
-
-.answer-text-active {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.metadata-text {
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  letter-spacing: 0;
-}
-
-.metadata-semibold {
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-}
-
-.stat-number {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.font-mono-numbers {
-  font-family: 'Inter', monospace;
-  font-weight: 600;
+/* Clean Typography Helpers */
+.tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
 @layer utilities {
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-6px); }
-    40%, 80% { transform: translateX(6px); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
   }
   .animate-shake {
-    animation: shake 0.4s ease-in-out;
+    animation: shake 0.35s ease-in-out;
   }
 
-  .animate-blink-play {
-    /* Clean solid button without pulsating neon bloom */
-    transition: transform 0.15s ease, filter 0.15s ease;
-  }
-  
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
   /* Hide scrollbar for IE, Edge and Firefox */
   .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
-
-

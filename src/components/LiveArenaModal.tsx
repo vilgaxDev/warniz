@@ -229,128 +229,108 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={`relative z-10 w-full max-w-xl max-h-[92vh] flex flex-col rounded-2xl shadow-2xl border overflow-hidden ${
-            isDark
-              ? 'bg-[#0B0E14] text-slate-100 border-[#1A2332]'
-              : 'bg-white text-slate-900 border-slate-200'
-          }`}
+          className="relative z-10 w-full max-w-xl max-h-[92vh] flex flex-col rounded-2xl shadow-2xl border overflow-hidden bg-[var(--card)] text-[var(--text-primary)] border-[var(--border)]"
         >
-          {/* 1. MODAL HEADER */}
-          <div className={`px-3.5 py-3 sm:px-4 sm:py-3.5 border-b flex items-center justify-between gap-2.5 ${
-            isDark ? 'border-white/5 bg-[#0a0f16]/90' : 'border-slate-100 bg-slate-50'
-          }`}>
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-              <div className="relative shrink-0">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-[#222C3E] bg-[#182030] flex items-center justify-center">
-                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
-                </div>
-                <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-rose-500"></span>
-                </span>
-              </div>
-
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <h2 className="font-extrabold text-sm sm:text-lg tracking-tight leading-tight truncate">
-                    Live Quiz Arena
-                  </h2>
-                  <span className="text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase tracking-wider shrink-0">
-                    LIVE
+            {/* 1. MODAL HEADER */}
+            <div className="px-3.5 py-3 sm:px-4 sm:py-3.5 border-b flex items-center justify-between gap-2.5 border-[var(--border)] bg-[var(--surface)]">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div className="relative shrink-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-[var(--border)] bg-[var(--card)] flex items-center justify-center">
+                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                  </div>
+                  <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-rose-500"></span>
                   </span>
                 </div>
-                <p className={`text-[11px] sm:text-xs truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  Choose your featured topic, speed mode & promo code
-                </p>
+
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <h2 className="font-extrabold text-sm sm:text-lg tracking-tight leading-tight truncate text-[var(--text-primary)]">
+                      Live Quiz Arena
+                    </h2>
+                    <span className="text-[9px] sm:text-[10px] font-extrabold px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-500 border border-rose-500/30 uppercase tracking-wider shrink-0">
+                      LIVE
+                    </span>
+                  </div>
+                  <p className="text-[11px] sm:text-xs truncate text-[var(--text-muted)]">
+                    Choose your featured topic, speed mode & promo code
+                  </p>
+                </div>
               </div>
+
+              <button
+                onClick={onClose}
+                aria-label="Close Live Arena modal"
+                className="p-1.5 sm:p-2 rounded-xl border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            <button
-              onClick={onClose}
-              aria-label="Close Live Arena modal"
-              className={`p-1.5 sm:p-2 rounded-xl border transition-colors cursor-pointer shrink-0 ${
-                isDark
-                  ? 'bg-zinc-800/80 border-zinc-700 text-slate-300 hover:text-white hover:bg-zinc-700'
-                  : 'bg-slate-200 border-slate-300 text-slate-700 hover:text-black hover:bg-slate-300'
-              }`}
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+            {/* 2. TAB NAVIGATOR (Topics, Speed Modes, Stakes, Promo Code) */}
+            <div className="px-2 sm:px-3 pt-2 pb-1.5 border-b grid grid-cols-4 gap-1 sm:gap-1.5 border-[var(--border)] bg-[var(--surface)]">
+              <button
+                onClick={() => setActiveTab('topics')}
+                className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
+                  activeTab === 'topics'
+                    ? 'bg-[var(--accent)] text-white font-black shadow-xs'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
+                }`}
+              >
+                <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">
+                  <span className="hidden sm:inline">1. </span>Topics
+                </span>
+              </button>
 
-          {/* 2. TAB NAVIGATOR (Topics, Speed Modes, Stakes, Promo Code) */}
-          <div className={`px-2 sm:px-3 pt-2 pb-1.5 border-b grid grid-cols-4 gap-1 sm:gap-1.5 ${
-            isDark ? 'border-[#262933] bg-[#0c0e14]' : 'border-slate-100 bg-slate-50/50'
-          }`}>
-            <button
-              onClick={() => setActiveTab('topics')}
-              className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
-                activeTab === 'topics'
-                  ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
-                  : isDark
-                    ? 'text-slate-400 hover:text-slate-200 hover:bg-zinc-800/50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Compass className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">
-                <span className="hidden sm:inline">1. </span>Topics
-              </span>
-            </button>
+              <button
+                onClick={() => setActiveTab('modes')}
+                className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
+                  activeTab === 'modes'
+                    ? 'bg-[var(--accent)] text-white font-black shadow-xs'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
+                }`}
+              >
+                <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">
+                  <span className="hidden sm:inline">2. </span>Speed
+                </span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('modes')}
-              className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
-                activeTab === 'modes'
-                  ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
-                  : isDark
-                    ? 'text-slate-400 hover:text-slate-200 hover:bg-zinc-800/50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">
-                <span className="hidden sm:inline">2. </span>Speed
-              </span>
-            </button>
+              <button
+                onClick={() => setActiveTab('stakes')}
+                className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
+                  activeTab === 'stakes'
+                    ? 'bg-[var(--accent)] text-white font-black shadow-xs'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
+                }`}
+              >
+                <Coins className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">
+                  <span className="hidden sm:inline">3. </span>Stakes
+                </span>
+              </button>
 
-            <button
-              onClick={() => setActiveTab('stakes')}
-              className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 ${
-                activeTab === 'stakes'
-                  ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
-                  : isDark
-                    ? 'text-slate-400 hover:text-slate-200 hover:bg-zinc-800/50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Coins className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">
-                <span className="hidden sm:inline">3. </span>Stakes
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('promo')}
-              className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 relative ${
-                activeTab === 'promo'
-                  ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
-                  : appliedPromo
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : isDark
-                      ? 'text-slate-400 hover:text-slate-200 hover:bg-zinc-800/50'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              <Ticket className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">
-                <span className="hidden sm:inline">4. </span>Promo
-              </span>
-              {appliedPromo && (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 absolute top-1 right-1" />
-              )}
-            </button>
-          </div>
+              <button
+                onClick={() => setActiveTab('promo')}
+                className={`py-1.5 px-1 sm:px-2.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-1.5 relative ${
+                  activeTab === 'promo'
+                    ? 'bg-[var(--accent)] text-white font-black shadow-xs'
+                    : appliedPromo
+                      ? 'bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
+                }`}
+              >
+                <Ticket className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">
+                  <span className="hidden sm:inline">4. </span>Promo
+                </span>
+                {appliedPromo && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] absolute top-1 right-1" />
+                )}
+              </button>
+            </div>
 
           {/* 3. MODAL BODY (Scrollable Selection) */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[55vh]">
@@ -747,17 +727,15 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
             )}
 
             {/* QUICK SELECTION SUMMARY CARD */}
-            <div className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs ${
-              isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-100 border-slate-200'
-            }`}>
+            <div className="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] flex items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="text-xl shrink-0">{currentCategory.icon}</span>
                 <div className="min-w-0">
-                  <div className="font-bold truncate">{currentCategory.name}</div>
-                  <div className={`text-[11px] truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <div className="font-bold truncate text-[var(--text-primary)]">{currentCategory.name}</div>
+                  <div className="text-[11px] truncate text-[var(--text-muted)]">
                     {currentSpeedMode.name.split(' ')[0]} Speed • {currentStake.name}
                     {appliedPromo && (
-                      <span className="ml-1 text-emerald-400 font-bold font-mono">
+                      <span className="ml-1 text-[var(--accent-text)] font-bold font-mono">
                         ({appliedPromo.code})
                       </span>
                     )}
@@ -766,10 +744,10 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
               </div>
 
               <div className="text-right shrink-0">
-                <div className="text-[10px] uppercase font-bold text-slate-400">
+                <div className="text-[10px] uppercase font-bold text-[var(--text-muted)]">
                   {effectiveEntryFee === 0 ? 'Entry Fee' : 'Top Prize'}
                 </div>
-                <div className="font-mono font-bold text-emerald-400">
+                <div className="font-mono font-bold text-[var(--accent-text)]">
                   {effectiveEntryFee === 0 ? 'FREE ENTRY' : `KSh ${currentStake.maxWinningsKsh.toLocaleString()}`}
                 </div>
               </div>
@@ -777,12 +755,10 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
           </div>
 
           {/* 4. MODAL BOTTOM ACTIONS & LAUNCH CTA */}
-          <div className={`p-4 border-t space-y-2 ${
-            isDark ? 'border-white/5 bg-[#0a0f16]' : 'border-slate-100 bg-slate-50'
-          }`}>
+          <div className="p-4 border-t border-[var(--border)] bg-[var(--surface)] space-y-2">
             <button
               onClick={handleLaunch}
-              className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-sm shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
+              className="w-full py-3 px-4 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] active:scale-98 text-white font-bold text-sm shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>
@@ -792,12 +768,12 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center justify-between text-[11px] px-1 text-slate-400">
+            <div className="flex items-center justify-between text-[11px] px-1 text-[var(--text-muted)]">
               <span className="flex items-center gap-1">
-                <Users className="w-3 h-3 text-emerald-400" />
+                <Users className="w-3 h-3 text-[var(--accent-text)]" />
                 <span>1,420 players active</span>
               </span>
-              <span className="flex items-center gap-1 text-emerald-400 font-semibold">
+              <span className="flex items-center gap-1 text-[var(--accent-text)] font-semibold">
                 <Shield className="w-3 h-3" />
                 <span>Instant M-Pesa Payouts</span>
               </span>

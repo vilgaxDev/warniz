@@ -67,34 +67,26 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
             className="fixed inset-0 bg-black/60 backdrop-blur-xs cursor-pointer"
           />
 
-          {/* Right Drawer Container - Ultra-Compact & Slim for Phones */}
+          {/* Right Drawer Container - Modern & Lively for Phones */}
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className={`relative z-10 w-[86vw] max-w-[360px] h-full min-h-0 flex flex-col shadow-2xl border-l overflow-hidden ${
-              isDark
-                ? 'bg-[#0B0E14] text-slate-100 border-[#1A2332]'
-                : 'bg-white text-slate-900 border-slate-200'
-            }`}
+            className="relative z-10 w-[88vw] max-w-[360px] h-full min-h-0 flex flex-col shadow-2xl border-l overflow-hidden bg-[var(--card)] text-[var(--text-primary)] border-[var(--border)]"
           >
             {/* 1. TOP HEADER */}
-            <div className={`p-3 border-b flex items-center justify-between gap-2 ${
-              isDark ? 'border-white/5 bg-[#0d1219]/90' : 'border-slate-100 bg-slate-50'
-            }`}>
+            <div className="p-3 border-b flex items-center justify-between gap-2 border-[var(--border)] bg-[var(--surface)]">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                  <Layers className="w-3.5 h-3.5" />
+                <div className="w-7 h-7 rounded-lg bg-[var(--accent-soft)] border border-[var(--border)] flex items-center justify-center text-[var(--accent-text)]">
+                  <Layers className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="font-extrabold text-xs tracking-tight leading-none">
+                  <h2 className="font-extrabold text-xs sm:text-sm tracking-tight leading-none text-[var(--text-primary)]">
                     Quiz Topics
                   </h2>
-                  <div className={`text-[9px] font-semibold uppercase tracking-wider ${
-                    isDark ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
-                    {categories.length} Categories
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                    {categories.length} Arenas Active
                   </div>
                 </div>
               </div>
@@ -102,65 +94,56 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
               <button
                 onClick={onClose}
                 aria-label="Close Categories Menu"
-                className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-                  isDark
-                    ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:text-white'
-                    : 'bg-slate-200 border-slate-300 text-slate-700 hover:text-black'
-                }`}
+                className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* 2. SEARCH & SPEED MODE FILTER */}
-            <div className={`p-2.5 border-b space-y-2 ${
-              isDark ? 'border-white/5 bg-[#090d14]/80' : 'border-slate-100 bg-slate-50/70'
-            }`}>
+            <div className="p-3 border-b space-y-2.5 border-[var(--border)] bg-[var(--card)]">
               {/* Category Search Input */}
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
-                  <Search className="w-3 h-3" />
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-[var(--text-muted)]">
+                  <Search className="w-3.5 h-3.5" />
                 </div>
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter topics..."
-                  className={`w-full pl-7 pr-6 py-1.5 rounded-lg text-xs transition-colors outline-none ${
-                    isDark
-                      ? 'bg-[#121926] border border-white/10 text-slate-100 placeholder-slate-500 focus:border-emerald-500'
-                      : 'bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-emerald-500'
-                  }`}
+                  placeholder="Filter topics & arenas..."
+                  className="w-full pl-8 pr-6 py-1.5 rounded-lg text-xs transition-colors outline-none bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-[var(--accent)]"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-white"
+                    className="absolute inset-y-0 right-0 pr-2 flex items-center text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
 
               {/* Speed Mode Selector Pills */}
               <div>
-                <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider mb-1 text-slate-400">
-                  <span>Speed Mode</span>
-                  <span className="text-amber-400 font-mono">{activeSpeed?.durationSeconds ?? 15}s / Q</span>
+                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider mb-1.5 text-[var(--text-muted)]">
+                  <span className="flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-[var(--accent-text)]" />
+                    <span>Speed Mode</span>
+                  </span>
+                  <span className="text-amber-500 font-mono font-extrabold">{activeSpeed?.durationSeconds ?? 15}s / Question</span>
                 </div>
-                <div className="grid grid-cols-3 gap-1">
+                <div className="grid grid-cols-3 gap-1.5">
                   {speedModes.map((mode) => {
                     const isSelected = mode.id === selectedSpeedModeId;
                     return (
                       <button
                         key={mode.id}
                         onClick={() => onSelectSpeedMode(mode.id)}
-                        className={`py-1 px-1.5 rounded-lg text-[10px] font-bold border transition-all cursor-pointer truncate ${
+                        className={`py-1.5 px-2 rounded-lg text-[10px] font-bold border transition-all cursor-pointer truncate ${
                           isSelected
-                            ? 'bg-emerald-600 border-emerald-500 text-white shadow-xs'
-                            : isDark
-                              ? 'bg-[#121926] border-white/5 text-slate-300 hover:border-emerald-700/50'
-                              : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
+                            ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-xs'
+                            : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
                         }`}
                       >
                         {mode.name.split(' ')[0]}
@@ -172,7 +155,7 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
             </div>
 
             {/* 3. SCROLLABLE CATEGORIES LIST */}
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2.5 space-y-2 [scrollbar-width:thin] [scrollbar-color:#475569_transparent]">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2.5 space-y-2 [scrollbar-width:thin]">
               {filteredCategories.map((cat) => {
                 const isSelected = cat.id === selectedCategoryId;
                 const themeInfo = getCategoryTheme(cat.id);
@@ -182,14 +165,10 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
                     onClick={() => {
                       onSelectCategory(cat.id);
                     }}
-                    className={`p-2.5 rounded-2xl border transition-all cursor-pointer relative group ${
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer relative group ${
                       isSelected
-                        ? isDark
-                          ? `${themeInfo.bgActiveDark} ${themeInfo.borderActive} ring-1 ring-emerald-400/50 shadow-md`
-                          : `${themeInfo.bgActiveLight} border-slate-900 ring-1 ring-slate-900/30 shadow-md`
-                        : isDark
-                          ? 'bg-[#101624] border-[#1e283c] hover:border-slate-400 hover:bg-[#151d2f]'
-                          : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:bg-white'
+                        ? 'border-[var(--accent)] bg-[var(--accent-soft)] shadow-xs'
+                        : 'bg-[var(--surface)] border-[var(--border)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-hover)]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -203,29 +182,27 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
                       {/* Info */}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-1">
-                          <h3 className={`font-black text-xs truncate ${
-                            isSelected ? (isDark ? 'text-white' : 'text-slate-950') : (isDark ? 'text-slate-100' : 'text-slate-900')
+                          <h3 className={`font-bold text-xs truncate ${
+                            isSelected ? 'text-[var(--accent-text)]' : 'text-[var(--text-primary)]'
                           }`}>
                             {cat.name}
                           </h3>
                           {isSelected && (
-                            <span className="text-[8px] px-1.5 py-0.5 rounded-full font-black uppercase tracking-wider bg-emerald-400 text-slate-950 shadow-xs shrink-0">
+                            <span className="text-[8px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider bg-[var(--accent)] text-white shrink-0">
                               ACTIVE
                             </span>
                           )}
                         </div>
-                        <p className={`text-[10px] truncate mt-0.5 ${isSelected ? (isDark ? 'text-slate-300' : 'text-slate-700') : (isDark ? 'text-slate-400' : 'text-slate-500')}`}>
+                        <p className="text-[10px] truncate mt-0.5 text-[var(--text-muted)]">
                           {cat.subtitle || themeInfo.subtitle}
                         </p>
                       </div>
                     </div>
 
                     {/* Action Controls for Category */}
-                    <div className="mt-2 pt-1.5 border-t border-slate-800/40 flex items-center justify-between gap-1.5">
-                      <span className={`text-[9px] flex items-center gap-1 font-semibold ${
-                        isDark ? 'text-slate-400' : 'text-slate-600'
-                      }`}>
-                        <Clock className="w-2.5 h-2.5 text-amber-400" />
+                    <div className="mt-2 pt-1.5 border-t border-[var(--border)] flex items-center justify-between gap-1.5">
+                      <span className="text-[10px] flex items-center gap-1 font-semibold text-[var(--text-secondary)]">
+                        <Clock className="w-3 h-3 text-amber-500" />
                         <span>{activeSpeed?.questionsCount ?? 0}Q • {activeSpeed?.durationSeconds ?? 15}s</span>
                       </span>
 
@@ -236,10 +213,10 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
                           onPlayCategory(cat.id);
                           onClose();
                         }}
-                        className="py-1 px-2 rounded-md bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-[10px] flex items-center gap-1 shadow-xs cursor-pointer transition-all"
+                        className="py-1 px-2.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-hover)] active:scale-95 text-white font-bold text-[10px] flex items-center gap-1 shadow-xs cursor-pointer transition-all"
                       >
                         <span>Play</span>
-                        <Play className="w-2 h-2 fill-white" />
+                        <Play className="w-2.5 h-2.5 fill-white" />
                       </button>
                     </div>
                   </div>
@@ -247,11 +224,11 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
               })}
 
               {filteredCategories.length === 0 && (
-                <div className="text-center py-6">
-                  <p className="text-xs text-slate-400">No categories matching "{searchQuery}"</p>
+                <div className="text-center py-8">
+                  <p className="text-xs text-[var(--text-muted)]">No categories matching "{searchQuery}"</p>
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="mt-1 text-xs font-bold text-emerald-400 hover:underline"
+                    className="mt-1.5 text-xs font-bold text-[var(--accent-text)] hover:underline cursor-pointer"
                   >
                     Clear Filter
                   </button>
@@ -260,15 +237,13 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
             </div>
 
             {/* 4. BOTTOM DIRECT LAUNCH BUTTON */}
-            <div className={`p-2.5 border-t ${
-              isDark ? 'border-white/5 bg-[#0d1219]' : 'border-slate-100 bg-slate-50'
-            }`}>
+            <div className="p-3 border-t border-[var(--border)] bg-[var(--surface)]">
               <button
                 onClick={() => {
                   onPlayCategory(selectedCategoryId);
                   onClose();
                 }}
-                className="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all"
+                className="w-full py-2.5 px-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] active:scale-95 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
                 <span>Launch Quiz Now</span>

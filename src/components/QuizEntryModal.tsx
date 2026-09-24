@@ -1,9 +1,22 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Play, Trophy, Flame, Zap, Wallet, ShieldAlert, Sparkles, ChevronRight, PlusCircle, CheckCircle2, ArrowRight, Plus } from 'lucide-react';
+import {
+  X,
+  Play,
+  Trophy,
+  Flame,
+  Zap,
+  Wallet,
+  ShieldAlert,
+  ChevronRight,
+  PlusCircle,
+  Plus,
+  ArrowDownToLine,
+} from 'lucide-react';
 import { QuizCategory, SpeedMode } from '../types';
-import { generateRewardLadder, calculatePotentialWinnings, getStreakMultiplier } from '../data/quizData';
+import { generateRewardLadder, calculatePotentialWinnings } from '../data/quizData';
 import { paymentSettingsService } from '../services/paymentSettingsService';
+import { getCategoryLucideIcon } from './CategoryNav';
 
 interface QuizEntryModalProps {
   isOpen: boolean;
@@ -21,7 +34,7 @@ interface QuizEntryModalProps {
   isDemo?: boolean;
 }
 
-const PRESET_STAKES = [5, 10, 20, 50, 100, 200];
+const PRESET_STAKES = [10, 20, 50, 100, 200, 500];
 
 export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
   isOpen,
@@ -35,17 +48,14 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
   onOpenDeposit,
   onOpenAuth,
   isLoggedIn = true,
-  theme = 'dark',
   isDemo = false,
 }) => {
-  const isDark = theme === 'dark';
   const [stakeInput, setStakeInput] = useState<string>('20');
   const [presetStakes, setPresetStakes] = useState<number[]>(PRESET_STAKES);
   const [minBet, setMinBet] = useState<number>(10);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const numericStake = Math.max(0, parseInt(stakeInput, 10) || 0);
 
-  // Load bet settings from backend
   useEffect(() => {
     const loadBetSettings = async () => {
       try {
@@ -56,8 +66,8 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
         if (settings.min_bet) {
           setMinBet(settings.min_bet);
         }
-      } catch (error) {
-        console.error('Failed to load bet settings:', error);
+      } catch {
+        // fallback
       }
     };
     loadBetSettings();
@@ -66,7 +76,6 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
   const currentMode = speedModes.find((m) => m.id === selectedSpeedModeId) || speedModes[0];
   const questionsCount = currentMode?.questionsCount || 6;
 
-  // Real-time ladder and maximum payout based on stake
   const ladderSteps = useMemo(() => {
     return generateRewardLadder(numericStake, questionsCount);
   }, [numericStake, questionsCount]);
@@ -80,661 +89,276 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Show sign-in prompt if not logged in (skip for demo mode)
   if (!isLoggedIn && !isDemo) {
     return (
-      <AnimatePresence>
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden font-sans">
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-          />
-          
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className={`relative w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden ${
-              isDark ? 'bg-[#0F172A] border-slate-700' : 'bg-white border-slate-200'
-            }`}
-          >
-            {/* Header */}
-            <div className={`p-4 sm:p-5 border-b ${
-              isDark ? 'border-slate-700' : 'border-slate-200'
-            }`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isDark ? 'bg-amber-500/20' : 'bg-amber-100'
-                  }`}>
-                    <Play className={`w-5 h-5 ${isDark ? 'text-amber-400' : 'text-amber-600'}`} />
-                  </div>
-                  <div>
-                    <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      Sign In Required
-                    </h3>
-                    <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                      {category.name} • {currentMode?.name}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className={`p-2 rounded-lg transition-colors ${
-                    isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-slate-100 text-slate-500'
-                  }`}
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Body */}
-            <div className="p-5 sm:p-6 space-y-4">
-              <div className={`p-4 rounded-xl border ${
-                isDark ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-50 border-blue-200'
-              }`}>
-                <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
-                  Please sign in to play {category.name} and start winning real prizes!
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onOpenAuth?.();
-                }}
-                className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg flex items-center justify-center gap-2"
-              >
-                <ShieldAlert className="w-5 h-5" />
-                <span>Sign In to Play</span>
-              </button>
-
-              <p className={`text-xs text-center ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                Don't have an account? You'll be able to create one after signing in.
-              </p>
-            </div>
-          </motion.div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans select-none">
+        <div className="triv-card w-full max-w-sm p-6 text-center space-y-4 shadow-xl">
+          <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] text-[var(--accent-text)] flex items-center justify-center mx-auto">
+            <Wallet className="w-5 h-5" />
+          </div>
+          <h2 className="text-base font-bold text-[var(--text-primary)]">
+            Account Required
+          </h2>
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+            Please log in or sign up to stake and participate in live cash trivia arenas.
+          </p>
+          <div className="flex gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-2 rounded-lg text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                if (onOpenAuth) onOpenAuth();
+              }}
+              className="flex-1 py-2 rounded-lg text-xs font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white transition-colors cursor-pointer"
+            >
+              Sign In
+            </button>
+          </div>
         </div>
-      </AnimatePresence>
+      </div>
     );
   }
+
+  const CategoryIcon = getCategoryLucideIcon(category.id || category.name);
 
   const handlePresetClick = (amount: number) => {
     setStakeInput(String(amount));
   };
 
   const handleMaxClick = () => {
-    const maxVal = Math.min(1000, Math.max(minBet, walletBalance));
-    setStakeInput(String(maxVal));
+    if (walletBalance > 0) {
+      setStakeInput(String(Math.floor(walletBalance)));
+    }
   };
 
   const handleConfirm = () => {
-    if (!isBalanceSufficient) return;
-    if (numericStake < minBet) return;
-    onConfirmStart(category.id, selectedSpeedModeId, numericStake);
-    onClose();
+    if (isBalanceSufficient && isAboveMinBet) {
+      onConfirmStart(category.id, selectedSpeedModeId, numericStake);
+    }
   };
 
   return (
-    <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden font-sans">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 bg-black/85 backdrop-blur-sm cursor-pointer"
-        />
-
-        {/* Modal Window */}
-        <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.98 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 30, scale: 0.98 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={`relative w-full max-w-lg max-h-[92dvh] sm:max-h-[88vh] flex flex-col rounded-t-3xl sm:rounded-2xl border shadow-2xl overflow-hidden z-10 ${
-            isDark ? 'bg-[#0E131E] border-[#222C3E] text-slate-100' : 'bg-white border-slate-200 text-slate-900'
-          }`}
-        >
-          {/* Mobile Drag Indicator Bar */}
-          <div className="w-full flex justify-center pt-2 pb-0.5 sm:hidden shrink-0">
-            <div className={`w-10 h-1 rounded-full ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`} />
-          </div>
-
-          {/* Header */}
-          <div className={`px-4 py-3 sm:p-5 border-b flex items-center justify-between shrink-0 ${
-            isDark ? 'border-[#222C3E] bg-[#121722]' : 'border-slate-200 bg-slate-50'
-          }`}>
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-xl sm:text-2xl border shrink-0 ${
-                isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200 shadow-xs'
-              }`}>
-                {category.icon || '🇰🇪'}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-bold text-base sm:text-lg leading-tight">{category.name}</h2>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded font-extrabold uppercase tracking-wider ${
-                    isDemo
-                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                  }`}>
-                    {isDemo ? 'DEMO' : 'LIVE'}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
-                  {isDemo ? 'Virtual Money Only - Not Real Account Balance' : (category.subtitle || 'Configure stake to activate streak multiplier ladder')}
-                </p>
-              </div>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs font-sans select-none">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="triv-card w-full max-w-lg rounded-t-2xl sm:rounded-2xl flex flex-col max-h-[90vh] overflow-hidden shadow-2xl"
+      >
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center text-[var(--accent-text)] shrink-0">
+              <CategoryIcon className="w-4 h-4" />
             </div>
-
-            <button
-              onClick={onClose}
-              className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                isDark ? 'hover:bg-[#182030] text-slate-400 hover:text-white' : 'hover:bg-slate-200 text-slate-500 hover:text-slate-900'
-              }`}
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="font-bold text-sm sm:text-base text-[var(--text-primary)]">
+                  {category.name}
+                </h2>
+                <span className="text-[9.5px] px-1.5 py-0.2 rounded font-semibold uppercase tracking-wider bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)]">
+                  {isDemo ? 'DEMO' : 'LIVE'}
+                </span>
+              </div>
+              <p className="text-[11px] text-[var(--text-muted)] line-clamp-1">
+                {category.subtitle || 'Configure stake to activate streak multiplier ladder'}
+              </p>
+            </div>
           </div>
 
-          {/* Modal Body - Scrollable */}
-          <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 sm:p-5 space-y-3.5 sm:space-y-4 no-scrollbar">
-            
-            {/* Speed Mode Selector */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                1. Select Speed Mode
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-4 no-scrollbar">
+          {/* 1. Mode selector */}
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">
+              1. Select Speed Mode
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {speedModes.map((mode) => {
+                const isSelected = mode.id === selectedSpeedModeId;
+
+                return (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    onClick={() => onSelectSpeedMode(mode.id)}
+                    className={`p-2.5 rounded-xl border text-center transition-colors cursor-pointer ${
+                      isSelected
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent)] text-[var(--accent-text)] font-semibold'
+                        : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]'
+                    }`}
+                  >
+                    <div className="text-xs font-bold truncate">{mode.name.split(' ')[0]}</div>
+                    <div className="text-[10px] text-[var(--text-muted)] mt-0.5 font-mono">
+                      {mode.questionsCount}Q · {mode.durationSeconds}s
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 2. Stake Amount */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                2. Enter Stake (KES)
               </label>
-              <div className="grid grid-cols-3 gap-2">
-                {speedModes.map((mode) => {
-                  const isSelected = mode.id === selectedSpeedModeId;
-                  return (
-                    <button
-                      key={mode.id}
-                      type="button"
-                      onClick={() => onSelectSpeedMode(mode.id)}
-                      className={`p-2 sm:p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
-                        isSelected
-                          ? isDark
-                            ? 'bg-[#1E293B] border-slate-200 text-white ring-1 ring-slate-300 shadow-xs'
-                            : 'bg-slate-900 border-slate-900 text-white shadow-xs'
-                          : isDark
-                            ? 'bg-[#121722] border-[#222C3E] text-slate-400 hover:text-slate-200 hover:bg-[#182030]'
-                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
-                    >
-                      <div className="text-xs font-bold truncate">{mode.name.split(' ')[0]}</div>
-                      <div className={`text-[10px] mt-0.5 font-semibold ${
-                        isSelected
-                          ? isDark ? 'text-slate-300' : 'text-slate-300'
-                          : isDark ? 'text-slate-500' : 'text-slate-500'
-                      }`}>
-                        {mode.questionsCount}Q · {mode.durationSeconds}s
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Stake Amount Input */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  2. Enter Stake Amount
-                </label>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-                    <Wallet className={`w-3.5 h-3.5 ${isDemo ? 'text-purple-400' : 'text-emerald-400'}`} />
-                    <span>{isDemo ? 'Demo Balance:' : 'Balance:'}</span>
-                    <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      KSh {walletBalance.toLocaleString()}
-                    </span>
-                  </div>
-                  {onOpenDeposit && !isDemo && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose();
-                        onOpenDeposit();
-                      }}
-                      className="px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
-                    >
-                      <Plus className="w-3 h-3" />
-                      Deposit
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Currency Input Box */}
-              <div className={`relative flex items-center rounded-xl border transition-all ${
-                !isBalanceSufficient && numericStake > 0
-                  ? 'border-rose-500 ring-1 ring-rose-500/40'
-                  : isDark
-                    ? 'bg-[#121722] border-[#222C3E] focus-within:border-slate-400'
-                    : 'bg-slate-50 border-slate-200 focus-within:border-slate-900'
-              }`}>
-                <div className="pl-3.5 pr-2 font-black text-sm text-slate-400 select-none">
-                  KSh
-                </div>
-                <input
-                  type="number"
-                  min={minBet}
-                  step="5"
-                  value={stakeInput}
-                  onChange={(e) => setStakeInput(e.target.value)}
-                  placeholder="20"
-                  className={`w-full py-2.5 sm:py-3 pr-14 text-base sm:text-lg font-black bg-transparent outline-none ${
-                    isDark ? 'text-white' : 'text-slate-950'
-                  }`}
-                />
-                <button
-                  type="button"
-                  onClick={handleMaxClick}
-                  className={`absolute right-2.5 px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider cursor-pointer transition-colors ${
-                    isDark
-                      ? 'bg-[#182030] text-slate-300 hover:text-white border border-[#222C3E]'
-                      : 'bg-white text-slate-700 hover:text-slate-950 border border-slate-200 shadow-xs'
-                  }`}
-                >
-                  MAX
-                </button>
-              </div>
-
-              {/* Quick Amount Buttons */}
-              <div className="grid grid-cols-6 gap-1 sm:gap-1.5 mt-2">
-                {presetStakes.map((amount) => {
-                  const isSelected = numericStake === amount;
-                  return (
-                    <button
-                      key={amount}
-                      type="button"
-                      onClick={() => handlePresetClick(amount)}
-                      className={`py-1.5 px-0.5 sm:px-1 rounded-lg border text-xs font-bold transition-all cursor-pointer text-center ${
-                        isSelected
-                          ? isDark
-                            ? 'bg-white text-slate-950 border-white font-black'
-                            : 'bg-slate-900 text-white border-slate-900 font-black'
-                          : isDark
-                            ? 'bg-[#121722] border-[#222C3E] text-slate-300 hover:border-slate-500 hover:bg-[#182030]'
-                            : 'bg-white border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-slate-50'
-                      }`}
-                    >
-                      {amount}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Low Balance Warning / Deposit Action */}
-              {!isBalanceSufficient && numericStake > 0 && (
-                <div className="mt-2 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between text-xs text-rose-400">
-                  <div className="flex items-center gap-1.5">
-                    <ShieldAlert className="w-4 h-4 shrink-0" />
-                    <span className="text-[11px] font-medium">
-                      {isDemo ? 'Demo balance insufficient' : `Stake exceeds balance (KSh ${walletBalance})`}
-                    </span>
-                  </div>
-                  {onOpenDeposit && !isDemo && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose();
-                        onOpenDeposit();
-                      }}
-                      className="px-2.5 py-1 rounded-lg bg-rose-500 text-white font-bold text-[11px] flex items-center gap-1 hover:bg-rose-600 transition-colors cursor-pointer"
-                    >
-                      <PlusCircle className="w-3 h-3" />
-                      <span>Top Up</span>
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Minimum Bet Warning */}
-              {numericStake > 0 && numericStake < minBet && (
-                <div className="mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-1.5 text-xs text-amber-400">
-                  <ShieldAlert className="w-4 h-4 shrink-0" />
-                  <span className="text-[11px] font-medium">Minimum bet is KSh {minBet}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Exit Confirmation Modal for Demo */}
-            {isDemo && showExitConfirm && (
-              <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowExitConfirm(false)} />
-                <div className={`relative w-full max-w-sm rounded-2xl border shadow-2xl p-6 ${
-                  isDark ? 'bg-[#0E131E] border-[#222C3E]' : 'bg-white border-slate-200'
-                }`}>
-                  <div className="text-center">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                      isDark ? 'bg-purple-500/20' : 'bg-purple-100'
-                    }`}>
-                      <X className={`w-6 h-6 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
-                    </div>
-                    <h3 className={`font-bold text-lg mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                      Exit Demo?
-                    </h3>
-                    <p className={`text-sm mb-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                      Are you sure you want to leave the demo? Your progress will be lost.
-                    </p>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setShowExitConfirm(false)}
-                        className={`flex-1 py-3 rounded-xl font-bold text-sm transition-colors ${
-                          isDark
-                            ? 'bg-[#182030] text-slate-300 hover:text-white border border-[#222C3E]'
-                            : 'bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200'
-                        }`}
-                      >
-                        Stay in Demo
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowExitConfirm(false);
-                          onClose();
-                        }}
-                        className="flex-1 py-3 rounded-xl font-bold text-sm bg-purple-600 hover:bg-purple-500 text-white transition-colors"
-                      >
-                        Exit Demo
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Potential Payout & Multiplier Mechanics Card - Hide for demo */}
-            {!isDemo && (
-            <div className={`p-3.5 sm:p-4 rounded-xl border transition-all ${
-              isDark ? 'bg-[#121722] border-[#222C3E]' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                  <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Max Potential Payout</span>
+              <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+                <Wallet className="w-3.5 h-3.5 text-[var(--accent-text)]" />
+                <span>Balance:</span>
+                <span className="font-mono font-bold text-[var(--text-primary)]">
+                  KES {walletBalance.toLocaleString()}
                 </span>
-                <span className={`text-lg sm:text-xl font-black tracking-tight ${
-                  isDark ? 'text-emerald-400' : 'text-emerald-600'
-                }`}>
-                  KSh {maxPotentialPayout.toLocaleString()}
-                </span>
-              </div>
-
-              {/* High-Contrast Streak Multiplier Banner */}
-              <div className={`p-2.5 rounded-xl border flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 text-[11px] font-bold ${
-                isDark
-                  ? 'bg-[#0A0E18] border-amber-500/30'
-                  : 'bg-amber-50/90 border-amber-200'
-              }`}>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <Flame className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
-                  <span className={`uppercase font-black tracking-wider text-[11px] ${
-                    isDark ? 'text-amber-400' : 'text-amber-900'
-                  }`}>
-                    STREAK BOOST:
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5 overflow-x-auto w-full xs:w-auto pb-0.5 xs:pb-0 no-scrollbar">
-                  {/* 2x Chip */}
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-lg border font-black text-[10px] whitespace-nowrap shadow-2xs ${
-                    isDark
-                      ? 'bg-amber-950/60 border-amber-500/60 text-amber-200'
-                      : 'bg-amber-100 border-amber-300 text-amber-950'
-                  }`}>
-                    <span className="px-1 py-0.2 rounded bg-amber-500 text-slate-950 text-[9px] font-black">2x</span>
-                    <span>@ 2 Streak</span>
-                  </div>
-
-                  {/* 3x Chip */}
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-lg border font-black text-[10px] whitespace-nowrap shadow-2xs ${
-                    isDark
-                      ? 'bg-orange-950/60 border-orange-500/60 text-orange-200'
-                      : 'bg-orange-100 border-orange-300 text-orange-950'
-                  }`}>
-                    <span className="px-1 py-0.2 rounded bg-orange-500 text-white text-[9px] font-black">3x</span>
-                    <span>@ 3 Streak</span>
-                  </div>
-
-                  {/* 5x Chip */}
-                  <div className={`flex items-center gap-1 px-2 py-1 rounded-lg border font-black text-[10px] whitespace-nowrap shadow-2xs ${
-                    isDark
-                      ? 'bg-emerald-950/60 border-emerald-500/60 text-emerald-200'
-                      : 'bg-emerald-100 border-emerald-300 text-emerald-950'
-                  }`}>
-                    <span className="px-1 py-0.2 rounded bg-emerald-400 text-slate-950 text-[9px] font-black">5x</span>
-                    <span>@ 5 Streak</span>
-                  </div>
-                </div>
+                {onOpenDeposit && !isDemo && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenDeposit();
+                    }}
+                    className="ml-1.5 px-2 py-0.5 rounded-md bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-[10px] font-extrabold flex items-center gap-1 shadow-xs transition-all cursor-pointer"
+                    title="Deposit Funds"
+                  >
+                    <ArrowDownToLine className="w-3 h-3 stroke-[2.5]" />
+                    <span>Deposit</span>
+                  </button>
+                )}
               </div>
             </div>
-            )}
 
-            {/* Sample Reward Pipeline Preview (Scaled to KSh stake) - Hide for demo */}
-            {!isDemo && (
-            <div className={`p-3.5 rounded-xl border transition-all ${
-              isDark ? 'bg-[#121722] border-[#222C3E]' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <div className={`text-xs font-bold flex items-center gap-1.5 ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>
-                    <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Reward Pipeline</span>
-                  </div>
-                  <div className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Scaled to KSh {numericStake || 20} stake
-                  </div>
-                </div>
-
-                {/* Mobile badge indicator */}
-                <div className="sm:hidden flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full border border-amber-500/40 bg-amber-500/10 text-amber-400">
-                  <span>Q3 · Q4 · Q5 BOOSTS</span>
-                </div>
-
-                {/* Desktop scroll hint */}
-                <div className={`hidden sm:flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                  isDark ? 'bg-[#182030] border-slate-700 text-amber-400' : 'bg-white border-slate-200 text-amber-700 shadow-2xs'
-                }`}>
-                  <span>Scroll questions</span>
-                  <span>→</span>
-                </div>
-              </div>
-
-              {/* MOBILE PIPELINE: Specifically Questions 3, 4, 5 with 2X, 3X, 5X Odds shown clearly */}
-              <div className="grid grid-cols-3 gap-2 sm:hidden pt-0.5">
-                {[3, 4, 5].map((qNum) => {
-                  const stepIndex = qNum - 1;
-                  const step = ladderSteps[stepIndex] || {
-                    questionNumber: qNum,
-                    rewardKsh: qNum === 3 ? 16 : qNum === 4 ? 30 : 60,
-                  };
-                  const multiplier = qNum === 3 ? 2 : qNum === 4 ? 3 : 5;
-                  const multipliedReward = step.rewardKsh * multiplier;
-
-                  const badgeBg =
-                    multiplier === 5
-                      ? 'bg-emerald-400 text-slate-950 ring-1 ring-emerald-300'
-                      : multiplier === 3
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-amber-400 text-slate-950';
-
-                  const cardStyle =
-                    multiplier === 5
-                      ? isDark
-                        ? 'bg-emerald-950/30 border-emerald-500/60 ring-1 ring-emerald-500/30'
-                        : 'bg-emerald-50/90 border-emerald-300 shadow-xs'
-                      : multiplier === 3
-                      ? isDark
-                        ? 'bg-orange-950/20 border-orange-500/50'
-                        : 'bg-orange-50/80 border-orange-300 shadow-xs'
-                      : isDark
-                      ? 'bg-amber-950/20 border-amber-500/50'
-                      : 'bg-amber-50/80 border-amber-300 shadow-xs';
-
-                  return (
-                    <div
-                      key={qNum}
-                      className={`p-2 rounded-xl border text-center transition-all flex flex-col justify-between ${cardStyle}`}
-                    >
-                      {/* Top row: Q number + Odds Pill */}
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <span className={`text-[10px] font-black px-1.5 py-0.2 rounded ${
-                          isDark ? 'bg-slate-800/80 text-slate-200' : 'bg-slate-200 text-slate-800'
-                        }`}>
-                          Q{qNum}
-                        </span>
-                        <span className={`text-[9px] px-1.5 py-0.2 rounded font-black tracking-tight shadow-2xs ${badgeBg}`}>
-                          {multiplier}X ODDS
-                        </span>
-                      </div>
-
-                      {/* Main Multiplied Reward Amount */}
-                      <div className={`text-xs xs:text-sm font-black tracking-tight my-1 whitespace-nowrap ${
-                        multiplier === 5
-                          ? 'text-emerald-400'
-                          : multiplier === 3
-                          ? 'text-orange-400'
-                          : 'text-amber-400'
-                      }`}>
-                        KSh {multipliedReward.toLocaleString()}
-                      </div>
-
-                      {/* Base Reward Subtext */}
-                      <div className="text-[8.5px] text-slate-400 font-semibold whitespace-nowrap">
-                        Base KSh {step.rewardKsh}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* DESKTOP PIPELINE: Horizontal Question Cards Ribbon */}
-              <div className="hidden sm:flex gap-2 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar snap-x snap-mandatory">
-                {ladderSteps.slice(0, questionsCount).map((step, idx) => {
-                  const mult = getStreakMultiplier(idx);
-                  const multipliedReward = step.rewardKsh * mult;
-
-                  return (
-                    <div
-                      key={step.questionNumber}
-                      className={`flex-none w-[105px] p-2.5 rounded-xl border text-center snap-start transition-all shadow-xs ${
-                        mult >= 5
-                          ? isDark
-                            ? 'bg-emerald-950/30 border-emerald-500/50 ring-1 ring-emerald-500/30'
-                            : 'bg-emerald-50/80 border-emerald-300'
-                          : mult >= 2
-                            ? isDark
-                              ? 'bg-amber-950/20 border-amber-500/40'
-                              : 'bg-amber-50/70 border-amber-300'
-                            : isDark
-                              ? 'bg-[#161D2B] border-[#222C3E]'
-                              : 'bg-white border-slate-200'
-                      }`}
-                    >
-                      {/* Question Badge & Multiplier Tag */}
-                      <div className="flex items-center justify-between text-[10px] font-black mb-1.5">
-                        <span className={`px-1.5 py-0.2 rounded ${
-                          isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-700'
-                        }`}>
-                          Q{step.questionNumber}
-                        </span>
-
-                        {mult > 1 ? (
-                          <span className={`text-[9px] px-1.5 py-0.2 rounded font-black tracking-tight ${
-                            mult >= 5
-                              ? 'bg-emerald-400 text-slate-950 shadow-2xs'
-                              : mult >= 3
-                                ? 'bg-orange-500 text-white shadow-2xs'
-                                : 'bg-amber-400 text-slate-950 shadow-2xs'
-                          }`}>
-                            {mult}x Boost
-                          </span>
-                        ) : (
-                          <span className="text-[9px] font-bold text-slate-400 opacity-60">1x Base</span>
-                        )}
-                      </div>
-
-                      {/* Large Clear Reward */}
-                      <div className={`text-sm font-black tracking-tight whitespace-nowrap ${
-                        mult >= 5
-                          ? 'text-emerald-400'
-                          : mult >= 2
-                            ? 'text-amber-400'
-                            : isDark
-                              ? 'text-slate-100'
-                              : 'text-slate-900'
-                      }`}>
-                        KSh {multipliedReward.toLocaleString()}
-                      </div>
-
-                      {/* Base Reward Subtext */}
-                      <div className="text-[9px] text-slate-400 font-semibold mt-1 whitespace-nowrap">
-                        {mult > 1 ? `Base KSh ${step.rewardKsh}` : 'Round step'}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            )}
-          </div>
-
-          {/* Modal Footer CTA - Always Pinned at Bottom */}
-          <div className={`p-3.5 sm:p-5 border-t flex items-center gap-2.5 sm:gap-3 shrink-0 shadow-lg ${
-            isDark ? 'border-[#222C3E] bg-[#121722]' : 'border-slate-200 bg-slate-50'
-          }`}>
-            <button
-              type="button"
-              onClick={() => {
-                if (isDemo) {
-                  setShowExitConfirm(true);
-                } else {
-                  onClose();
-                }
-              }}
-              className={`py-3 px-3.5 sm:px-4 rounded-xl border text-xs font-bold transition-colors cursor-pointer shrink-0 ${
-                isDark
-                  ? 'border-[#222C3E] text-slate-400 hover:text-white hover:bg-[#182030]'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              Cancel
-            </button>
-
-            <button
-              type="button"
-              onClick={handleConfirm}
-              disabled={!isBalanceSufficient || !isAboveMinBet}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99] text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500 ${
-                isDemo
-                  ? 'bg-purple-600 hover:bg-purple-500'
-                  : 'bg-emerald-600 hover:bg-emerald-500'
-              }`}
-            >
-              <Play className="w-4 h-4 fill-white" />
-              <span className="truncate">
-                {numericStake > 0
-                  ? `${isDemo ? 'Start Demo' : 'Start Quiz'} · KSh ${numericStake.toLocaleString()}`
-                  : 'Enter Stake Amount'}
+            {/* Input */}
+            <div className="relative flex items-center rounded-xl bg-[var(--surface)] border border-[var(--border)] focus-within:border-[var(--accent)] transition-colors">
+              <span className="pl-3.5 text-xs font-mono font-bold text-[var(--text-muted)] select-none">
+                KES
               </span>
-              <ChevronRight className="w-4 h-4 shrink-0" />
-            </button>
+              <input
+                type="number"
+                min={minBet}
+                step="5"
+                value={stakeInput}
+                onChange={(e) => setStakeInput(e.target.value)}
+                placeholder="20"
+                className="w-full py-2.5 pl-2 pr-14 text-sm font-mono font-bold bg-transparent text-[var(--text-primary)] outline-none"
+              />
+              <button
+                type="button"
+                onClick={handleMaxClick}
+                className="absolute right-2 px-2 py-1 rounded-md text-[10px] font-bold bg-[var(--card)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer"
+              >
+                MAX
+              </button>
+            </div>
+
+            {/* Preset Stakes */}
+            <div className="grid grid-cols-6 gap-1.5 mt-2">
+              {presetStakes.map((amount) => {
+                const isSelected = numericStake === amount;
+                return (
+                  <button
+                    key={amount}
+                    type="button"
+                    onClick={() => handlePresetClick(amount)}
+                    className={`py-1 rounded-lg text-xs font-mono font-semibold transition-colors cursor-pointer border ${
+                      isSelected
+                        ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                        : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--surface-hover)]'
+                    }`}
+                  >
+                    {amount}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Insufficient balance message */}
+            {!isBalanceSufficient && numericStake > 0 && (
+              <div className="mt-2 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-between text-xs">
+                <span className="font-semibold">Insufficient balance for KES {numericStake}</span>
+                {onOpenDeposit && !isDemo && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenDeposit();
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-[11px] flex items-center gap-1 shadow-xs transition-all cursor-pointer"
+                  >
+                    <ArrowDownToLine className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>Deposit Now</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+
+          {/* 3. Potential Payout Card */}
+          <div className="p-3.5 rounded-xl bg-[var(--surface)] border border-[var(--border)]">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center gap-1">
+                <Trophy className="w-3.5 h-3.5 text-[var(--accent-text)]" />
+                <span>Max Potential Payout</span>
+              </span>
+              <span className="font-mono font-bold text-base text-[var(--success)]">
+                KES {maxPotentialPayout.toLocaleString()}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-[var(--border)] text-center text-[10px]">
+              <div className="p-1 rounded bg-[var(--card)] border border-[var(--border)]">
+                <span className="text-[var(--text-muted)] block">2 Streak</span>
+                <span className="font-mono font-bold text-[var(--accent-text)]">2x Boost</span>
+              </div>
+              <div className="p-1 rounded bg-[var(--card)] border border-[var(--border)]">
+                <span className="text-[var(--text-muted)] block">3 Streak</span>
+                <span className="font-mono font-bold text-[var(--accent-text)]">3x Boost</span>
+              </div>
+              <div className="p-1 rounded bg-[var(--card)] border border-[var(--border)]">
+                <span className="text-[var(--text-muted)] block">5 Streak</span>
+                <span className="font-mono font-bold text-[var(--success)]">5x Boost</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-[var(--border)] bg-[var(--surface)] flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="py-2.5 px-4 rounded-lg text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={!isBalanceSufficient || !isAboveMinBet}
+            className="flex-1 py-2.5 px-4 rounded-lg text-xs font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+          >
+            <Play className="w-3.5 h-3.5 fill-white" />
+            <span>Enter Quiz Arena (KES {numericStake.toLocaleString()})</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </motion.div>
+    </div>
   );
 };

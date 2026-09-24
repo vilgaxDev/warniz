@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, ArrowUpRight, History, Trophy, Bell, Key, Lock, Settings,
-  FileText, ShieldCheck, LogOut, Plus, LogIn, X, ChevronRight, Wallet, Sparkles, HelpCircle, Gift, Eye, EyeOff
+  FileText, ShieldCheck, LogOut, Plus, LogIn, X, ChevronRight, Wallet, Sparkles, HelpCircle, Gift, Eye, EyeOff,
+  ArrowDownToLine, ArrowUpFromLine
 } from 'lucide-react';
 import { UserProfile, UserState } from '../types';
 
@@ -219,39 +220,37 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <button
                       onClick={handleDepositClick}
-                      className="py-2 px-3 rounded-xl bg-[#00A344] hover:bg-[#008A38] text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md active:scale-95"
+                      className="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md shadow-emerald-600/20 active:scale-95"
                     >
-                      <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                      <ArrowDownToLine className="w-3.5 h-3.5 stroke-[2.5]" />
                       <span>Deposit</span>
                     </button>
 
                     <button
                       onClick={handleWithdrawClick}
-                      className="py-2 px-3 rounded-xl bg-[#121722] border border-[#EF4444]/50 hover:bg-[#EF4444] text-[#EF4444] hover:text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-sm active:scale-95"
+                      className="py-2.5 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-black text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md shadow-rose-600/20 active:scale-95"
                     >
-                      <ArrowUpRight className="w-3.5 h-3.5 stroke-[3]" />
+                      <ArrowUpFromLine className="w-3.5 h-3.5 stroke-[2.5]" />
                       <span>Withdraw</span>
                     </button>
                   </div>
                 </div>
               ) : (
                 /* Guest Player Card */
-                <div className={`p-4 rounded-xl border text-center space-y-2.5 ${
-                  isDark ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-emerald-200 bg-emerald-50'
-                }`}>
-                  <div className="w-10 h-10 mx-auto rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center">
+                <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-center space-y-2.5">
+                  <div className="w-10 h-10 mx-auto rounded-full bg-[var(--accent-soft)] text-[var(--accent-text)] flex items-center justify-center">
                     <User className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className={`font-bold text-sm ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Guest Player</h4>
-                    <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Sign in to save KES quiz earnings & rank up.</p>
+                    <h4 className="font-bold text-sm text-[var(--text-primary)]">Guest Player</h4>
+                    <p className="text-xs mt-0.5 text-[var(--text-muted)]">Sign in to save KES quiz earnings & rank up.</p>
                   </div>
                   <button
                     onClick={() => {
                       onOpenAuth();
                       onClose();
                     }}
-                    className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs shadow-emerald-600/20"
+                    className="w-full py-2 px-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs"
                   >
                     <LogIn className="w-3.5 h-3.5" />
                     <span>Sign In / Register</span>

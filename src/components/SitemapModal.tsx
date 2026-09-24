@@ -22,6 +22,8 @@ import {
   Lock,
   Layers,
   X,
+  ArrowDownToLine,
+  ArrowUpFromLine,
 } from 'lucide-react';
 import { TrivquestIcon } from './TrivquestLogo';
 import { QUIZ_CATEGORIES, SPEED_MODES } from '../data/quizData';
@@ -171,7 +173,7 @@ export const SitemapModal: React.FC<SitemapModalProps> = ({
           title: 'Direct M-PESA Cashout / Withdrawal',
           subtitle: 'Withdraw winnings straight to your Safaricom phone number from KSh 50.',
           badge: 'Zero Delay',
-          badgeColor: 'bg-teal-500/15 text-teal-400 border border-teal-500/30',
+          badgeColor: 'bg-rose-500/15 text-rose-400 border border-rose-500/30',
           action: () => {
             onOpenWithdraw();
             onClose();
@@ -540,14 +542,22 @@ export const SitemapModal: React.FC<SitemapModalProps> = ({
 
                       <button
                         type="button"
-                        className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-all ${
-                          isDark
+                        className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold flex items-center gap-1 transition-all ${
+                          item.type === 'deposit'
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
+                            : item.type === 'withdraw'
+                            ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-xs'
+                            : isDark
                             ? 'bg-[#182438] text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white'
                             : 'bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white'
                         }`}
                       >
+                        {item.type === 'deposit' && <ArrowDownToLine className="w-3 h-3 stroke-[2.5]" />}
+                        {item.type === 'withdraw' && <ArrowUpFromLine className="w-3 h-3 stroke-[2.5]" />}
                         <span>{item.actionLabel}</span>
-                        <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                        {item.type !== 'deposit' && item.type !== 'withdraw' && (
+                          <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                        )}
                       </button>
                     </div>
                   ))}

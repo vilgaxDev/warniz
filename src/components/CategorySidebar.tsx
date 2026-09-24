@@ -1,82 +1,149 @@
-import React from 'react';
+import React, { useState } from 'react';
+import {
+  LayoutGrid,
+  TrendingUp,
+  Trophy,
+  Atom,
+  Cpu,
+  ChartNoAxesCombined,
+  Bitcoin,
+  Globe2,
+  Landmark,
+  Clapperboard,
+  ChevronDown,
+  ChevronUp,
+  Brain,
+  MapPin,
+  Sparkles,
+} from 'lucide-react';
 import { QuizCategory } from '../types';
 
 interface CategorySidebarProps {
-  categories: QuizCategory[];
+  categories?: QuizCategory[];
   selectedCategory: string;
   onCategorySelect: (categoryId: string) => void;
+  className?: string;
   theme?: 'dark' | 'light';
 }
 
+interface SidebarItem {
+  id: string;
+  name: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+const PRIMARY_SIDEBAR_ITEMS: SidebarItem[] = [
+  { id: 'all', name: 'All', icon: LayoutGrid },
+  { id: 'trending', name: 'Trending', icon: TrendingUp },
+  { id: 'sports', name: 'Sports', icon: Trophy },
+  { id: 'science', name: 'Science', icon: Atom },
+  { id: 'tech', name: 'Technology', icon: Cpu },
+  { id: 'finance', name: 'Finance', icon: ChartNoAxesCombined },
+  { id: 'crypto', name: 'Crypto', icon: Bitcoin },
+  { id: 'world', name: 'World', icon: Globe2 },
+  { id: 'politics', name: 'Politics', icon: Landmark },
+  { id: 'entertainment', name: 'Entertainment', icon: Clapperboard },
+];
+
+const MORE_SIDEBAR_ITEMS: SidebarItem[] = [
+  { id: 'kenya', name: 'Kenya', icon: MapPin },
+  { id: 'general_knowledge', name: 'General Trivia', icon: Brain },
+];
+
 export const CategorySidebar: React.FC<CategorySidebarProps> = ({
-  categories,
   selectedCategory,
   onCategorySelect,
-  theme = 'dark',
+  className = '',
 }) => {
-  const isDark = theme === 'dark';
-
-  const allCategories = [
-    { id: 'all', name: 'All Categories', icon: '🌟', subtitle: 'Browse all trivia categories' },
-    ...categories,
-  ];
+  const [showMore, setShowMore] = useState(false);
 
   return (
-    <div className={`p-4 rounded-2xl border sticky top-24 ${
-      isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200'
-    }`}>
-      <h3 className={`text-sm font-bold uppercase tracking-wider mb-4 ${
-        isDark ? 'text-slate-400' : 'text-slate-600'
-      }`}>
-        Categories
-      </h3>
+    <aside className={`w-full triv-card p-3 select-none ${className}`}>
+      <div className="flex items-center justify-between px-2 py-1.5 mb-2">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+          Categories
+        </span>
+      </div>
 
-      <div className="space-y-1">
-        {allCategories.map((category) => {
-          const isSelected = selectedCategory === category.id;
-          
+      <nav className="space-y-0.5">
+        {PRIMARY_SIDEBAR_ITEMS.map((item) => {
+          const isSelected = selectedCategory === item.id || (!selectedCategory && item.id === 'all');
+          const Icon = item.icon;
+
           return (
             <button
-              key={category.id}
-              onClick={() => onCategorySelect(category.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
+              key={item.id}
+              type="button"
+              onClick={() => onCategorySelect(item.id)}
+              className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer text-left ${
                 isSelected
-                  ? isDark
-                    ? 'bg-emerald-600 text-white shadow-lg'
-                    : 'bg-emerald-600 text-white shadow-lg'
-                  : isDark
-                    ? 'hover:bg-[#222C3E] text-slate-300 hover:text-white'
-                    : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
+                  ? 'bg-[var(--accent-soft)] text-[var(--accent-text)] font-semibold border border-[var(--border-strong)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent'
               }`}
             >
-              <span className="text-lg shrink-0">{category.icon}</span>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm truncate">{category.name}</div>
-                {category.subtitle && (
-                  <div className={`text-xs truncate ${isSelected ? 'text-white/70' : isDark ? 'text-slate-500' : 'text-slate-500'}`}>
-                    {category.subtitle}
-                  </div>
-                )}
+              <div className="flex items-center gap-2.5 truncate">
+                <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[var(--accent-text)]' : 'text-[var(--text-muted)]'}`} />
+                <span className="truncate">{item.name}</span>
               </div>
               {isSelected && (
-                <div className="w-2 h-2 rounded-full bg-white shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
               )}
             </button>
           );
         })}
-      </div>
 
-      {/* Stats Section */}
-      <div className={`mt-6 pt-6 border-t ${
-        isDark ? 'border-[#222C3E]' : 'border-slate-200'
-      }`}>
-        <div className={`text-xs font-medium mb-3 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-          Available Categories
+        {/* More categories dropdown accordion */}
+        {showMore && (
+          <div className="pt-0.5 space-y-0.5 border-t border-[var(--border)] mt-1">
+            {MORE_SIDEBAR_ITEMS.map((item) => {
+              const isSelected = selectedCategory === item.id;
+              const Icon = item.icon;
+
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onCategorySelect(item.id)}
+                  className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer text-left ${
+                    isSelected
+                      ? 'bg-[var(--accent-soft)] text-[var(--accent-text)] font-semibold border border-[var(--border-strong)]'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-[var(--accent-text)]' : 'text-[var(--text-muted)]'}`} />
+                    <span className="truncate">{item.name}</span>
+                  </div>
+                  {isSelected && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setShowMore(!showMore)}
+          className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer mt-1"
+        >
+          <span>{showMore ? 'Less' : 'More'}</span>
+          {showMore ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </button>
+      </nav>
+
+      {/* Speed Arena Info Box */}
+      <div className="mt-4 pt-3 border-t border-[var(--border)] px-2">
+        <div className="flex items-center justify-between text-[11px] mb-1">
+          <span className="text-[var(--text-muted)]">Live Multiplier</span>
+          <span className="font-mono font-semibold text-[var(--success)]">Up to 10x</span>
         </div>
-        <div className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-          {categories.length}
+        <div className="flex items-center justify-between text-[11px]">
+          <span className="text-[var(--text-muted)]">Settlement</span>
+          <span className="font-mono text-[var(--text-secondary)]">Instant M-Pesa</span>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };

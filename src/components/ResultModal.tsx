@@ -1,6 +1,15 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Flame, Wallet, RotateCcw, ArrowRight, ShieldCheck, AlertCircle, Sparkles, Star, Gift, Share2 } from 'lucide-react';
+import { motion } from 'motion/react';
+import {
+  Trophy,
+  Flame,
+  Wallet,
+  RotateCcw,
+  ArrowRight,
+  ShieldCheck,
+  AlertCircle,
+  Share2,
+} from 'lucide-react';
 
 interface ResultModalProps {
   totalWon: number;
@@ -27,16 +36,10 @@ export const ResultModal: React.FC<ResultModalProps> = ({
   categoryName,
   onClaimAndContinue,
   onPlayAgain,
-  theme = 'dark',
   stakeAmount = 0,
-  isDemo = false,
-  onSignUp,
   onShareBettingSlip,
 }) => {
-  const isDark = theme === 'dark';
   const isVictory = reason === 'completed' || reason === 'cashed_out';
-  const isBigWin = isVictory && totalWon > (stakeAmount * 2); // Won more than 2x stake
-  const showCongrats = isVictory && (totalWon > 0);
 
   const getTitle = () => {
     switch (reason) {
@@ -56,265 +59,117 @@ export const ResultModal: React.FC<ResultModalProps> = ({
   const getSubtitle = () => {
     switch (reason) {
       case 'cashed_out':
-        return `You safely locked in KSh ${totalWon.toLocaleString()} in accumulated trivia cash rewards.`;
+        return `You safely locked in KES ${totalWon.toLocaleString()} in speed trivia earnings.`;
       case 'completed':
-        return `Perfect score! Answered all ${totalQuestions} questions correctly.`;
+        return `Perfect accuracy! All ${totalQuestions} questions answered correctly.`;
       case 'timeout':
-        return `Time limit elapsed on question ${questionsCorrect + 1}.`;
+        return `Timer ran out on question ${questionsCorrect + 1}.`;
       case 'wrong_answer':
       case 'wrong':
       default:
-        return `Challenge settled on question ${questionsCorrect + 1}.`;
+        return `Arena round settled on question ${questionsCorrect + 1}.`;
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm font-sans">
-      {/* Congratulations Overlay for Wins */}
-      <AnimatePresence>
-        {showCongrats && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="relative"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur-3xl opacity-30 animate-pulse" />
-              <div className="relative text-8xl mb-4">
-                {isBigWin ? '🎉' : '🏆'}
-              </div>
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className={`text-3xl font-black text-center ${
-                  isDark ? 'text-white' : 'text-slate-900'
-                }`}
-              >
-                {isBigWin ? 'BIG WIN!' : 'CONGRATULATIONS!'}
-              </motion.div>
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className={`text-xl font-bold text-center mt-2 ${
-                  isDark ? 'text-emerald-400' : 'text-emerald-600'
-                }`}
-              >
-                +KSh {totalWon.toLocaleString()}
-              </motion.div>
-              {/* Floating particles */}
-              {[...Array(8)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ scale: 0, x: 0, y: 0 }}
-                  animate={{
-                    scale: [0, 1, 0],
-                    x: [0, Math.cos(i * 45 * Math.PI / 180) * 100],
-                    y: [0, Math.sin(i * 45 * Math.PI / 180) * 100],
-                  }}
-                  transition={{ duration: 1.5, delay: 0.5 + i * 0.1 }}
-                  className="absolute top-1/2 left-1/2 w-4 h-4"
-                >
-                  <div className="w-full h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full" />
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans select-none">
       <motion.div
-        initial={{ scale: 0.95, opacity: 0, y: 10 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        className={`w-full max-w-md rounded-2xl p-6 border flex flex-col items-center text-center relative overflow-hidden shadow-2xl ${
-          isDark ? 'bg-[#121927] border-slate-800' : 'bg-white border-slate-200'
-        }`}
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="w-full max-w-sm triv-card p-6 flex flex-col items-center text-center shadow-xl relative"
       >
-        {/* Status Icon Header */}
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border ${
+        {/* Status Icon */}
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 border ${
           isVictory
-            ? isDark ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-400' : 'bg-emerald-100 border-emerald-300 text-emerald-800'
-            : isDark ? 'bg-rose-950/60 border-rose-500/50 text-rose-400' : 'bg-rose-100 border-rose-300 text-rose-800'
+            ? 'bg-[var(--success-soft)] border-[var(--success)] text-[var(--success)]'
+            : 'bg-[var(--danger-soft)] border-[var(--danger)] text-[var(--danger)]'
         }`}>
           {reason === 'cashed_out' ? (
-            <ShieldCheck className="w-7 h-7" />
+            <ShieldCheck className="w-6 h-6" />
           ) : isVictory ? (
-            <Trophy className="w-7 h-7" />
+            <Trophy className="w-6 h-6" />
           ) : (
-            <AlertCircle className="w-7 h-7" />
+            <AlertCircle className="w-6 h-6" />
           )}
         </div>
 
         {/* Category Badge */}
-        <span className={`text-[11px] px-2.5 py-0.5 rounded-md border mb-2 uppercase tracking-wider font-semibold ${
-          isDark ? 'bg-slate-800 text-slate-300 border-slate-700/80' : 'bg-slate-100 text-slate-700 border-slate-200'
-        }`}>
+        <span className="text-[10px] px-2 py-0.5 rounded font-semibold uppercase tracking-wider bg-[var(--surface)] text-[var(--text-muted)] border border-[var(--border)] mb-2">
           {categoryName}
         </span>
 
         {/* Title & Subtitle */}
-        <h2 className={`text-xl sm:text-2xl font-bold tracking-tight ${
-          isDark ? 'text-slate-100' : 'text-slate-900'
-        }`}>
+        <h2 className="text-lg font-bold text-[var(--text-primary)]">
           {getTitle()}
         </h2>
-        <p className={`text-xs mt-1.5 leading-relaxed max-w-xs font-normal ${
-          isDark ? 'text-slate-400' : 'text-slate-600'
-        }`}>
+        <p className="text-xs text-[var(--text-secondary)] mt-1 mb-4 leading-relaxed">
           {getSubtitle()}
         </p>
 
-        {/* Winnings Box */}
-        <div className={`w-full my-5 p-4 rounded-xl border flex flex-col items-center justify-center ${
-          isDark ? 'bg-[#0b101b] border-slate-800/90' : 'bg-slate-50 border-slate-200'
-        }`}>
-          <div className={`flex items-center gap-1.5 text-xs font-semibold mb-1 ${
-            isDark ? 'text-slate-400' : 'text-slate-600'
-          }`}>
-            <Wallet className="w-3.5 h-3.5 text-emerald-500" />
-            <span>TOTAL EARNINGS</span>
+        {/* Earnings Box */}
+        <div className="w-full py-3.5 px-4 rounded-xl bg-[var(--surface)] border border-[var(--border)] mb-4">
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-muted)] mb-0.5">
+            Round Winnings
           </div>
-          <div className="text-3xl font-extrabold text-emerald-500">
-            KSh {totalWon.toLocaleString()}
+          <div className="text-2xl font-mono font-bold text-[var(--success)]">
+            KES {totalWon.toLocaleString()}
           </div>
-          <div className={`text-[11px] mt-1 font-medium ${
-            isDark ? 'text-slate-500' : 'text-slate-500'
-          }`}>
-            Credited directly to your wallet balance
+          <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
+            +{totalWon * 10} XP gained
           </div>
         </div>
 
-        {/* Mini Performance Stats Grid */}
-        <div className={`grid ${stakeAmount > 0 ? 'grid-cols-4' : 'grid-cols-2'} gap-2 w-full mb-6 text-center`}>
-          {stakeAmount > 0 && (
-            <div className={`p-2.5 rounded-xl border ${
-              isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <div className={`text-[10px] uppercase tracking-wider font-semibold ${
-                isDark ? 'text-slate-400' : 'text-slate-600'
-              }`}>Stake</div>
-              <div className={`text-sm font-bold mt-0.5 ${
-                isDark ? 'text-slate-200' : 'text-slate-900'
-              }`}>
-                KSh {stakeAmount}
-              </div>
-            </div>
-          )}
-
-          <div className={`p-2.5 rounded-xl border ${
-            isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-50 border-slate-200'
-          }`}>
-            <div className={`text-[10px] uppercase tracking-wider font-semibold ${
-              isDark ? 'text-slate-400' : 'text-slate-600'
-            }`}>Correct</div>
-            <div className={`text-sm font-bold mt-0.5 ${
-              isDark ? 'text-slate-100' : 'text-slate-900'
-            }`}>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-2 w-full mb-5 text-center">
+          <div className="p-2 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
+            <div className="text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Accuracy</div>
+            <div className="text-xs font-mono font-bold text-[var(--text-primary)] mt-0.5">
               {questionsCorrect}/{totalQuestions}
             </div>
           </div>
-
-          <div className={`p-2.5 rounded-xl border ${
-            isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-50 border-slate-200'
-          }`}>
-            <div className={`text-[10px] uppercase tracking-wider font-semibold ${
-              isDark ? 'text-slate-400' : 'text-slate-600'
-            }`}>Peak Mult</div>
-            <div className="text-sm font-bold text-amber-500 mt-0.5 flex items-center justify-center gap-0.5">
-              <Flame className="w-3.5 h-3.5 fill-amber-500" />
-              <span>{maxStreak >= 5 ? '5x' : maxStreak >= 3 ? '3x' : maxStreak >= 2 ? '2x' : '1x'}</span>
+          <div className="p-2 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
+            <div className="text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Max Streak</div>
+            <div className="text-xs font-mono font-bold text-[var(--accent-text)] mt-0.5">
+              {maxStreak}x
             </div>
           </div>
-
-          {stakeAmount > 0 && (
-            <div className={`p-2.5 rounded-xl border ${
-              isDark ? 'bg-[#0f172a] border-slate-800' : 'bg-slate-50 border-slate-200'
-            }`}>
-              <div className={`text-[10px] uppercase tracking-wider font-semibold ${
-                isDark ? 'text-slate-400' : 'text-slate-600'
-              }`}>Net P&L</div>
-              <div className={`text-sm font-extrabold mt-0.5 ${
-                totalWon >= stakeAmount ? 'text-emerald-400' : 'text-rose-400'
-              }`}>
-                {totalWon >= stakeAmount ? `+${(totalWon - stakeAmount)}` : `-${(stakeAmount - totalWon)}`}
-              </div>
+          <div className="p-2 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
+            <div className="text-[9.5px] uppercase tracking-wider text-[var(--text-muted)]">Stake</div>
+            <div className="text-xs font-mono font-bold text-[var(--text-primary)] mt-0.5">
+              KES {stakeAmount || 0}
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Demo Mode Sign-Up Banner */}
-        {isDemo && (
-          <div className={`w-full my-4 p-4 rounded-xl border-2 border-dashed text-center ${
-            isDark ? 'border-emerald-500/40 bg-emerald-950/30' : 'border-emerald-400 bg-emerald-50'
-          }`}>
-            <div className="text-lg mb-1">🏆</div>
-            <p className={`text-xs font-semibold mb-2 ${
-              isDark ? 'text-emerald-300' : 'text-emerald-700'
-            }`}>
-              You're playing in <strong>Demo Mode</strong>. No real money earned.
-            </p>
-            <p className={`text-[11px] mb-3 ${
-              isDark ? 'text-slate-400' : 'text-slate-600'
-            }`}>
-              Create a free account to play for real KSh prizes and withdraw winnings!
-            </p>
-            {onSignUp && (
-              <button
-                onClick={onSignUp}
-                className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all cursor-pointer shadow-md"
-              >
-                Create Free Account →
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2.5 w-full">
+        {/* Action Buttons */}
+        <div className="w-full space-y-2">
           <button
+            type="button"
             onClick={onPlayAgain}
-            className={`flex-1 py-3 px-4 rounded-xl border font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer ${
-              isDark
-                ? 'bg-slate-800 hover:bg-slate-700 text-slate-100 border-slate-700'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-900 border-slate-300'
-            }`}
+            className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Play Next Round</span>
+            <span>Play Again</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onClaimAndContinue}
+            className="w-full py-2 px-4 rounded-lg text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-[var(--border)] transition-colors cursor-pointer"
+          >
+            Back to Arenas
           </button>
 
           {onShareBettingSlip && (
             <button
+              type="button"
               onClick={onShareBettingSlip}
-              className={`flex-1 py-3 px-4 rounded-xl border font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer ${
-                isDark
-                  ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-300'
-              }`}
+              className="w-full py-1.5 px-4 text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer flex items-center justify-center gap-1"
             >
-              <Share2 className="w-3.5 h-3.5" />
-              <span>Share Slip</span>
+              <Share2 className="w-3 h-3" />
+              <span>Share Result</span>
             </button>
           )}
-
-          <button
-            onClick={onClaimAndContinue}
-            className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md ${
-              isDark
-                ? 'bg-white hover:bg-slate-100 text-slate-950'
-                : 'bg-slate-900 hover:bg-slate-800 text-white'
-            }`}
-          >
-            <span>Claim & Lobby</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
         </div>
       </motion.div>
     </div>

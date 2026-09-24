@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X, User, Wallet, History, Settings, LogOut, ArrowUpRight, ArrowDownLeft,
-  CheckCircle2, Clock, Phone, Mail, Award, Flame, Trophy, Plus, ShieldAlert, Edit2, Save, Key, Check, ShieldCheck, FileText, Globe, ChevronDown, Eye, EyeOff
+  CheckCircle2, Clock, Phone, Mail, Award, Flame, Trophy, Plus, ShieldAlert, Edit2, Save, Key, Check, ShieldCheck, FileText, Globe, ChevronDown, Eye, EyeOff,
+  ArrowDownToLine, ArrowUpFromLine
 } from 'lucide-react';
 import { UserProfile, TransactionRecord, QuestionHistoryItem, UserState } from '../types';
 import { getAvatarOptionsForCountry } from '../data/userProfileData';
@@ -447,16 +448,16 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
                       onClick={onOpenDepositModal}
-                      className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-colors"
+                      className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-black text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-emerald-600/20 active:scale-95 transition-all"
                     >
-                      <Plus className="w-4 h-4" />
+                      <ArrowDownToLine className="w-4 h-4 stroke-[2.5]" />
                       Deposit
                     </button>
                     <button
                       onClick={onOpenWithdrawModal}
-                      className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-[#EF4444] hover:bg-[#DC2626] text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-colors"
+                      className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-black text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-rose-600/20 active:scale-95 transition-all"
                     >
-                      <ArrowUpRight className="w-4 h-4" />
+                      <ArrowUpFromLine className="w-4 h-4 stroke-[2.5]" />
                       Withdraw
                     </button>
                   </div>

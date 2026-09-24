@@ -1,44 +1,26 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search, Sun, Moon, Gift, Bell, Info, Plus, ArrowUpRight,
-  Wallet, LogIn, ChevronDown, Check, X, Sparkles, User, Target
+  Search,
+  Sun,
+  Moon,
+  Gift,
+  Bell,
+  Wallet,
+  ChevronDown,
+  X,
+  Target,
+  Plus,
+  Compass,
+  LayoutGrid,
+  Trophy,
+  ArrowDownToLine,
+  ArrowUpFromLine,
 } from 'lucide-react';
 import { UserState, UserProfile } from '../types';
 import { ProfileDropdown } from './ProfileDropdown';
 import { SquareCategoryFilter } from './SquareCategoryFilter';
 import { TrivquestLogo } from './TrivquestLogo';
-
-export interface PolymarketCategoryItem {
-  id: string;
-  name: string;
-  icon: string;
-  highlight?: boolean;
-}
-
-export const POLYMARKET_CATEGORIES: PolymarketCategoryItem[] = [
-  { id: 'trending', name: 'Trending', icon: '🔥' },
-  { id: 'combos', name: 'Combos', icon: '⚡' },
-  { id: 'perps', name: 'Perps', icon: '📈' },
-  { id: 'breaking', name: 'Breaking', icon: '🚨' },
-  { id: 'new', name: 'New', icon: '✦' },
-  { id: 'politics', name: 'Politics', icon: '🏛️' },
-  { id: 'sports', name: 'Sports', icon: '🏆' },
-  { id: 'crypto', name: 'Crypto', icon: '🪙' },
-  { id: 'esports', name: 'Esports', icon: '🎮' },
-  { id: 'iran', name: 'Iran', icon: '🇮🇷' },
-  { id: 'finance', name: 'Finance', icon: '💼' },
-  { id: 'geopolitics', name: 'Geopolitics', icon: '🌍' },
-  { id: 'tech', name: 'Tech', icon: '🤖' },
-  { id: 'culture', name: 'Culture', icon: '🎭' },
-  { id: 'economy', name: 'Economy', icon: '📊' },
-  { id: 'weather', name: 'Weather', icon: '🌤️' },
-  { id: 'mentions', name: 'Mentions', icon: '💬' },
-  { id: 'elections', name: 'Elections', icon: '🗳️' },
-  { id: 'art', name: 'Art', icon: '🎨' },
-  { id: 'more', name: 'More', icon: '➕' },
-];
-
 
 interface WalletBarProps {
   userState: UserState;
@@ -83,12 +65,8 @@ export const WalletBar: React.FC<WalletBarProps> = ({
   userProfile,
   searchQuery,
   onSearchChange,
-  selectedSubcategory,
-  onSelectSubcategory,
   onOpenNotifications,
   unreadCount,
-  onOpenHowItWorks,
-  onOpenDailyRewards,
   onDepositClick,
   onWithdrawClick,
   onOpenAuth,
@@ -100,7 +78,7 @@ export const WalletBar: React.FC<WalletBarProps> = ({
   onOpenMobileProfile,
   onOpenMobileCategories,
   categoryItems,
-  theme,
+  theme = 'dark',
   onToggleTheme,
   onOpenQuizBets,
   siteConfig,
@@ -109,301 +87,264 @@ export const WalletBar: React.FC<WalletBarProps> = ({
 }) => {
   const navigate = useNavigate();
   const isDark = theme === 'dark';
-  const cfg = siteConfig ?? {
-    siteName: 'Trivquest',
-    headerAnnouncement: '⚡ Win up to 100,000 KES on live speed trivia games!',
-    headerAnnouncementEnabled: true,
-    headerBadge: 'SPEED TRIVIA (+100 XP)',
-    headerCtaText: 'PLAY NOW',
-  };
 
   return (
-    <header className={`sticky top-0 z-40 w-full transition-colors backdrop-blur-md will-change-transform ${
-      isDark ? 'bg-[#0B0E14]/95 text-[#F8FAFC] shadow-lg shadow-black/50' : 'bg-white/95 text-slate-900 shadow-md shadow-slate-200/70'
-    }`}>
-      {/* ANNOUNCEMENT BAR */}
-      {cfg.headerAnnouncementEnabled && cfg.headerAnnouncement && (
-        <div 
+    <header className="sticky top-0 z-40 w-full transition-colors backdrop-blur-md bg-[var(--card)]/90 border-b border-[var(--border)]">
+      {/* 1. ANNOUNCEMENT STRIP (if enabled) */}
+      {siteConfig?.headerAnnouncementEnabled && siteConfig?.headerAnnouncement && (
+        <div
           onClick={() => onCategoryClick && onCategoryClick('all')}
-          className={`w-full text-[11px] font-semibold tracking-wide text-center py-1.5 px-4 truncate border-b flex items-center justify-center gap-2 cursor-pointer hover:opacity-80 transition-opacity ${
-            isDark
-              ? 'bg-[#101726] text-slate-200 border-[#1E293B]'
-              : 'bg-slate-100 text-slate-700 border-slate-200'
-          }`}
-          title="Click to see all categories"
+          className="w-full text-[11px] font-medium tracking-wide text-center py-1 px-4 truncate border-b border-[var(--border)] flex items-center justify-center gap-2 cursor-pointer bg-[var(--surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />
-          <span className="truncate">{cfg.headerAnnouncement}</span>
-          <span className="hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-            FAST PAYOUTS
+          <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] shrink-0" />
+          <span className="truncate">{siteConfig.headerAnnouncement}</span>
+          <span className="hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] font-semibold uppercase tracking-wider bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)]">
+            INSTANT CASHOUTS
           </span>
         </div>
       )}
-      {/* 1. TOP MAIN HEADER BAR */}
-      <div className={`border-b w-full ${isDark ? 'border-[#222C3E] bg-[#0B0E14]/95' : 'border-slate-200 bg-white/95'}`}>
-        <div className="max-w-[1440px] mx-auto px-2.5 sm:px-5 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-4 relative w-full">
-          
-          {/* LEFT: Trivquest Brand Logo & Search Input */}
-          <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
-            {/* Logo Mark */}
-            <div
-              onClick={() => navigate('/')}
-              className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 select-none group"
-            >
-              <TrivquestLogo size="md" theme={theme} />
-            </div>
 
-            {/* Desktop / Tablet Search Bar */}
-            <div className="relative flex-1 hidden md:block max-w-md">
-              <div className={`absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none ${
-                isDark ? 'text-[#94A3B8]' : 'text-slate-400'
-              }`}>
-                <Search className="w-4 h-4" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Search quizzes, topics & markets..."
-                className={`w-full pl-9 pr-8 py-2 rounded-xl text-xs sm:text-sm font-normal transition-all outline-none ${
-                  isDark
-                    ? 'bg-[#121722] border border-[#222C3E] text-[#F8FAFC] placeholder-[#94A3B8]/70 focus:border-slate-400 focus:bg-[#182030] focus:ring-1 focus:ring-slate-400/30'
-                    : 'bg-slate-100 border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-slate-400 focus:bg-white focus:ring-1 focus:ring-slate-300'
-                }`}
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => onSearchChange('')}
-                  className={`absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer ${
-                    isDark ? 'text-[#94A3B8] hover:text-white' : 'text-slate-400 hover:text-slate-800'
-                  }`}
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
+      {/* 2. MAIN HEADER BAR */}
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-3">
+        {/* LEFT ZONE: Logo & Primary Nav Links */}
+        <div className="flex items-center gap-4 sm:gap-6 shrink-0">
+          <div
+            onClick={() => {
+              if (onCategoryClick) onCategoryClick('all');
+              navigate('/');
+            }}
+            className="cursor-pointer select-none"
+          >
+            <TrivquestLogo size="md" theme={theme} />
           </div>
 
-          {/* RIGHT CONTROLS: Theme, Bell, Auth (Sign In & Sign Up fitting 100% on phone) */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            
-            {/* Theme Toggle Button (Yellow Sun / Moon) */}
+          {/* Primary Nav Links */}
+          <nav className="hidden md:flex items-center gap-1 text-xs font-medium text-[var(--text-secondary)]">
             <button
               type="button"
-              onClick={onToggleTheme}
-              className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer ${
-                isDark
-                  ? 'text-amber-400 hover:text-amber-300 hover:bg-[#182030]'
-                  : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
-              }`}
-              title="Toggle Light / Dark Mode"
+              onClick={() => {
+                if (onCategoryClick) onCategoryClick('all');
+                navigate('/');
+              }}
+              className="px-2.5 py-1.5 rounded-lg hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
             >
-              {isDark ? (
-                <Sun className="w-4 h-4 stroke-[2.3]" />
-              ) : (
-                <Moon className="w-4 h-4 text-slate-700 stroke-[2.3]" />
-              )}
+              Discover
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (onOpenMobileCategories) {
+                  onOpenMobileCategories();
+                } else {
+                  const el = document.getElementById('categories-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="px-2.5 py-1.5 rounded-lg hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+            >
+              Categories
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/leaderboard')}
+              className="px-2.5 py-1.5 rounded-lg hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+            >
+              Leaderboard
+            </button>
+          </nav>
+        </div>
 
-            {/* Notification Bell with Red Badge Dot (Visible ONLY when logged in) */}
-            {userProfile.isLoggedIn && (
+        {/* CENTER ZONE: Search Bar */}
+        <div className="flex-1 max-w-sm sm:max-w-md hidden sm:block">
+          <div className="relative w-full">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search trivia, topics & categories..."
+              className="w-full pl-8.5 pr-8 py-1.5 rounded-lg text-xs bg-[var(--surface)] border border-[var(--border)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] transition-all"
+            />
+            {searchQuery && (
               <button
                 type="button"
-                onClick={onOpenNotifications}
-                className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer relative ${
-                  isDark
-                    ? 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#182030]'
-                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
-                }`}
-                title="Notifications"
+                onClick={() => onSearchChange('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
-                <Bell className="w-4 h-4" />
-                {unreadCount > 0 && (
-                  <span className={`absolute top-1 right-1 min-w-[7px] h-[7px] rounded-full bg-[#EF4444] ring-2 ${
-                    isDark ? 'ring-[#0B0E14]' : 'ring-white'
-                  }`} />
-                )}
+                <X className="w-3 h-3" />
               </button>
-            )}
-
-            {/* Quiz Bets Button (Visible ONLY when logged in) */}
-            {userProfile.isLoggedIn && onOpenQuizBets && (
-              <button
-                type="button"
-                onClick={onOpenQuizBets}
-                className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer ${
-                  isDark
-                    ? 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#182030]'
-                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
-                }`}
-                title="Latest Quiz Bets"
-              >
-                <Target className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Desktop Navigation Links */}
-            {userProfile.isLoggedIn && (
-              <div className="hidden lg:flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={onOpenDailyRewards}
-                  className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                    isDark ? 'text-[#94A3B8] hover:text-white hover:bg-[#182030]' : 'text-slate-600 hover:bg-slate-100'
-                  }`}
-                  title="Daily Rewards"
-                >
-                  <Gift className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={onOpenHowItWorks}
-                  className={`flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer ${
-                    isDark ? 'text-[#94A3B8] hover:text-white' : 'text-slate-700 hover:text-slate-950'
-                  }`}
-                >
-                  <Info className="w-3.5 h-3.5 text-slate-400" />
-                  <span>How It Works</span>
-                </button>
-              </div>
-            )}
-
-            {/* USER AUTH SECTION: Sign In & Sign Up OR Logged In Profile */}
-            {userProfile.isLoggedIn ? (
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                {/* Wallet Balance Chip */}
-                <div
-                  onClick={() => onSelectNav('wallet')}
-                  className={`flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs font-bold cursor-pointer transition-all ${
-                    isDark
-                      ? 'bg-[#121722] border-[#222C3E] text-emerald-400 hover:border-emerald-500/50'
-                      : 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100/80 text-emerald-800'
-                  }`}
-                >
-                  <Wallet className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="truncate max-w-[85px] sm:max-w-none font-mono">
-                    KES {userState.walletBalance.toLocaleString()}
-                  </span>
-                  {onDepositClick && (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDepositClick();
-                      }}
-                      className="p-0.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-colors cursor-pointer ml-0.5 shadow-2xs"
-                      title="Deposit"
-                    >
-                      <Plus className="w-3 h-3 stroke-[3]" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Profile Trigger Button: Visible on both mobile and desktop */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.innerWidth < 640 && onOpenMobileProfile) {
-                      onOpenMobileProfile();
-                    } else {
-                      onToggleProfileDropdown();
-                    }
-                  }}
-                  className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl border transition-all cursor-pointer ${
-                    isProfileDropdownOpen
-                      ? isDark
-                        ? 'bg-[#182030] border-emerald-500/60 text-white ring-1 ring-emerald-500/30'
-                        : 'bg-emerald-50 border-emerald-300 text-emerald-950'
-                      : isDark
-                        ? 'bg-[#121722] border-[#222C3E] text-white hover:border-emerald-500/40 hover:bg-[#182030]'
-                        : 'bg-slate-100 border-slate-200 text-slate-900 hover:bg-slate-200'
-                  }`}
-                  title={`Logged in as ${userProfile.name || userProfile.phone || 'Player'}`}
-                >
-                  <div className="relative shrink-0 flex items-center justify-center">
-                    <span className="text-xs sm:text-sm">{userProfile.avatar || '👤'}</span>
-                    <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-1 ${
-                      isDark ? 'ring-[#0B0E14]' : 'ring-white'
-                    } animate-pulse`} />
-                  </div>
-                  <div className="flex flex-col text-left leading-tight max-w-[80px] sm:max-w-[110px]">
-                    <span className="text-[11px] sm:text-xs font-bold truncate">
-                      {userProfile.name ? userProfile.name.split(' ')[0] : (userProfile.phone || 'Player')}
-                    </span>
-                    <span className="hidden sm:inline text-[9px] font-semibold text-emerald-400">
-                      {userProfile.id ? `ID #${userProfile.id}` : 'Player'}
-                    </span>
-                  </div>
-                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${isProfileDropdownOpen ? 'rotate-180 text-emerald-400' : ''}`} />
-                </button>
-              </div>
-            ) : (
-              /* LOGGED OUT: Sign In and Sign Up buttons tailored to fit on all mobile widths */
-              <div className="flex items-center gap-1 sm:gap-2">
-                {/* Sign In Button */}
-                <button
-                  type="button"
-                  onClick={() => onOpenAuth('signin')}
-                  className={`px-2 sm:px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap rounded-lg ${
-                    isDark ? 'text-slate-300 hover:text-white' : 'text-slate-700 hover:text-slate-950'
-                  }`}
-                >
-                  Sign In
-                </button>
-
-                {/* Sign Up Solid Button */}
-                <button
-                  type="button"
-                  onClick={() => onOpenAuth('signup')}
-                  className="px-3 sm:px-4 py-1.5 rounded-xl font-bold text-xs transition-all shadow-2xs active:scale-95 cursor-pointer whitespace-nowrap bg-emerald-600 hover:bg-emerald-500 text-white"
-                >
-                  Sign Up
-                </button>
-
-                {/* Demo Button - Same style as Sign Up */}
-                <button
-                  type="button"
-                  onClick={() => navigate('/viral')}
-                  className="px-3 sm:px-4 py-1.5 rounded-xl font-bold text-xs transition-all shadow-2xs active:scale-95 cursor-pointer whitespace-nowrap flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white"
-                >
-                  <Target className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Demo</span>
-                </button>
-              </div>
             )}
           </div>
-
-          {/* Profile Dropdown Component */}
-          <ProfileDropdown
-            isOpen={isProfileDropdownOpen}
-            onClose={onCloseProfileDropdown}
-            userProfile={userProfile}
-            userState={userState}
-            onSelectNav={onSelectNav}
-            onOpenAuth={() => onOpenAuth('signin')}
-            onLogout={onLogout}
-            onOpenDeposit={() => {
-              if (onDepositClick) onDepositClick();
-            }}
-            onOpenWithdraw={() => {
-              if (onWithdrawClick) onWithdrawClick();
-              else onSelectNav('withdraw');
-            }}
-            unreadCount={unreadCount}
-            theme={theme}
-          />
         </div>
+
+        {/* RIGHT ZONE: Utility Controls & User Profile / Auth */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Theme Toggle */}
+          <button
+            type="button"
+            onClick={onToggleTheme}
+            className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle Theme"
+          >
+            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+          </button>
+
+          {/* Notifications */}
+          <button
+            type="button"
+            onClick={onOpenNotifications}
+            className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer relative"
+            title="Notifications"
+            aria-label="Notifications"
+          >
+            <Bell className="w-4 h-4" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[var(--danger)]" />
+            )}
+          </button>
+
+          {/* User Auth or Profile Button */}
+          {userProfile.isLoggedIn ? (
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Wallet Chip */}
+              <div
+                onClick={() => onSelectNav('wallet')}
+                className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] text-xs font-semibold cursor-pointer hover:border-[var(--border-strong)] transition-colors"
+                title="Wallet Balance"
+              >
+                <Wallet className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="tabular-nums font-mono font-bold text-[var(--text-primary)] text-[11px] sm:text-xs">
+                  KES {userState.walletBalance.toLocaleString()}
+                </span>
+              </div>
+
+              {/* Green Deposit Button */}
+              {onDepositClick && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDepositClick();
+                  }}
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-extrabold transition-all shadow-xs active:scale-95 cursor-pointer"
+                  title="Deposit Funds via M-PESA"
+                >
+                  <ArrowDownToLine className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span className="hidden xs:inline sm:inline">Deposit</span>
+                </button>
+              )}
+
+              {/* Red Withdraw Button */}
+              {onWithdrawClick && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onWithdrawClick();
+                  }}
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white text-xs font-extrabold transition-all shadow-xs active:scale-95 cursor-pointer"
+                  title="Instant Cashout / Withdraw"
+                >
+                  <ArrowUpFromLine className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span className="hidden xs:inline sm:inline">Withdraw</span>
+                </button>
+              )}
+
+              {/* Profile Trigger */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.innerWidth < 640 && onOpenMobileProfile) {
+                    onOpenMobileProfile();
+                  } else {
+                    onToggleProfileDropdown();
+                  }
+                }}
+                className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-colors cursor-pointer text-xs ${
+                  isProfileDropdownOpen
+                    ? 'bg-[var(--surface-hover)] border-[var(--border-strong)] text-[var(--text-primary)]'
+                    : 'bg-[var(--surface)] border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)]'
+                }`}
+              >
+                <div className="w-5 h-5 rounded-full bg-[var(--accent-soft)] flex items-center justify-center text-[10px] text-[var(--accent-text)] font-bold shrink-0">
+                  {userProfile.name ? userProfile.name[0].toUpperCase() : 'P'}
+                </div>
+                <span className="hidden md:inline font-medium max-w-[90px] truncate text-[var(--text-primary)]">
+                  {userProfile.name ? userProfile.name.split(' ')[0] : 'Player'}
+                </span>
+                <ChevronDown className="w-3 h-3 text-[var(--text-muted)]" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Green Deposit Button for Guests */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (onDepositClick) onDepositClick();
+                  else onOpenAuth('signin');
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-extrabold transition-all shadow-xs active:scale-95 cursor-pointer"
+                title="Instant Deposit via M-PESA"
+              >
+                <ArrowDownToLine className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Deposit</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenAuth('signin')}
+                className="px-2.5 py-1 text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors cursor-pointer"
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenAuth('signup')}
+                className="px-3 py-1 rounded-lg text-xs font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white transition-colors cursor-pointer shadow-xs"
+              >
+                Sign Up
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/viral')}
+                className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border border-[var(--border)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)] transition-colors cursor-pointer"
+              >
+                <Target className="w-3 h-3" />
+                <span>Demo</span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Profile Dropdown Component */}
+        <ProfileDropdown
+          isOpen={isProfileDropdownOpen}
+          onClose={onCloseProfileDropdown}
+          userProfile={userProfile}
+          userState={userState}
+          onSelectNav={onSelectNav}
+          onOpenAuth={() => onOpenAuth('signin')}
+          onLogout={onLogout}
+          onOpenDeposit={() => {
+            if (onDepositClick) onDepositClick();
+          }}
+          onOpenWithdraw={() => {
+            if (onWithdrawClick) onWithdrawClick();
+            else onSelectNav('withdraw');
+          }}
+          unreadCount={unreadCount}
+          theme={theme}
+        />
       </div>
 
-      {/* 2. SUBHEADER SINGLE-LINE POLYMARKET CATEGORY NAV BAR */}
+      {/* 3. SUBHEADER HORIZONTAL CATEGORY NAVIGATION */}
       <SquareCategoryFilter
         selectedCategoryId={selectedCategoryId || 'all'}
         onSelectCategory={onCategoryClick || (() => {})}
         theme={theme}
         items={categoryItems && categoryItems.length > 0 ? categoryItems : undefined}
       />
-
     </header>
   );
 };

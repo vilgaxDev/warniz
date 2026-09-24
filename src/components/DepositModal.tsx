@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
-  X, Zap, AlertCircle, RefreshCw, CheckCircle2, Lock, ShieldCheck, CreditCard, Smartphone, Building2, Globe, Diamond, LogIn
+  X, Zap, AlertCircle, RefreshCw, CheckCircle2, Lock, ShieldCheck, CreditCard, Smartphone, Building2, Globe, Diamond, LogIn,
+  ArrowDownToLine
 } from 'lucide-react';
 import { UserProfile, UserState } from '../types';
 import { paymentService, PaymentProvider } from '../services/paymentService';
@@ -234,10 +235,10 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                 onClose();
                 onOpenAuth?.();
               }}
-              className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm tracking-wide uppercase transition-all shadow-md active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm tracking-wide uppercase transition-all shadow-md shadow-emerald-600/25 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
-              <LogIn className="w-4 h-4" />
-              <span>Sign In to Continue</span>
+              <ArrowDownToLine className="w-4 h-4 stroke-[2.5]" />
+              <span>Sign In to Deposit</span>
             </button>
           </div>
           <div className={`px-5 py-3 border-t flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-wider ${
@@ -326,30 +327,22 @@ export const DepositModal: React.FC<DepositModalProps> = ({
         initial={{ opacity: 0, scale: 0.95, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        className={`w-full max-w-md rounded-3xl border relative overflow-hidden shadow-2xl my-auto ${
-          isDark
-            ? 'bg-[#0B0E14] border-[#1A2332] text-[#F8FAFC]'
-            : 'bg-white border-slate-200 text-slate-900'
-        }`}
+        className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--card)] text-[var(--text-primary)] relative overflow-hidden shadow-xl my-auto triv-card"
       >
         {/* Clean Modern Header */}
-        <div className={`px-5 py-4 flex items-center justify-between border-b ${
-          isDark ? 'bg-[#121722] border-[#222C3E] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-        }`}>
+        <div className="px-5 py-4 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)]">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border ${
-              isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-white border-slate-200 shadow-2xs'
-            }`}>
-              KE
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black shrink-0 border border-emerald-500/30 bg-emerald-500/15 text-emerald-500">
+              <ArrowDownToLine className="w-4 h-4 stroke-[2.5]" />
             </div>
             <div>
               <div className="flex items-center gap-1.5 mb-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">
-                  Instant Deposit
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-500">
+                  Instant M-PESA Deposit
                 </span>
               </div>
-              <h3 className="font-bold text-base tracking-tight leading-none">
+              <h3 className="font-bold text-sm sm:text-base tracking-tight leading-none text-[var(--text-primary)]">
                 Mobile Money Top-Up
               </h3>
             </div>
@@ -357,9 +350,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close modal"
-            className={`p-2 rounded-full border transition-colors cursor-pointer ${
-              isDark ? 'border-[#222C3E] text-slate-400 hover:text-white hover:bg-[#182030]' : 'border-slate-200 text-slate-600 hover:bg-slate-100'
-            }`}
+            className="p-1.5 rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -522,14 +513,14 @@ export const DepositModal: React.FC<DepositModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm tracking-wide uppercase transition-all shadow-xs active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm tracking-wide uppercase transition-all shadow-md shadow-emerald-600/25 active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <RefreshCw className="w-4 h-4 animate-spin text-white" />
                 ) : (
-                  <Zap className="w-4 h-4 fill-white" />
+                  <ArrowDownToLine className="w-4 h-4 stroke-[2.5]" />
                 )}
-                <span>{isSubmitting ? 'Processing Payment...' : 'Deposit'}</span>
+                <span>{isSubmitting ? 'Processing Payment...' : `Deposit KES ${parsedAmount ? parsedAmount.toLocaleString() : 'Funds'}`}</span>
               </button>
             </form>
           )}

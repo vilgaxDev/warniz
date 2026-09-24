@@ -4,6 +4,7 @@ export interface Question {
   question_text?: string; // Backend field name
   options: string[];
   correctIndex: number;
+  correctAnswerIndex?: number;
   explanation?: string;
   category?: string;
   difficulty?: string;
@@ -23,6 +24,8 @@ export interface QuizCategory {
   badge?: string;
   subtitle: string;
   questions: Question[];
+  questionsCount?: number;
+  pool?: string;
   gradient?: string;
   slug?: string;
   parent_id?: number | null;

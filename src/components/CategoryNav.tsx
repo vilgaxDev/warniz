@@ -19,50 +19,64 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { getCategoryLucideIcon } from './CategoryNav';
 
-export interface CategoryFilterItem {
+export interface CategoryNavItem {
   id: string;
   name: string;
-  icon?: any;
-  badge?: string;
-  gradient?: string;
-  lightGradient?: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
-export const SQUARE_CATEGORY_ITEMS: CategoryFilterItem[] = [
-  { id: 'all', name: 'All' },
-  { id: 'trending', name: 'Trending' },
-  { id: 'kenya', name: 'Kenya' },
-  { id: 'world', name: 'World' },
-  { id: 'sports', name: 'Sports' },
-  { id: 'science', name: 'Science' },
-  { id: 'tech', name: 'Tech' },
-  { id: 'finance', name: 'Finance' },
-  { id: 'crypto', name: 'Crypto' },
-  { id: 'geopolitics', name: 'Geopolitics' },
-  { id: 'politics', name: 'Politics' },
-  { id: 'esports', name: 'Esports' },
-  { id: 'entertainment', name: 'Entertainment' },
-  { id: 'history', name: 'History' },
-  { id: 'space', name: 'Space' },
-  { id: 'general_knowledge', name: 'General Trivia' },
+export const CATEGORY_NAV_ITEMS: CategoryNavItem[] = [
+  { id: 'all', name: 'All', icon: LayoutGrid },
+  { id: 'trending', name: 'Trending', icon: TrendingUp },
+  { id: 'kenya', name: 'Kenya', icon: MapPin },
+  { id: 'world', name: 'World', icon: Globe2 },
+  { id: 'sports', name: 'Sports', icon: Trophy },
+  { id: 'science', name: 'Science', icon: Atom },
+  { id: 'tech', name: 'Tech', icon: Cpu },
+  { id: 'finance', name: 'Finance', icon: ChartNoAxesCombined },
+  { id: 'crypto', name: 'Crypto', icon: Bitcoin },
+  { id: 'geopolitics', name: 'Geopolitics', icon: Globe },
+  { id: 'politics', name: 'Politics', icon: Landmark },
+  { id: 'esports', name: 'Esports', icon: Gamepad2 },
+  { id: 'entertainment', name: 'Entertainment', icon: Clapperboard },
+  { id: 'history', name: 'History', icon: BookOpen },
+  { id: 'space', name: 'Space', icon: Rocket },
+  { id: 'general_knowledge', name: 'General Trivia', icon: Brain },
 ];
 
-interface SquareCategoryFilterProps {
+// Helper mapping for any other category id/name to Lucide icon
+export const getCategoryLucideIcon = (idOrName: string): React.ComponentType<{ className?: string }> => {
+  const norm = idOrName.toLowerCase();
+  if (norm.includes('trend')) return TrendingUp;
+  if (norm.includes('kenya')) return MapPin;
+  if (norm.includes('world') || norm.includes('global')) return Globe2;
+  if (norm.includes('sport') || norm.includes('football') || norm.includes('basketball')) return Trophy;
+  if (norm.includes('sci') || norm.includes('physics') || norm.includes('chem')) return Atom;
+  if (norm.includes('tech') || norm.includes('code') || norm.includes('ai')) return Cpu;
+  if (norm.includes('finan') || norm.includes('money') || norm.includes('market')) return ChartNoAxesCombined;
+  if (norm.includes('crypto') || norm.includes('btc') || norm.includes('web3')) return Bitcoin;
+  if (norm.includes('geo')) return Globe;
+  if (norm.includes('polit') || norm.includes('law') || norm.includes('gov')) return Landmark;
+  if (norm.includes('esport') || norm.includes('game')) return Gamepad2;
+  if (norm.includes('movie') || norm.includes('music') || norm.includes('entertain')) return Clapperboard;
+  if (norm.includes('hist') || norm.includes('heritage')) return BookOpen;
+  if (norm.includes('space') || norm.includes('astron')) return Rocket;
+  if (norm.includes('trivia') || norm.includes('brain') || norm.includes('general')) return Brain;
+  return LayoutGrid;
+};
+
+interface CategoryNavProps {
   selectedCategoryId: string;
   onSelectCategory: (categoryId: string) => void;
-  theme?: 'dark' | 'light';
-  variant?: 'banner' | 'compact' | 'standalone';
-  items?: CategoryFilterItem[];
+  className?: string;
 }
 
-export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
+export const CategoryNav: React.FC<CategoryNavProps> = ({
   selectedCategoryId,
   onSelectCategory,
-  items,
+  className = '',
 }) => {
-  const categoryItems = items && items.length > 0 ? items : SQUARE_CATEGORY_ITEMS;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -96,7 +110,8 @@ export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
   };
 
   return (
-    <div className="relative w-full border-b border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-md select-none">
+    <div className={`relative w-full border-b border-[var(--border)] bg-[var(--card)]/90 backdrop-blur-md select-none ${className}`}>
+      {/* Scroll Left Button */}
       {canScrollLeft && (
         <button
           type="button"
@@ -108,6 +123,7 @@ export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
         </button>
       )}
 
+      {/* Scroll Right Button */}
       {canScrollRight && (
         <button
           type="button"
@@ -119,13 +135,14 @@ export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
         </button>
       )}
 
+      {/* Horizontal Category Strip */}
       <div
         ref={scrollRef}
         className="max-w-[1440px] mx-auto px-3 sm:px-6 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 text-xs"
       >
-        {categoryItems.map((item) => {
+        {CATEGORY_NAV_ITEMS.map((item) => {
           const isSelected = selectedCategoryId === item.id || (!selectedCategoryId && item.id === 'all');
-          const IconComp = getCategoryLucideIcon(item.id || item.name);
+          const Icon = item.icon;
 
           return (
             <button
@@ -138,13 +155,8 @@ export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] border border-transparent font-medium'
               }`}
             >
-              <IconComp className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-[var(--accent-text)]' : 'text-[var(--text-muted)]'}`} />
+              <Icon className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-[var(--accent-text)]' : 'text-[var(--text-muted)]'}`} />
               <span>{item.name}</span>
-              {item.badge && (
-                <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold uppercase tracking-wider bg-[var(--surface)] text-[var(--text-muted)] border border-[var(--border)]">
-                  {item.badge}
-                </span>
-              )}
             </button>
           );
         })}

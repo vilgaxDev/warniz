@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Play, Trophy, Zap, X, RefreshCw, Wallet, AlertCircle } from 'lucide-react';
+import { Play, Trophy, Zap, X, RefreshCw, Wallet, AlertCircle, Sparkles, Gamepad2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { WalletBar } from '../components/WalletBar';
 import { SiteFooter } from '../components/SiteFooter';
@@ -532,10 +532,8 @@ export default function ViralPage() {
   }, [isDemoPlaying, demoQuestions.length, timeLeft]);
 
   return (
-    <div className={`min-h-screen font-sans antialiased w-full max-w-full transition-colors duration-200 ${
-      theme === 'dark'
-        ? 'dark bg-[#090D15] text-[#F8FAFC] selection:bg-emerald-500/30 selection:text-emerald-300'
-        : 'bg-[#F8FAFC] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-700'
+    <div className={`min-h-screen font-sans antialiased w-full max-w-full bg-[var(--bg-main)] text-[var(--text-primary)] transition-colors duration-200 ${
+      theme === 'dark' ? 'dark' : ''
     }`}>
       {/* Header - stays visible at all times on the demo page, including while the demo plays */}
       {/* CRITICAL: On ViralPage (demo page), ALWAYS use DEMO balance from userState, never real balance */}
@@ -572,14 +570,14 @@ export default function ViralPage() {
       {isDemoPlaying ? (
         /* Demo Quiz - plays inline on the page, between the always-visible header and footer */
         <>
-          {/* DEMO MODE BANNER - CLEARLY INDICATES VIRTUAL MONEY */}
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-center py-2 text-xs font-bold tracking-wider sticky top-0 z-50">
-            🎮 DEMO MODE - VIRTUAL MONEY ONLY - NOT REAL ACCOUNT BALANCE
+          {/* DEMO MODE BANNER - CLEAN DESIGN SYSTEM */}
+          <div className="bg-[var(--accent-soft)] border-b border-[var(--border)] text-[var(--accent-text)] text-center py-2 px-4 text-xs font-bold tracking-wider sticky top-0 z-50 flex items-center justify-center gap-2">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>DEMO MODE — VIRTUAL PRACTICE BALANCE — NOT REAL FUNDS</span>
           </div>
           {demoQuestions.length > 0 ? (
             <QuestionCard
               categoryName="Demo Challenge"
-              categoryIcon="🎯"
               question={demoQuestions[currentQuestion]}
               currentQuestionIndex={currentQuestion}
               totalQuestions={demoQuestions.length}
@@ -604,8 +602,8 @@ export default function ViralPage() {
           ) : (
             <div className="min-h-[60vh] w-full flex items-center justify-center">
               <div className="text-center space-y-3">
-                <div className="inline-block w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-gray-400 text-sm">Loading demo questions...</p>
+                <div className="inline-block w-8 h-8 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                <p className="text-[var(--text-muted)] text-xs font-mono">Loading demo questions...</p>
               </div>
             </div>
           )}
@@ -613,175 +611,154 @@ export default function ViralPage() {
       ) : (
         <>
       <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="max-w-7xl mx-auto">
-          {/* Hero Section - Enhanced */}
-          <div className="text-center space-y-10 sm:space-y-12 mb-16 sm:mb-20">
-            {/* CTA Button - Bigger and more dramatic */}
-            <button
-              onClick={handlePlayClick}
-              className="group relative px-10 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-blue-600 hover:from-emerald-600 hover:via-emerald-700 hover:to-blue-700 rounded-2xl sm:rounded-3xl font-bold text-lg sm:text-xl md:text-2xl transition-all transform hover:scale-105 shadow-2xl shadow-emerald-500/30"
-            >
-              <span className="flex items-center gap-3 sm:gap-4">
-                <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-white" />
-                PLAY THE DEMO CHALLENGE
-              </span>
-              <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity blur-md" />
-            </button>
+        <div className="max-w-6xl mx-auto">
+          {/* Hero Section */}
+          <div className="text-center space-y-4 mb-10 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] border border-[var(--border)] text-[var(--accent-text)] text-xs font-semibold">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Interactive Practice Arena</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text-primary)]">
+              Practice Trivia Speed Risk-Free
+            </h1>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+              Experience the TrivQuest speed multiplier ladder with KES 1,000 in virtual practice credits. Test your timing and see how high your streak climbs.
+            </p>
+
+            {/* CTA Button */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handlePlayClick}
+                className="px-8 py-3.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-xl font-bold text-sm sm:text-base transition-colors flex items-center gap-2.5 mx-auto cursor-pointer shadow-xs"
+              >
+                <Play className="w-4 h-4 fill-white" />
+                <span>START DEMO CHALLENGE</span>
+              </button>
+            </div>
           </div>
 
-
-
-          {/* Demo Balance Display - Enhanced */}
-          <div className={`max-w-lg mx-auto p-6 sm:p-8 rounded-2xl sm:rounded-3xl border mb-8 sm:mb-12 ${
-            theme === 'dark'
-              ? 'bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/30 shadow-xl shadow-emerald-500/10'
-              : 'bg-gradient-to-br from-emerald-50 to-white border-emerald-200 shadow-xl'
-          }`}>
+          {/* Demo Balance Display */}
+          <div className="max-w-lg mx-auto p-5 rounded-xl border border-[var(--border)] bg-[var(--card)] mb-10 shadow-xs">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center ${
-                  theme === 'dark' ? 'bg-emerald-500/20' : 'bg-emerald-100'
-                }`}>
-                  <Wallet className={`w-6 h-6 sm:w-7 sm:h-7 ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                  <Wallet className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className={`text-sm sm:text-base font-semibold ${theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">
                     Demo Balance
                   </span>
-                  <p className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-500'}`}>
-                    Virtual money for practice
+                  <p className="text-xs text-[var(--text-muted)]">
+                    Virtual credits for practice rounds
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`text-2xl sm:text-3xl font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                  KSh {userState.walletBalance.toLocaleString()}
+                <span className="text-xl sm:text-2xl font-bold font-mono text-[var(--text-primary)]">
+                  KES {userState.walletBalance.toLocaleString()}
                 </span>
                 <button
+                  type="button"
                   onClick={() => {
                     const newBalance = 1000;
                     setUserState(prev => ({ ...prev, walletBalance: newBalance }));
                     localStorage.setItem('demo_balance', newBalance.toString());
                   }}
-                  className={`p-2 sm:p-2.5 rounded-xl transition-colors ${theme === 'dark' ? 'hover:bg-white/10 text-slate-400 hover:text-white' : 'hover:bg-slate-200 text-slate-500 hover:text-slate-900'}`}
-                  title="Reset to KSh 1,000"
+                  className="p-2 rounded-lg bg-[var(--surface)] hover:bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                  title="Reset to KES 1,000"
                 >
-                  <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
             </div>
             {userState.walletBalance <= 0 && (
-              <div className={`mt-4 p-3 sm:p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs sm:text-sm font-medium text-amber-500 flex items-center gap-2 ${theme === 'dark' ? 'text-amber-400' : 'text-amber-600'}`}>
-                <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Balance reset to KSh 1,000 available - Click refresh or start to add!</span>
+              <div className="mt-3 p-3 rounded-lg bg-[var(--warning-soft)] border border-[var(--warning)] text-xs font-medium text-[var(--warning)] flex items-center gap-2">
+                <Zap className="w-4 h-4 shrink-0" />
+                <span>Practice balance depleted — Click refresh to reload KES 1,000!</span>
               </div>
             )}
           </div>
 
           {/* Features Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto mb-16 sm:mb-20">
-            <div className={`p-6 sm:p-8 rounded-2xl sm:rounded-3xl border ${
-              theme === 'dark'
-                ? 'bg-[#121722] border-[#222C3E]'
-                : 'bg-white border-slate-200 shadow-xl'
-            }`}>
-              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 ${
-                theme === 'dark' ? 'bg-emerald-500/20' : 'bg-emerald-100'
-              }`}>
-                <Trophy className={`w-7 h-7 sm:w-8 sm:h-8 ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto mb-12">
+            <div className="triv-card p-5">
+              <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)] flex items-center justify-center mb-3">
+                <Trophy className="w-5 h-5" />
               </div>
-              <h3 className={`text-lg sm:text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                Win Real Cash
+              <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">
+                Real Cash Tournaments
               </h3>
-              <p className={`text-sm sm:text-base ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
-                Answer correctly and win real money. The more you play, the more you can win!
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                When you are ready, enter live cash arenas with M-Pesa stakes and compete for genuine cash pools.
               </p>
             </div>
-            <div className={`p-6 sm:p-8 rounded-2xl sm:rounded-3xl border ${
-              theme === 'dark'
-                ? 'bg-[#121722] border-[#222C3E]'
-                : 'bg-white border-slate-200 shadow-xl'
-            }`}>
-              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 ${
-                theme === 'dark' ? 'bg-blue-500/20' : 'bg-blue-100'
-              }`}>
-                <Zap className={`w-7 h-7 sm:w-8 sm:h-8 ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`} />
+            <div className="triv-card p-5">
+              <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)] flex items-center justify-center mb-3">
+                <Zap className="w-5 h-5" />
               </div>
-              <h3 className={`text-lg sm:text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                Fast Paced
+              <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">
+                Speed Multipliers
               </h3>
-              <p className={`text-sm sm:text-base ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
-                60-second speed rounds. Quick questions, quick answers, quick rewards.
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Each correct answer in sequence multiplies your round winnings up the ladder in real time.
               </p>
             </div>
-            <div className={`p-6 sm:p-8 rounded-2xl sm:rounded-3xl border ${
-              theme === 'dark'
-                ? 'bg-[#121722] border-[#222C3E]'
-                : 'bg-white border-slate-200 shadow-xl'
-            }`}>
-              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-4 ${
-                theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
-              }`}>
-                <Trophy className={`w-7 h-7 sm:w-8 sm:h-8 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} />
+            <div className="triv-card p-5">
+              <div className="w-10 h-10 rounded-lg bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)] flex items-center justify-center mb-3">
+                <Gamepad2 className="w-5 h-5" />
               </div>
-              <h3 className={`text-lg sm:text-xl font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                Climb Leaderboard
+              <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">
+                National Leaderboards
               </h3>
-              <p className={`text-sm sm:text-base ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
-                Compete with players across Kenya. Top players win bigger prizes.
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Climb the daily, weekly, and all-time rankings to showcase your trivia mastery to other players.
               </p>
             </div>
           </div>
 
           {/* How It Works Section */}
-          <div className="max-w-4xl mx-auto mb-16 sm:mb-20">
-            <h2 className={`text-2xl sm:text-3xl md:text-4xl font-black text-center mb-8 sm:mb-12 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-              How It Works
+          <div className="max-w-4xl mx-auto mb-12">
+            <h2 className="text-xl sm:text-2xl font-bold text-center mb-8 text-[var(--text-primary)]">
+              How TrivQuest Works
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-              <div className="text-center">
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl sm:text-3xl font-black ${
-                  theme === 'dark' ? 'bg-emerald-500 text-white' : 'bg-emerald-600 text-white'
-                }`}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="triv-card p-4 text-center">
+                <div className="w-8 h-8 rounded-full bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)] flex items-center justify-center mx-auto mb-2.5 font-mono font-bold text-xs">
                   1
                 </div>
-                <h3 className={`text-base sm:text-lg font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                  Select Challenge
+                <h3 className="text-xs font-bold text-[var(--text-primary)] mb-1">
+                  Select Arena & Stake
                 </h3>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
-                  Choose your speed mode and stake amount
+                <p className="text-[11px] text-[var(--text-secondary)]">
+                  Pick your favorite trivia category and speed mode with flexible stakes.
                 </p>
               </div>
-              <div className="text-center">
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl sm:text-3xl font-black ${
-                  theme === 'dark' ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'
-                }`}>
+              <div className="triv-card p-4 text-center">
+                <div className="w-8 h-8 rounded-full bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)] flex items-center justify-center mx-auto mb-2.5 font-mono font-bold text-xs">
                   2
                 </div>
-                <h3 className={`text-base sm:text-lg font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                  Answer Questions
+                <h3 className="text-xs font-bold text-[var(--text-primary)] mb-1">
+                  Answer Questions Quickly
                 </h3>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
-                  Answer correctly within 60 seconds
+                <p className="text-[11px] text-[var(--text-secondary)]">
+                  Every correct consecutive answer climbs your payout multiplier.
                 </p>
               </div>
-              <div className="text-center">
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl sm:text-3xl font-black ${
-                  theme === 'dark' ? 'bg-purple-500 text-white' : 'bg-purple-600 text-white'
-                }`}>
+              <div className="triv-card p-4 text-center">
+                <div className="w-8 h-8 rounded-full bg-[var(--accent-soft)] text-[var(--accent-text)] border border-[var(--border)] flex items-center justify-center mx-auto mb-2.5 font-mono font-bold text-xs">
                   3
                 </div>
-                <h3 className={`text-base sm:text-lg font-bold mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                  Win Prizes
+                <h3 className="text-xs font-bold text-[var(--text-primary)] mb-1">
+                  Lock In & Instant Cashout
                 </h3>
-                <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
-                  Cash out anytime or complete for bonus
+                <p className="text-[11px] text-[var(--text-secondary)]">
+                  Cash out anytime to lock in profits, sent straight to your M-Pesa wallet.
                 </p>
               </div>
             </div>
           </div>
-
-          </div>
+        </div>
       </div>
         </>
       )}
@@ -862,40 +839,34 @@ export default function ViralPage() {
       {showExitConfirm && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/60 backdrop-blur-xs"
             onClick={() => setShowExitConfirm(false)}
           />
-          <div className={`relative w-full max-w-sm rounded-2xl border shadow-2xl p-6 ${
-            theme === 'dark' ? 'bg-[#0E131E] border-[#222C3E]' : 'bg-white border-slate-200'
-          }`}>
+          <div className="triv-card relative w-full max-w-sm rounded-2xl border border-[var(--border)] shadow-xl p-6 bg-[var(--card)] text-[var(--text-primary)]">
             <div className="text-center">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                theme === 'dark' ? 'bg-purple-500/20' : 'bg-purple-100'
-              }`}>
-                <X className={`w-6 h-6 ${theme === 'dark' ? 'text-purple-400' : 'text-purple-600'}`} />
+              <div className="w-10 h-10 rounded-xl bg-[var(--danger-soft)] text-[var(--danger)] flex items-center justify-center mx-auto mb-3">
+                <AlertCircle className="w-5 h-5" />
               </div>
-              <h3 className={`font-bold text-lg mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                Leave Demo?
+              <h3 className="font-bold text-base mb-1.5 text-[var(--text-primary)]">
+                Leave Demo Arena?
               </h3>
-              <p className={`text-sm mb-6 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
-                Are you sure you want to leave the demo? Your progress will be lost.
+              <p className="text-xs text-[var(--text-secondary)] mb-5">
+                Are you sure you want to leave the active demo challenge? Unclaimed progress will reset.
               </p>
-              <div className="flex gap-3">
+              <div className="flex gap-2.5">
                 <button
+                  type="button"
                   onClick={() => setShowExitConfirm(false)}
-                  className={`flex-1 py-3 rounded-xl font-bold text-sm transition-colors ${
-                    theme === 'dark'
-                      ? 'bg-[#182030] text-slate-300 hover:text-white border border-[#222C3E]'
-                      : 'bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200'
-                  }`}
+                  className="flex-1 py-2.5 px-3 rounded-xl font-semibold text-xs border border-[var(--border)] hover:border-[var(--border-strong)] bg-[var(--surface)] hover:bg-[var(--surface-hover)] text-[var(--text-primary)] transition-colors cursor-pointer"
                 >
                   Stay in Demo
                 </button>
                 <button
+                  type="button"
                   onClick={confirmExitDemo}
-                  className="flex-1 py-3 rounded-xl font-bold text-sm bg-purple-600 hover:bg-purple-500 text-white transition-colors"
+                  className="flex-1 py-2.5 px-3 rounded-xl font-semibold text-xs bg-[var(--danger)] hover:bg-red-700 text-white transition-colors cursor-pointer"
                 >
-                  Leave Demo
+                  Leave Arena
                 </button>
               </div>
             </div>

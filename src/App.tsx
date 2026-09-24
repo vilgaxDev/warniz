@@ -25,7 +25,7 @@ import { BettingSlipModal } from './components/BettingSlipModal';
 
 import { SiteFooter } from './components/SiteFooter';
 import { AdminPortalModal } from './components/admin/AdminPortalModal';
-import { User, Play, Sparkles, Layers, AlertCircle } from 'lucide-react';
+import { User, Play, Sparkles, Layers, AlertCircle, Home, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function App() {
@@ -1560,11 +1560,7 @@ export default function App() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className={`min-h-screen font-sans antialiased w-full max-w-full transition-colors duration-200 ${
-      theme === 'dark'
-        ? 'dark bg-[#090D15] text-[#F8FAFC] selection:bg-emerald-500/30 selection:text-emerald-300'
-        : 'bg-[#F8FAFC] text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-700'
-    }`}>
+    <div className={`min-h-screen font-sans antialiased w-full max-w-full bg-[var(--bg-main)] text-[var(--text-primary)] transition-colors duration-150 ${theme}`}>
       {/* Main Content Layout */}
       <div className={`flex flex-col min-h-screen w-full max-w-full ${!isQuizActive ? 'pb-20 lg:pb-0' : 'pb-0'}`}>
         
@@ -1999,33 +1995,32 @@ export default function App() {
       {/* MOBILE FIXED BOTTOM NAVIGATION BAR: Always docked at bottom, fitting 100% left-to-right (Hidden in active quiz mode) */}
       {!isQuizActive && (
         <nav
-          className={`fixed bottom-0 left-0 right-0 z-50 lg:hidden w-full border-t transition-colors backdrop-blur-xl pb-[env(safe-area-inset-bottom)] ${
-            theme === 'dark'
-              ? 'bg-[#070709]/95 border-[#262933] text-[#F8FAFC]'
-              : 'bg-white/95 border-slate-200 text-slate-900 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]'
-          }`}
+          className="fixed bottom-0 left-0 right-0 z-50 lg:hidden w-full border-t transition-colors backdrop-blur-xl pb-[env(safe-area-inset-bottom)] bg-[var(--card)]/95 border-[var(--border)] text-[var(--text-primary)] shadow-lg"
         >
-          <div className="w-full max-w-lg mx-auto grid grid-cols-3 items-center px-3 py-2">
-            {/* Left: Open Profile Drawer */}
+          <div className="w-full max-w-lg mx-auto grid grid-cols-5 items-center px-2 py-1.5">
+            {/* 1. Home Button */}
             <button
-              onClick={() => setIsMobileProfileOpen(true)}
-              className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-colors cursor-pointer ${
-                theme === 'dark'
-                  ? 'hover:bg-zinc-800 text-slate-400 active:text-white'
-                  : 'hover:bg-slate-100 text-slate-700 active:text-black'
-              }`}
+              onClick={() => {
+                navigate('/');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
             >
-              <div className="relative flex items-center justify-center">
-                <User className="w-4 h-4 text-slate-400 dark:text-slate-300" />
-                {userProfile.isLoggedIn && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#10B981] ring-1 ring-[#050507]" />
-                )}
-              </div>
-              <span className="text-[11px] font-bold tracking-tight">Profile</span>
+              <Home className="w-4 h-4" />
+              <span className="text-[10px] font-bold tracking-tight">Home</span>
             </button>
 
-            {/* Center: Live Arena Modal Launcher */}
-            <div className="flex items-center justify-center px-1">
+            {/* 2. Topics Drawer */}
+            <button
+              onClick={() => setIsMobileCategoriesOpen(true)}
+              className="flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-emerald-500" />
+              <span className="text-[10px] font-bold tracking-tight">Topics</span>
+            </button>
+
+            {/* 3. Center: Live Arena Action Button */}
+            <div className="flex items-center justify-center px-0.5">
               <button
                 onClick={() => {
                   if (!userProfile.isLoggedIn) {
@@ -2034,24 +2029,34 @@ export default function App() {
                   }
                   setIsLiveArenaOpen(true);
                 }}
-                className="w-full max-w-[120px] py-2 px-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer bg-emerald-600 hover:bg-emerald-500 active:scale-95 shadow-xs"
+                className="w-full py-1.5 px-1.5 rounded-xl text-white font-bold text-[11px] flex flex-col items-center justify-center gap-0.5 transition-all cursor-pointer bg-[var(--accent)] hover:bg-[var(--accent-hover)] active:scale-95 shadow-md"
               >
-                <Play className="w-3.5 h-3.5 fill-white shrink-0" />
-                <span className="truncate">Live Arena</span>
+                <Play className="w-3.5 h-3.5 fill-white" />
+                <span className="truncate leading-none">Arena</span>
               </button>
             </div>
 
-            {/* Right: Open Categories Drawer */}
+            {/* 4. Leaderboard Modal */}
             <button
-              onClick={() => setIsMobileCategoriesOpen(true)}
-              className={`flex flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl transition-colors cursor-pointer ${
-                theme === 'dark'
-                  ? 'hover:bg-zinc-800 text-emerald-400 active:text-emerald-300'
-                  : 'hover:bg-emerald-50 text-emerald-600 active:text-emerald-800'
-              }`}
+              onClick={() => setIsLeaderboardOpen(true)}
+              className="flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
             >
-              <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-              <span className="text-[11px] font-bold tracking-tight">Topics</span>
+              <Trophy className="w-4 h-4 text-amber-500" />
+              <span className="text-[10px] font-bold tracking-tight">Rankings</span>
+            </button>
+
+            {/* 5. Profile Drawer */}
+            <button
+              onClick={() => setIsMobileProfileOpen(true)}
+              className="flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-hover)] transition-colors cursor-pointer"
+            >
+              <div className="relative flex items-center justify-center">
+                <User className="w-4 h-4" />
+                {userProfile.isLoggedIn && (
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[var(--accent)] ring-1 ring-[var(--card)]" />
+                )}
+              </div>
+              <span className="text-[10px] font-bold tracking-tight">Profile</span>
             </button>
           </div>
         </nav>
