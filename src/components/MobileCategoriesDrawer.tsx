@@ -11,7 +11,7 @@ interface MobileCategoriesDrawerProps {
   onClose: () => void;
   categories: QuizCategory[];
   speedModes: SpeedMode[];
-  selectedCategoryId: string;
+  selectedCategoryId?: string | null;
   selectedSpeedModeId: string;
   onSelectCategory: (categoryId: string) => void;
   onSelectSpeedMode: (speedModeId: string) => void;
@@ -73,9 +73,9 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className={`relative z-10 w-[62%] max-w-[225px] h-full flex flex-col shadow-2xl border-l overflow-hidden ${
+            className={`relative z-10 w-[86vw] max-w-[360px] h-full min-h-0 flex flex-col shadow-2xl border-l overflow-hidden ${
               isDark
-                ? 'bg-[#080c10] black-net text-slate-100 border-emerald-950/60'
+                ? 'bg-[#0B0E14] text-slate-100 border-[#1A2332]'
                 : 'bg-white text-slate-900 border-slate-200'
             }`}
           >
@@ -146,7 +146,7 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
               <div>
                 <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider mb-1 text-slate-400">
                   <span>Speed Mode</span>
-                  <span className="text-amber-400 font-mono">12s / Q</span>
+                  <span className="text-amber-400 font-mono">{activeSpeed?.durationSeconds ?? 15}s / Q</span>
                 </div>
                 <div className="grid grid-cols-3 gap-1">
                   {speedModes.map((mode) => {
@@ -172,7 +172,7 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
             </div>
 
             {/* 3. SCROLLABLE CATEGORIES LIST */}
-            <div className="flex-1 overflow-y-auto p-2.5 space-y-2">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-2.5 space-y-2 [scrollbar-width:thin] [scrollbar-color:#475569_transparent]">
               {filteredCategories.map((cat) => {
                 const isSelected = cat.id === selectedCategoryId;
                 const themeInfo = getCategoryTheme(cat.id);
@@ -226,7 +226,7 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
                         isDark ? 'text-slate-400' : 'text-slate-600'
                       }`}>
                         <Clock className="w-2.5 h-2.5 text-amber-400" />
-                        <span>{activeSpeed.questionsCount}Q • 12s</span>
+                        <span>{activeSpeed?.questionsCount ?? 0}Q • {activeSpeed?.durationSeconds ?? 15}s</span>
                       </span>
 
                       <button
@@ -268,9 +268,9 @@ export const MobileCategoriesDrawer: React.FC<MobileCategoriesDrawerProps> = ({
                   onPlayCategory(selectedCategoryId);
                   onClose();
                 }}
-                className="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 active:scale-95 text-slate-950 font-black text-xs shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all border border-emerald-300 animate-blink-play"
+                className="w-full py-2.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all"
               >
-                <Play className="w-3.5 h-3.5 fill-slate-950" />
+                <Play className="w-3.5 h-3.5 fill-white" />
                 <span>Launch Quiz Now</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>

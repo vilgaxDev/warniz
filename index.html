@@ -3,18 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trivquest</title>
-    <meta name="description" content="Trivquest: Speed trivia and live prediction arena with real-time M-PESA multiplier ladder, 2X, 3X, 5X odds pipeline, and instant payout settling." />
-    <meta property="og:title" content="Trivquest" />
-    <meta property="og:description" content="Trivquest: Speed trivia and live prediction arena with real-time M-PESA multiplier ladder, 2X, 3X, 5X odds pipeline, and instant payout settling." />
+    <title>Trivquest - Kenya's Fast-Paced Speed Trivia Arena with Real Cash Prizes</title>
+    <meta name="description" content="Trivquest: Kenya's fastest speed trivia arena with real-time cash prizes, multiplier ladder, and instant M-PESA mobile money cashouts. Play quizzes, win money, withdraw instantly!" />
+    <meta name="keywords" content="trivia quiz, Kenya, cash prizes, M-PESA, mobile money, speed quiz, trivia games, win money, instant payout, trivia arena" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://trivquest.co.ke/" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <meta property="og:title" content="Trivquest - Kenya's Speed Trivia Arena" />
+    <meta property="og:description" content="Play fast-paced trivia quizzes and win real cash prizes with instant M-PESA payouts. Join Kenya's trivia arena today!" />
+    <meta property="og:url" content="https://trivquest.co.ke/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_KE" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Trivquest - Kenya's Speed Trivia Arena" />
+    <meta name="twitter:description" content="Play fast-paced trivia quizzes and win real cash prizes with instant M-PESA payouts." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* Position JotForm agent on the left side */
+      .jotform-agent-widget {
+        position: fixed !important;
+        left: 20px !important;
+        bottom: 20px !important;
+        right: auto !important;
+        z-index: 9999 !important;
+      }
+    </style>
   </head>
-  <body class="bg-[#050507] black-net text-[#F8FAFC] font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-300">
+  <body class="bg-[#090D15] text-[#F8FAFC] font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-300">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- JotForm Chatbot Embed - Loaded asynchronously to avoid webpack conflicts -->
+    <script>
+      (function() {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.jotfor.ms/agent/embedjs/01a0b48f7680700084d2346c0f150f15e3ad/embed.js';
+        script.async = true;
+        script.onload = function() {
+          console.log('JotForm agent loaded successfully');
+        };
+        script.onerror = function() {
+          console.error('Failed to load JotForm agent');
+        };
+        document.body.appendChild(script);
+      })();
+    </script>
   </body>
 </html>
 

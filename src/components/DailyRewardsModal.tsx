@@ -55,7 +55,7 @@ export const DailyRewardsModal: React.FC<DailyRewardsModalProps> = ({
             exit={{ scale: 0.95, opacity: 0, y: 15 }}
             transition={{ duration: 0.2 }}
             className={`relative z-10 w-full max-w-lg rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
-              isDark ? 'bg-[#080d14] black-net border-emerald-950/60 text-slate-100 shadow-slate-950/80' : 'bg-white border-slate-200 text-slate-900'
+              isDark ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100' : 'bg-white border-slate-200 text-slate-900'
             }`}
           >
             {/* Header */}

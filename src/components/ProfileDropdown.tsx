@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, ArrowUpRight, History, Trophy, Bell, Key, Lock, Settings,
-  FileText, ShieldCheck, LogOut, Plus, LogIn, X, ChevronRight, Wallet, Sparkles, HelpCircle, Gift
+  FileText, ShieldCheck, LogOut, Plus, LogIn, X, ChevronRight, Wallet, Sparkles, HelpCircle, Gift, Eye, EyeOff
 } from 'lucide-react';
 import { UserProfile, UserState } from '../types';
 
@@ -35,6 +35,23 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
 }) => {
   const isDark = theme === 'dark';
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [hidePhoneNumber, setHidePhoneNumber] = useState(() => {
+    return localStorage.getItem('hidePhoneNumber') === 'true';
+  });
+
+  // Save phone visibility preference
+  useEffect(() => {
+    localStorage.setItem('hidePhoneNumber', hidePhoneNumber.toString());
+  }, [hidePhoneNumber]);
+
+  // Function to mask phone number
+  const maskPhoneNumber = (phone: string) => {
+    if (!hidePhoneNumber) return phone;
+    if (!phone) return 'N/A';
+    const cleaned = phone.replace(/[^0-9]/g, '');
+    if (cleaned.length < 4) return '*'.repeat(cleaned.length);
+    return '*'.repeat(cleaned.length - 4) + cleaned.slice(-4);
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -100,8 +117,8 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
             transition={{ duration: 0.16, ease: 'easeOut' }}
             className={`fixed lg:absolute top-16 sm:top-14 right-2 sm:right-4 z-50 w-[calc(100vw-1rem)] max-w-sm sm:w-88 rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-5rem)] font-sans ${
               isDark
-                ? 'bg-[#080d14] black-net border-emerald-950/60 text-slate-100 shadow-slate-950/80'
-                : 'bg-white border-slate-200 text-slate-900 shadow-slate-300/80'
+                ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100 shadow-2xl'
+                : 'bg-white border-slate-200 text-slate-900 shadow-2xl'
             }`}
           >
             {/* Header Card Section with User Details */}
@@ -125,24 +142,38 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                         <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[#0f172a]" />
                       </div>
 
-                      {/* Name, Handle, Phone */}
-                      <div className="overflow-hidden">
-                        <h3 className={`font-bold text-sm sm:text-base truncate leading-tight ${
-                          isDark ? 'text-slate-100' : 'text-slate-900'
-                        }`}>
-                          {userProfile.name}
-                        </h3>
-                        <p className="text-xs font-semibold text-emerald-500 truncate">
-                          @{userProfile.email ? userProfile.email.split('@')[0] : 'KenyanQuizMaster'}
+                      {/* Name, Player ID, Phone, Email */}
+                      <div className="overflow-hidden flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <h3 className={`font-bold text-sm sm:text-base truncate leading-tight ${
+                            isDark ? 'text-slate-100' : 'text-slate-900'
+                          }`}>
+                            {userProfile.name || 'Player'}
+                          </h3>
+                          {userProfile.id && (
+                            <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
+                              #{userProfile.id}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs font-semibold text-emerald-400 truncate flex items-center gap-1 mt-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />
+                          <span>{maskPhoneNumber(userProfile.phone || userProfile.email || 'Verified Player')}</span>
+                          {userProfile.phone && (
+                            <button
+                              onClick={() => setHidePhoneNumber(!hidePhoneNumber)}
+                              className="ml-1 text-emerald-400/60 hover:text-emerald-400 transition-colors cursor-pointer"
+                              aria-label={hidePhoneNumber ? 'Show phone number' : 'Hide phone number'}
+                            >
+                              {hidePhoneNumber ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                            </button>
+                          )}
                         </p>
-                        <p className={`text-[11px] font-medium truncate mt-0.5 flex items-center gap-1.5 ${
-                          isDark ? 'text-slate-400' : 'text-slate-500'
-                        }`}>
-                          <span>{userProfile.avatar || '🇰🇪'}</span>
-                          <span>{userProfile.country || 'Kenya'}</span>
-                          <span>•</span>
-                          <span>{userProfile.phone}</span>
-                        </p>
+                        {userProfile.email && (
+                          <p className={`text-[11px] font-medium truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                            {userProfile.email}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -167,7 +198,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                         PORTFOLIO CASH
                       </span>
                       <span className="font-extrabold text-emerald-500 text-base sm:text-lg">
-                        KSh {userState.walletBalance.toLocaleString()}
+                        KES {userState.walletBalance.toLocaleString()}
                       </span>
                     </div>
 
@@ -191,15 +222,15 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                       className="py-2 px-3 rounded-xl bg-[#00A344] hover:bg-[#008A38] text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md active:scale-95"
                     >
                       <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                      <span>M-PESA In</span>
+                      <span>Deposit</span>
                     </button>
 
                     <button
                       onClick={handleWithdrawClick}
-                      className="py-2 px-3 rounded-xl bg-[#121722] border border-[#00A344]/50 hover:bg-[#00A344] text-[#00A344] hover:text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-sm active:scale-95 dark:text-emerald-400"
+                      className="py-2 px-3 rounded-xl bg-[#121722] border border-[#EF4444]/50 hover:bg-[#EF4444] text-[#EF4444] hover:text-white font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-sm active:scale-95"
                     >
                       <ArrowUpRight className="w-3.5 h-3.5 stroke-[3]" />
-                      <span>Cashout</span>
+                      <span>Withdraw</span>
                     </button>
                   </div>
                 </div>
@@ -212,8 +243,8 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                     <User className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className={`font-bold text-sm ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Guest Trader</h4>
-                    <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Sign in to save KSh prediction profits & rank up.</p>
+                    <h4 className={`font-bold text-sm ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>Guest Player</h4>
+                    <p className={`text-xs mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Sign in to save KES quiz earnings & rank up.</p>
                   </div>
                   <button
                     onClick={() => {
@@ -259,7 +290,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
               >
                 <div className="flex items-center gap-2.5">
                   <History className="w-4 h-4 text-emerald-500" />
-                  <span>Prediction History & Audits</span>
+                  <span>Quiz History & Audits</span>
                 </div>
                 <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
               </button>
@@ -314,6 +345,23 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                   <span>Security & PIN</span>
                 </div>
                 <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+              </button>
+
+              <button
+                onClick={() => setHidePhoneNumber(!hidePhoneNumber)}
+                className={`w-full p-2.5 rounded-xl flex items-center justify-between text-xs font-semibold transition-colors cursor-pointer ${
+                  isDark ? 'hover:bg-slate-800/80 text-slate-200' : 'hover:bg-slate-100 text-slate-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  {hidePhoneNumber ? <Eye className="w-4 h-4 text-slate-500" /> : <EyeOff className="w-4 h-4 text-slate-500" />}
+                  <span>{hidePhoneNumber ? 'Show Phone Number' : 'Hide Phone Number'}</span>
+                </div>
+                <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${
+                  hidePhoneNumber ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-300'
+                }`}>
+                  {hidePhoneNumber ? 'Hidden' : 'Visible'}
+                </span>
               </button>
 
               {/* Legal & Compliance Group */}

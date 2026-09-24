@@ -35,7 +35,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
             exit={{ scale: 0.95, opacity: 0, y: 15 }}
             transition={{ duration: 0.2 }}
             className={`relative z-10 w-full max-w-xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] ${
-              isDark ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+              isDark ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100' : 'bg-white border-slate-200 text-slate-900'
             }`}
           >
             {/* Header */}
@@ -50,10 +50,10 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
                   <h3 className={`font-bold text-base sm:text-lg leading-tight ${
                     isDark ? 'text-white' : 'text-slate-900'
                   }`}>
-                    How Polymarket Trivia Works
+                    How Trivquest Trivia Works
                   </h3>
                   <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Live predictions, speed trivia, and instant M-PESA cashouts
+                    Speed trivia, instant cash prizes, and M-PESA cashouts
                   </p>
                 </div>
               </div>
@@ -73,8 +73,8 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
               {/* Interactive Demo Callout Banner */}
               <div className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 ${
                 isDark
-                  ? 'bg-gradient-to-r from-emerald-950/60 to-teal-950/40 border-emerald-500/30 text-emerald-200'
-                  : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 text-emerald-950'
+                  ? 'bg-[#121722] border-[#222C3E] text-slate-200'
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-950'
               }`}>
                 <div className="flex items-center gap-2.5">
                   <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -107,7 +107,7 @@ export const HowItWorksModal: React.FC<HowItWorksModalProps> = ({
                     1. Pick Your Speed & Topic
                   </h4>
                   <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
-                    Select a prediction speed mode (3 min, 5 min, or 10 min) and enter a category like Football EPL, Tech Safari, or Kenyan News.
+                    Select a trivia speed mode (3 min, 5 min, or 10 min) and enter a category like Football EPL, Tech Safari, or Kenyan News.
                   </p>
                 </div>
               </div>

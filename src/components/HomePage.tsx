@@ -3,7 +3,6 @@ import { HeroSlider } from './HeroSlider';
 import { MarketSlider, MarketItem } from './MarketSlider';
 import { CategorySelector } from './CategorySelector';
 import { PayoutsSideBar } from './PayoutsSideBar';
-import { SQUARE_CATEGORY_ITEMS } from './SquareCategoryFilter';
 import { QuizCategory, SpeedMode } from '../types';
 import {
   Flame, Trophy, Zap, Clock, ChevronRight, X, Sparkles, Filter
@@ -12,7 +11,7 @@ import {
 interface HomePageProps {
   categories: QuizCategory[];
   speedModes: SpeedMode[];
-  selectedCategoryId: string;
+  selectedCategoryId?: string | null;
   selectedSpeedModeId: string;
   selectedSubcategory?: string;
   onSelectSubcategory?: (subId: string) => void;
@@ -48,21 +47,21 @@ export const HomePage: React.FC<HomePageProps> = ({
   bannerSlides,
 }) => {
   const isDark = theme === 'dark';
-  const activeSubcategoryMeta = SQUARE_CATEGORY_ITEMS.find((s) => s.id === selectedSubcategory);
-  const isFiltered = Boolean(selectedSubcategory && selectedSubcategory !== 'all');
+  const activeCategoryMeta = categories.find((c) => c.id === selectedCategoryId);
+  const isFiltered = Boolean(selectedCategoryId && selectedCategoryId !== 'all');
 
   return (
     <div className="w-full space-y-6 sm:space-y-8 font-sans max-w-[1600px] mx-auto px-3 sm:px-6 py-4 sm:py-6">
       {/* Active Filter Indicator Bar */}
-      {isFiltered && activeSubcategoryMeta && onSelectSubcategory && (
+      {isFiltered && activeCategoryMeta && onSelectCategory && (
         <div className={`p-3 sm:p-3.5 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
           isDark
             ? 'bg-[#182030] border-[#222C3E]'
             : 'bg-emerald-50/80 border-emerald-200 shadow-xs'
         }`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-600 flex items-center justify-center text-xl shadow-xs shrink-0 text-white">
-              {activeSubcategoryMeta.icon}
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-xl shadow-2xs shrink-0 text-white">
+              {activeCategoryMeta.icon}
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -76,13 +75,13 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </span>
               </div>
               <h4 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                {activeSubcategoryMeta.name} Trivia Arena
+                {activeCategoryMeta.name} Trivia Arena
               </h4>
             </div>
           </div>
 
           <button
-            onClick={() => onSelectSubcategory('all')}
+            onClick={() => onSelectCategory('all')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
               isDark
                 ? 'bg-[#121722] hover:bg-[#222C3E] text-slate-300 hover:text-white border border-[#222C3E]'
@@ -96,13 +95,13 @@ export const HomePage: React.FC<HomePageProps> = ({
       )}
 
       {/* 2-COLUMN MAIN LAYOUT: MAIN QUIZ ARENA + PAYOUTS SIDEBAR */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 items-start">
-        {/* MAIN COLUMN (3 COLS ON XL) */}
-        <div className="xl:col-span-3 space-y-6 sm:space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-start">
+        {/* MAIN COLUMN (2 COLS ON LG, 3 COLS ON XL) */}
+        <div className="lg:col-span-2 xl:col-span-3 space-y-6 sm:space-y-8">
           {/* 1. HERO FEATURED CAROUSEL SLIDER */}
           <HeroSlider onPlayCategory={onPlayCategory} theme={theme} slides={bannerSlides} />
 
-          {/* 3. HORIZONTAL QUIZ CHALLENGE SLIDERS */}
+          {/* 2. HORIZONTAL QUIZ CHALLENGE SLIDERS */}
           <MarketSlider
             title="Featured Quiz Challenges"
             subtitle="High-stakes speed trivia with live prize pools"
@@ -121,7 +120,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             theme={theme}
           />
 
-          {/* 4. SPEED ENGINE & 4-IN-A-ROW CATEGORY CARDS */}
+          {/* 3. SPEED ENGINE & 4-IN-A-ROW CATEGORY CARDS */}
           <CategorySelector
             categories={categories}
             speedModes={speedModes}
@@ -134,8 +133,8 @@ export const HomePage: React.FC<HomePageProps> = ({
           />
         </div>
 
-        {/* SIDEBAR COLUMN (1 COL ON XL): LIVE PAYOUTS BAR WITH HIDDEN NAME & PHONE */}
-        <div className="xl:col-span-1 sticky top-20">
+        {/* SIDEBAR COLUMN (1 COL ON LG/XL, FULL WIDTH ON MOBILE) */}
+        <div className="lg:col-span-1 xl:col-span-1 w-full">
           <PayoutsSideBar theme={theme} />
         </div>
       </div>

@@ -33,7 +33,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
 
   return (
     <div className={`w-full rounded-2xl p-4 sm:p-5 border transition-colors flex flex-col justify-between space-y-4 font-sans ${
-      isDark ? 'bg-[#080d14] black-net border-emerald-950/60' : 'bg-white border-slate-200 shadow-xs'
+      isDark ? 'bg-[#0B0E14] border-[#1A2332]' : 'bg-white border-slate-200 shadow-xs'
     }`}>
       {/* Leaderboard Header */}
       <div className={`flex items-center justify-between pb-3 border-b ${

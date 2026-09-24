@@ -80,7 +80,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
         exit={{ scale: 0.95, opacity: 0, y: 10 }}
         className={`relative z-10 w-full max-w-lg rounded-2xl p-4 sm:p-6 border flex flex-col max-h-[90vh] overflow-hidden shadow-2xl transition-colors duration-200 ${
           isDark
-            ? 'bg-[#070a0e] black-net border-emerald-950/60 text-[#F8FAFC]'
+            ? 'bg-[#0B0E14] border-[#1A2332] text-[#F8FAFC]'
             : 'bg-white border-slate-200 text-slate-900'
         }`}
       >
@@ -89,8 +89,10 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
           isDark ? 'border-[#222C3E]' : 'border-slate-100'
         }`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-600 text-white flex items-center justify-center relative shadow-md shadow-emerald-500/20">
-              <Bell className="w-5 h-5 fill-white" />
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center relative border ${
+              isDark ? 'bg-[#182030] border-[#222C3E] text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-600'
+            }`}>
+              <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white font-black text-[10px] flex items-center justify-center border-2 border-[#121722]">
                   {unreadCount}

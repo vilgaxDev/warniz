@@ -64,8 +64,8 @@ export const BotTraderModal: React.FC<BotTraderModalProps> = ({
                 <div>
                   <h3 className={`font-bold text-base sm:text-lg leading-tight ${
                     isDark ? 'text-slate-100' : 'text-slate-900'
-                  }`}>AI Prediction Assistant</h3>
-                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Algorithmic fast-execution & prediction signals</p>
+                  }`}>AI Trivia Assistant</h3>
+                  <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Algorithmic fast-execution & trivia hints</p>
                 </div>
               </div>
 

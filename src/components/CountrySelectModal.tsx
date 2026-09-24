@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Search, Globe, Check, Sparkles, Phone } from 'lucide-react';
 import { CountryInfo } from '../types';
+import { COUNTRIES_DATA } from '../data/countriesData';
 
 export interface SpecifiedCountryInfo extends CountryInfo {
   flagUrl?: string;
@@ -220,6 +221,22 @@ export const ALLOWED_SPECIFIED_COUNTRIES: SpecifiedCountryInfo[] = [
   }
 ];
 
+export const ALL_AVAILABLE_COUNTRIES: SpecifiedCountryInfo[] = (() => {
+  const map = new Map<string, SpecifiedCountryInfo>();
+  for (const c of ALLOWED_SPECIFIED_COUNTRIES) {
+    map.set(c.code, c);
+  }
+  for (const c of COUNTRIES_DATA) {
+    if (!map.has(c.code)) {
+      map.set(c.code, {
+        ...c,
+        flagUrl: `https://flagcdn.com/w80/${c.code.toLowerCase()}.png`,
+      });
+    }
+  }
+  return Array.from(map.values());
+})();
+
 interface CountrySelectModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -230,13 +247,14 @@ interface CountrySelectModalProps {
   title?: string;
 }
 
-const POPULAR_CODES = ['KE', 'UG', 'TZ', 'NG', 'GH', 'RW', 'CI', 'CD', 'ZM'];
+const POPULAR_CODES = ['KE', 'UG', 'TZ', 'NG', 'GH', 'RW', 'ZA', 'CI', 'CD', 'ZM', 'GB', 'US'];
 
 export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
   isOpen,
   onClose,
   selectedCountryCode,
   onSelectCountry,
+  countries,
   theme = 'dark',
   title = 'Select Country & Dial Code',
 }) => {
@@ -244,22 +262,26 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [imgErrorCodes, setImgErrorCodes] = useState<Record<string, boolean>>({});
 
+  const countryList = useMemo(() => {
+    return countries && countries.length > 0 ? (countries as SpecifiedCountryInfo[]) : ALL_AVAILABLE_COUNTRIES;
+  }, [countries]);
+
   const filteredCountries = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    if (!q) return ALLOWED_SPECIFIED_COUNTRIES;
-    return ALLOWED_SPECIFIED_COUNTRIES.filter((c) =>
+    if (!q) return countryList;
+    return countryList.filter((c) =>
       c.name.toLowerCase().includes(q) ||
       c.code.toLowerCase().includes(q) ||
       c.dialCode.toLowerCase().includes(q) ||
       c.currency.toLowerCase().includes(q) ||
       (c.currencyCode && c.currencyCode.toLowerCase().includes(q)) ||
-      c.paymentMethod.toLowerCase().includes(q)
+      (c.paymentMethod && c.paymentMethod.toLowerCase().includes(q))
     );
-  }, [searchQuery]);
+  }, [searchQuery, countryList]);
 
   const popularCountries = useMemo(() => {
-    return ALLOWED_SPECIFIED_COUNTRIES.filter((c) => POPULAR_CODES.includes(c.code));
-  }, []);
+    return countryList.filter((c) => POPULAR_CODES.includes(c.code));
+  }, [countryList]);
 
   const renderProviderBadges = (country: SpecifiedCountryInfo) => {
     const keys = country.providerKeys || [];
@@ -389,7 +411,7 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
           exit={{ opacity: 0, scale: 0.96, y: 10 }}
           className={`w-full max-w-2xl rounded-3xl border shadow-2xl overflow-hidden flex flex-col max-h-[85vh] transition-all ${
             isDark
-              ? 'bg-[#070a0e] black-net border-emerald-950/60 text-[#F8FAFC] shadow-emerald-500/5'
+              ? 'bg-[#0B0E14] border-[#1A2332] text-[#F8FAFC]'
               : 'bg-white border-slate-200 text-slate-900 shadow-2xl shadow-slate-900/10'
           }`}
         >
@@ -398,7 +420,7 @@ export const CountrySelectModal: React.FC<CountrySelectModalProps> = ({
             isDark ? 'border-[#222C3E] bg-[#141A26]' : 'border-slate-200 bg-slate-50'
           }`}>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-md shadow-emerald-600/30">
+              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-bold shadow-2xs">
                 <Globe className="w-4 h-4" />
               </div>
               <div>

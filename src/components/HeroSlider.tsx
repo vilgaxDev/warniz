@@ -37,7 +37,7 @@ const FEATURED_SLIDES: FeaturedSlide[] = [
     participants: 1420,
     endsIn: '4h 12m',
     icon: '🇰🇪',
-    gradient: 'from-emerald-950/90 via-slate-900 to-slate-950',
+    gradient: 'from-[#111827] via-[#0F172A] to-[#0B0E14]',
     difficulty: 'Medium',
     questionsCount: 10,
     tags: ['Kenya', 'History', 'Safari'],
@@ -55,7 +55,7 @@ const FEATURED_SLIDES: FeaturedSlide[] = [
     participants: 3280,
     endsIn: '1h 45m',
     icon: '⚽',
-    gradient: 'from-emerald-900/90 via-slate-900 to-slate-950',
+    gradient: 'from-[#111827] via-[#0F172A] to-[#0B0E14]',
     difficulty: 'Pro Challenge',
     questionsCount: 8,
     tags: ['World Cup', 'Football', 'Top Prize'],
@@ -306,9 +306,9 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({
 
                 <button
                   onClick={() => onPlayCategory(slide.categoryId)}
-                  className="px-5 sm:px-7 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95 bg-emerald-500 hover:bg-emerald-400 text-slate-950 border border-emerald-300 animate-blink-play"
+                  className="px-5 sm:px-7 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95 bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs"
                 >
-                  <Play className="w-4 h-4 fill-slate-950" />
+                  <Play className="w-4 h-4 fill-white" />
                   <span>Start Live Quiz</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </button>

@@ -1,6 +1,6 @@
 {
   "name": "Trivquest",
-  "description": "Trivquest: Speed trivia and live prediction arena with real-time M-PESA multiplier ladder, 2X, 3X, 5X odds pipeline, and instant payout settling.",
+  "description": "Trivquest: Fast-paced speed trivia arena with real-time M-PESA cash prizes, multiplier ladder, and instant mobile money cashouts.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

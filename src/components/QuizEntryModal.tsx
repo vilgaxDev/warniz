@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Play, Trophy, Flame, Zap, Wallet, ShieldAlert, Sparkles, ChevronRight, PlusCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { X, Play, Trophy, Flame, Zap, Wallet, ShieldAlert, Sparkles, ChevronRight, PlusCircle, CheckCircle2, ArrowRight, Plus } from 'lucide-react';
 import { QuizCategory, SpeedMode } from '../types';
 import { generateRewardLadder, calculatePotentialWinnings, getStreakMultiplier } from '../data/quizData';
+import { paymentSettingsService } from '../services/paymentSettingsService';
 
 interface QuizEntryModalProps {
   isOpen: boolean;
@@ -14,10 +15,13 @@ interface QuizEntryModalProps {
   onConfirmStart: (categoryId: string, speedModeId: string, stakeAmount: number) => void;
   walletBalance: number;
   onOpenDeposit?: () => void;
+  onOpenAuth?: () => void;
+  isLoggedIn?: boolean;
   theme?: 'dark' | 'light';
+  isDemo?: boolean;
 }
 
-const PRESET_STAKES = [10, 20, 50, 100, 200, 500];
+const PRESET_STAKES = [5, 10, 20, 50, 100, 200];
 
 export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
   isOpen,
@@ -29,11 +33,35 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
   onConfirmStart,
   walletBalance,
   onOpenDeposit,
+  onOpenAuth,
+  isLoggedIn = true,
   theme = 'dark',
+  isDemo = false,
 }) => {
   const isDark = theme === 'dark';
   const [stakeInput, setStakeInput] = useState<string>('20');
+  const [presetStakes, setPresetStakes] = useState<number[]>(PRESET_STAKES);
+  const [minBet, setMinBet] = useState<number>(10);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const numericStake = Math.max(0, parseInt(stakeInput, 10) || 0);
+
+  // Load bet settings from backend
+  useEffect(() => {
+    const loadBetSettings = async () => {
+      try {
+        const settings = await paymentSettingsService.fetchPaymentSettings();
+        if (settings.bet_amounts && settings.bet_amounts.length > 0) {
+          setPresetStakes(settings.bet_amounts);
+        }
+        if (settings.min_bet) {
+          setMinBet(settings.min_bet);
+        }
+      } catch (error) {
+        console.error('Failed to load bet settings:', error);
+      }
+    };
+    loadBetSettings();
+  }, []);
 
   const currentMode = speedModes.find((m) => m.id === selectedSpeedModeId) || speedModes[0];
   const questionsCount = currentMode?.questionsCount || 6;
@@ -48,20 +76,109 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
   }, [numericStake, questionsCount]);
 
   const isBalanceSufficient = walletBalance >= numericStake && numericStake > 0;
+  const isAboveMinBet = numericStake >= minBet;
 
   if (!isOpen) return null;
+
+  // Show sign-in prompt if not logged in (skip for demo mode)
+  if (!isLoggedIn && !isDemo) {
+    return (
+      <AnimatePresence>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 overflow-hidden font-sans">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
+          
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className={`relative w-full max-w-md rounded-2xl shadow-2xl border overflow-hidden ${
+              isDark ? 'bg-[#0F172A] border-slate-700' : 'bg-white border-slate-200'
+            }`}
+          >
+            {/* Header */}
+            <div className={`p-4 sm:p-5 border-b ${
+              isDark ? 'border-slate-700' : 'border-slate-200'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    isDark ? 'bg-amber-500/20' : 'bg-amber-100'
+                  }`}>
+                    <Play className={`w-5 h-5 ${isDark ? 'text-amber-400' : 'text-amber-600'}`} />
+                  </div>
+                  <div>
+                    <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      Sign In Required
+                    </h3>
+                    <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      {category.name} • {currentMode?.name}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className={`p-2 rounded-lg transition-colors ${
+                    isDark ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-slate-100 text-slate-500'
+                  }`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-5 sm:p-6 space-y-4">
+              <div className={`p-4 rounded-xl border ${
+                isDark ? 'bg-blue-500/10 border-blue-500/30' : 'bg-blue-50 border-blue-200'
+              }`}>
+                <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                  Please sign in to play {category.name} and start winning real prizes!
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenAuth?.();
+                }}
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg flex items-center justify-center gap-2"
+              >
+                <ShieldAlert className="w-5 h-5" />
+                <span>Sign In to Play</span>
+              </button>
+
+              <p className={`text-xs text-center ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Don't have an account? You'll be able to create one after signing in.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </AnimatePresence>
+    );
+  }
 
   const handlePresetClick = (amount: number) => {
     setStakeInput(String(amount));
   };
 
   const handleMaxClick = () => {
-    const maxVal = Math.min(1000, Math.max(10, walletBalance));
+    const maxVal = Math.min(1000, Math.max(minBet, walletBalance));
     setStakeInput(String(maxVal));
   };
 
   const handleConfirm = () => {
     if (!isBalanceSufficient) return;
+    if (numericStake < minBet) return;
     onConfirmStart(category.id, selectedSpeedModeId, numericStake);
     onClose();
   };
@@ -107,13 +224,15 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                 <div className="flex items-center gap-2">
                   <h2 className="font-bold text-base sm:text-lg leading-tight">{category.name}</h2>
                   <span className={`text-[10px] px-1.5 py-0.2 rounded font-extrabold uppercase tracking-wider ${
-                    isDark ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-100 text-emerald-800'
+                    isDemo
+                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                   }`}>
-                    LIVE
+                    {isDemo ? 'DEMO' : 'LIVE'}
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
-                  {category.subtitle || 'Configure stake to activate streak multiplier ladder'}
+                  {isDemo ? 'Virtual Money Only - Not Real Account Balance' : (category.subtitle || 'Configure stake to activate streak multiplier ladder')}
                 </p>
               </div>
             </div>
@@ -160,7 +279,7 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                           ? isDark ? 'text-slate-300' : 'text-slate-300'
                           : isDark ? 'text-slate-500' : 'text-slate-500'
                       }`}>
-                        {mode.questionsCount}Q · 12s
+                        {mode.questionsCount}Q · {mode.durationSeconds}s
                       </div>
                     </button>
                   );
@@ -174,12 +293,27 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
                   2. Enter Stake Amount
                 </label>
-                <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-                  <Wallet className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Balance:</span>
-                  <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                    KSh {walletBalance.toLocaleString()}
-                  </span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                    <Wallet className={`w-3.5 h-3.5 ${isDemo ? 'text-purple-400' : 'text-emerald-400'}`} />
+                    <span>{isDemo ? 'Demo Balance:' : 'Balance:'}</span>
+                    <span className={`font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      KSh {walletBalance.toLocaleString()}
+                    </span>
+                  </div>
+                  {onOpenDeposit && !isDemo && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenDeposit();
+                      }}
+                      className="px-2 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Deposit
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -196,7 +330,7 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                 </div>
                 <input
                   type="number"
-                  min="5"
+                  min={minBet}
                   step="5"
                   value={stakeInput}
                   onChange={(e) => setStakeInput(e.target.value)}
@@ -220,7 +354,7 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
 
               {/* Quick Amount Buttons */}
               <div className="grid grid-cols-6 gap-1 sm:gap-1.5 mt-2">
-                {PRESET_STAKES.map((amount) => {
+                {presetStakes.map((amount) => {
                   const isSelected = numericStake === amount;
                   return (
                     <button
@@ -248,9 +382,11 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                 <div className="mt-2 p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between text-xs text-rose-400">
                   <div className="flex items-center gap-1.5">
                     <ShieldAlert className="w-4 h-4 shrink-0" />
-                    <span className="text-[11px] font-medium">Stake exceeds balance (KSh {walletBalance})</span>
+                    <span className="text-[11px] font-medium">
+                      {isDemo ? 'Demo balance insufficient' : `Stake exceeds balance (KSh ${walletBalance})`}
+                    </span>
                   </div>
-                  {onOpenDeposit && (
+                  {onOpenDeposit && !isDemo && (
                     <button
                       type="button"
                       onClick={() => {
@@ -265,9 +401,63 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                   )}
                 </div>
               )}
+
+              {/* Minimum Bet Warning */}
+              {numericStake > 0 && numericStake < minBet && (
+                <div className="mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-1.5 text-xs text-amber-400">
+                  <ShieldAlert className="w-4 h-4 shrink-0" />
+                  <span className="text-[11px] font-medium">Minimum bet is KSh {minBet}</span>
+                </div>
+              )}
             </div>
 
-            {/* Potential Payout & Multiplier Mechanics Card */}
+            {/* Exit Confirmation Modal for Demo */}
+            {isDemo && showExitConfirm && (
+              <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowExitConfirm(false)} />
+                <div className={`relative w-full max-w-sm rounded-2xl border shadow-2xl p-6 ${
+                  isDark ? 'bg-[#0E131E] border-[#222C3E]' : 'bg-white border-slate-200'
+                }`}>
+                  <div className="text-center">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                      isDark ? 'bg-purple-500/20' : 'bg-purple-100'
+                    }`}>
+                      <X className={`w-6 h-6 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
+                    </div>
+                    <h3 className={`font-bold text-lg mb-2 ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      Exit Demo?
+                    </h3>
+                    <p className={`text-sm mb-6 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Are you sure you want to leave the demo? Your progress will be lost.
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setShowExitConfirm(false)}
+                        className={`flex-1 py-3 rounded-xl font-bold text-sm transition-colors ${
+                          isDark
+                            ? 'bg-[#182030] text-slate-300 hover:text-white border border-[#222C3E]'
+                            : 'bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200'
+                        }`}
+                      >
+                        Stay in Demo
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowExitConfirm(false);
+                          onClose();
+                        }}
+                        className="flex-1 py-3 rounded-xl font-bold text-sm bg-purple-600 hover:bg-purple-500 text-white transition-colors"
+                      >
+                        Exit Demo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Potential Payout & Multiplier Mechanics Card - Hide for demo */}
+            {!isDemo && (
             <div className={`p-3.5 sm:p-4 rounded-xl border transition-all ${
               isDark ? 'bg-[#121722] border-[#222C3E]' : 'bg-slate-50 border-slate-200'
             }`}>
@@ -331,64 +521,10 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                 </div>
               </div>
             </div>
+            )}
 
-            {/* PRIMARY START ACTION - DIRECTLY AFTER STAKE & POTENTIAL PAYOUT */}
-            <div className="space-y-2">
-              {isBalanceSufficient ? (
-                <button
-                  type="button"
-                  onClick={handleConfirm}
-                  className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 hover:brightness-105 active:scale-[0.99] text-slate-950 font-black text-sm sm:text-base shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer border border-emerald-300 ring-2 ring-emerald-400/20 animate-blink-play"
-                >
-                  <Play className="w-5 h-5 fill-slate-950 shrink-0" />
-                  <span className="truncate">START QUIZ NOW · KSh {numericStake.toLocaleString()}</span>
-                  <ChevronRight className="w-5 h-5 shrink-0" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onOpenDeposit?.();
-                  }}
-                  className="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 hover:brightness-105 active:scale-[0.99] text-white font-black text-sm sm:text-base shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2.5 transition-all cursor-pointer"
-                >
-                  <PlusCircle className="w-5 h-5 shrink-0" />
-                  <span className="truncate">Deposit KSh {(numericStake - walletBalance).toLocaleString()} to Start Quiz</span>
-                  <ChevronRight className="w-5 h-5 shrink-0" />
-                </button>
-              )}
-
-              {/* Real-time Balance Status Indicator */}
-              <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition-colors ${
-                isBalanceSufficient
-                  ? isDark
-                    ? 'bg-emerald-950/25 border-emerald-500/35 text-emerald-300'
-                    : 'bg-emerald-50/90 border-emerald-200 text-emerald-950'
-                  : isDark
-                    ? 'bg-rose-950/25 border-rose-500/35 text-rose-300'
-                    : 'bg-rose-50/90 border-rose-200 text-rose-950'
-              }`}>
-                <div className="flex items-center gap-2 font-bold">
-                  <Wallet className="w-4 h-4 shrink-0 opacity-80" />
-                  <span>Wallet: <strong className="font-black text-sm">KSh {walletBalance.toLocaleString()}</strong></span>
-                </div>
-
-                {isBalanceSufficient ? (
-                  <div className="flex items-center gap-1 font-black text-[11px] text-emerald-400">
-                    <CheckCircle2 className="w-4 h-4 shrink-0" />
-                    <span>Balance Good · Ready to Play</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1 font-bold text-[11px] text-rose-400">
-                    <ShieldAlert className="w-4 h-4 shrink-0" />
-                    <span>Deposit needed to play</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Sample Reward Pipeline Preview (Scaled to KSh stake) */}
+            {/* Sample Reward Pipeline Preview (Scaled to KSh stake) - Hide for demo */}
+            {!isDemo && (
             <div className={`p-3.5 rounded-xl border transition-all ${
               isDark ? 'bg-[#121722] border-[#222C3E]' : 'bg-slate-50 border-slate-200'
             }`}>
@@ -553,6 +689,7 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
                 })}
               </div>
             </div>
+            )}
           </div>
 
           {/* Modal Footer CTA - Always Pinned at Bottom */}
@@ -561,7 +698,13 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
           }`}>
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                if (isDemo) {
+                  setShowExitConfirm(true);
+                } else {
+                  onClose();
+                }
+              }}
               className={`py-3 px-3.5 sm:px-4 rounded-xl border text-xs font-bold transition-colors cursor-pointer shrink-0 ${
                 isDark
                   ? 'border-[#222C3E] text-slate-400 hover:text-white hover:bg-[#182030]'
@@ -574,13 +717,17 @@ export const QuizEntryModal: React.FC<QuizEntryModalProps> = ({
             <button
               type="button"
               onClick={handleConfirm}
-              disabled={!isBalanceSufficient}
-              className="flex-1 py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-slate-950 border border-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500 disabled:border-transparent animate-blink-play"
+              disabled={!isBalanceSufficient || !isAboveMinBet}
+              className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-[0.99] text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500 ${
+                isDemo
+                  ? 'bg-purple-600 hover:bg-purple-500'
+                  : 'bg-emerald-600 hover:bg-emerald-500'
+              }`}
             >
-              <Play className="w-4 h-4 fill-slate-950" />
+              <Play className="w-4 h-4 fill-white" />
               <span className="truncate">
                 {numericStake > 0
-                  ? `Start Quiz · KSh ${numericStake.toLocaleString()}`
+                  ? `${isDemo ? 'Start Demo' : 'Start Quiz'} · KSh ${numericStake.toLocaleString()}`
                   : 'Enter Stake Amount'}
               </span>
               <ChevronRight className="w-4 h-4 shrink-0" />

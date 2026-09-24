@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Trophy, Medal, Flame, Search, X, TrendingUp, Sparkles, Zap, ArrowUpRight,
   Shield, Check, User, Crown, Filter
@@ -17,35 +17,6 @@ export interface ExtendedLeaderboardUser {
   changeAmount: number;
   badge?: string;
 }
-
-const ALL_LEADERBOARD_DATA: Record<'daily' | 'weekly' | 'alltime', ExtendedLeaderboardUser[]> = {
-  daily: [
-    { rank: 1, name: 'Kiprono M.', avatar: '🇰🇪', winningsKsh: 14200, streak: 8, winRate: '94%', categorySpecialty: 'Kenya Heritage', change: 'up', changeAmount: 2, badge: 'Grand Master' },
-    { rank: 2, name: 'Wanjiku K.', avatar: '🏆', winningsKsh: 11800, streak: 6, winRate: '89%', categorySpecialty: 'Football EPL', change: 'same', changeAmount: 0, badge: 'Sharpshooter' },
-    { rank: 3, name: 'Otieno O.', avatar: '⚡', winningsKsh: 9500, streak: 5, winRate: '87%', categorySpecialty: 'Silicon Savannah', change: 'up', changeAmount: 4, badge: 'Speed Demon' },
-    { rank: 4, name: 'Amina S.', avatar: '🌟', winningsKsh: 7200, streak: 4, winRate: '82%', categorySpecialty: 'Business Economy', change: 'down', changeAmount: 1 },
-    { rank: 5, name: 'Kamau J.', avatar: '🔥', winningsKsh: 5900, streak: 3, winRate: '78%', categorySpecialty: 'Kenya Heritage', change: 'up', changeAmount: 1 },
-    { rank: 6, name: 'Brian N.', avatar: '⚽', winningsKsh: 5100, streak: 4, winRate: '85%', categorySpecialty: 'Football EPL', change: 'up', changeAmount: 3 },
-    { rank: 7, name: 'Faith M.', avatar: '💼', winningsKsh: 4600, streak: 3, winRate: '79%', categorySpecialty: 'Business Economy', change: 'down', changeAmount: 2 },
-    { rank: 8, name: 'Dennis K.', avatar: '🎯', winningsKsh: 3900, streak: 2, winRate: '75%', categorySpecialty: 'World Wonders', change: 'same', changeAmount: 0 },
-    { rank: 9, name: 'Mercy W.', avatar: '🌸', winningsKsh: 3200, streak: 3, winRate: '81%', categorySpecialty: 'Kenya Heritage', change: 'up', changeAmount: 5 },
-    { rank: 10, name: 'Kevin O.', avatar: '🚀', winningsKsh: 2800, streak: 2, winRate: '73%', categorySpecialty: 'Silicon Savannah', change: 'down', changeAmount: 3 },
-  ],
-  weekly: [
-    { rank: 1, name: 'Wanjiku K.', avatar: '🏆', winningsKsh: 48500, streak: 14, winRate: '92%', categorySpecialty: 'Football EPL', change: 'up', changeAmount: 1, badge: 'Legendary' },
-    { rank: 2, name: 'Kiprono M.', avatar: '🇰🇪', winningsKsh: 42100, streak: 12, winRate: '90%', categorySpecialty: 'Kenya Heritage', change: 'down', changeAmount: 1, badge: 'Grand Master' },
-    { rank: 3, name: 'Otieno O.', avatar: '⚡', winningsKsh: 36400, streak: 9, winRate: '88%', categorySpecialty: 'Silicon Savannah', change: 'up', changeAmount: 2, badge: 'Speed Demon' },
-    { rank: 4, name: 'Brian N.', avatar: '⚽', winningsKsh: 29800, streak: 8, winRate: '86%', categorySpecialty: 'Football EPL', change: 'up', changeAmount: 3 },
-    { rank: 5, name: 'Amina S.', avatar: '🌟', winningsKsh: 24500, streak: 7, winRate: '83%', categorySpecialty: 'Business Economy', change: 'down', changeAmount: 1 },
-  ],
-  alltime: [
-    { rank: 1, name: 'Kiprono M.', avatar: '🇰🇪', winningsKsh: 215000, streak: 26, winRate: '95%', categorySpecialty: 'Kenya Heritage', change: 'same', changeAmount: 0, badge: 'Hall of Fame' },
-    { rank: 2, name: 'Wanjiku K.', avatar: '🏆', winningsKsh: 189400, streak: 22, winRate: '93%', categorySpecialty: 'Football EPL', change: 'same', changeAmount: 0, badge: 'Hall of Fame' },
-    { rank: 3, name: 'Otieno O.', avatar: '⚡', winningsKsh: 142000, streak: 18, winRate: '91%', categorySpecialty: 'Silicon Savannah', change: 'same', changeAmount: 0, badge: 'Grand Master' },
-    { rank: 4, name: 'Brian N.', avatar: '⚽', winningsKsh: 118500, streak: 16, winRate: '89%', categorySpecialty: 'Football EPL', change: 'up', changeAmount: 1 },
-    { rank: 5, name: 'Amina S.', avatar: '🌟', winningsKsh: 98400, streak: 14, winRate: '87%', categorySpecialty: 'Business Economy', change: 'down', changeAmount: 1 },
-  ],
-};
 
 interface LeaderboardModalProps {
   isOpen: boolean;
@@ -68,11 +39,38 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'alltime'>('daily');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('All');
+  const [leaderboardData, setLeaderboardData] = useState<ExtendedLeaderboardUser[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch leaderboard data from backend
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const fetchLeaderboard = async () => {
+      setLoading(true);
+      try {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        const response = await fetch(`${baseUrl}/api/leaderboard?timeframe=${timeframe}&limit=50`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.leaderboard && Array.isArray(data.leaderboard)) {
+            setLeaderboardData(data.leaderboard);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, [isOpen, timeframe]);
 
   if (!isOpen) return null;
 
-  const activeList = ALL_LEADERBOARD_DATA[timeframe];
-  const filteredUsers = activeList.filter((u) => {
+  const filteredUsers = leaderboardData.filter((u) => {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       if (!u.name.toLowerCase().includes(q) && !u.categorySpecialty.toLowerCase().includes(q)) {
@@ -85,7 +83,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
     return true;
   });
 
-  const topThree = activeList.slice(0, 3);
+  const topThree = leaderboardData.slice(0, 3);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md font-sans">
@@ -95,7 +93,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         exit={{ opacity: 0, scale: 0.95, y: 15 }}
         className={`w-full max-w-3xl max-h-[92vh] rounded-3xl border flex flex-col overflow-hidden shadow-2xl transition-colors ${
           isDark
-            ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100'
+            ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100'
             : 'bg-white border-slate-200 text-slate-900'
         }`}
       >

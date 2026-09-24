@@ -5,7 +5,7 @@ export const INITIAL_USER_PROFILE: UserProfile = {
   name: 'Player',
   email: '',
   phone: '',
-  avatar: '🇰🇪',
+  avatar: '👤',
   joinedDate: '2026',
   isLoggedIn: false,
   role: 'player',

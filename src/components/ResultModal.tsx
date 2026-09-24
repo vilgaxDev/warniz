@@ -1,6 +1,6 @@
 import React from 'react';
-import { motion } from 'motion/react';
-import { Trophy, Flame, Wallet, RotateCcw, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Trophy, Flame, Wallet, RotateCcw, ArrowRight, ShieldCheck, AlertCircle, Sparkles, Star, Gift, Share2 } from 'lucide-react';
 
 interface ResultModalProps {
   totalWon: number;
@@ -13,6 +13,9 @@ interface ResultModalProps {
   onPlayAgain: () => void;
   theme?: 'dark' | 'light';
   stakeAmount?: number;
+  isDemo?: boolean;
+  onSignUp?: () => void;
+  onShareBettingSlip?: () => void;
 }
 
 export const ResultModal: React.FC<ResultModalProps> = ({
@@ -26,9 +29,14 @@ export const ResultModal: React.FC<ResultModalProps> = ({
   onPlayAgain,
   theme = 'dark',
   stakeAmount = 0,
+  isDemo = false,
+  onSignUp,
+  onShareBettingSlip,
 }) => {
   const isDark = theme === 'dark';
   const isVictory = reason === 'completed' || reason === 'cashed_out';
+  const isBigWin = isVictory && totalWon > (stakeAmount * 2); // Won more than 2x stake
+  const showCongrats = isVictory && (totalWon > 0);
 
   const getTitle = () => {
     switch (reason) {
@@ -48,7 +56,7 @@ export const ResultModal: React.FC<ResultModalProps> = ({
   const getSubtitle = () => {
     switch (reason) {
       case 'cashed_out':
-        return `You safely locked in KSh ${totalWon.toLocaleString()} in accumulated prediction rewards.`;
+        return `You safely locked in KSh ${totalWon.toLocaleString()} in accumulated trivia cash rewards.`;
       case 'completed':
         return `Perfect score! Answered all ${totalQuestions} questions correctly.`;
       case 'timeout':
@@ -56,12 +64,72 @@ export const ResultModal: React.FC<ResultModalProps> = ({
       case 'wrong_answer':
       case 'wrong':
       default:
-        return `Market settled on question ${questionsCorrect + 1}.`;
+        return `Challenge settled on question ${questionsCorrect + 1}.`;
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm font-sans">
+      {/* Congratulations Overlay for Wins */}
+      <AnimatePresence>
+        {showCongrats && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur-3xl opacity-30 animate-pulse" />
+              <div className="relative text-8xl mb-4">
+                {isBigWin ? '🎉' : '🏆'}
+              </div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className={`text-3xl font-black text-center ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}
+              >
+                {isBigWin ? 'BIG WIN!' : 'CONGRATULATIONS!'}
+              </motion.div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className={`text-xl font-bold text-center mt-2 ${
+                  isDark ? 'text-emerald-400' : 'text-emerald-600'
+                }`}
+              >
+                +KSh {totalWon.toLocaleString()}
+              </motion.div>
+              {/* Floating particles */}
+              {[...Array(8)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ scale: 0, x: 0, y: 0 }}
+                  animate={{
+                    scale: [0, 1, 0],
+                    x: [0, Math.cos(i * 45 * Math.PI / 180) * 100],
+                    y: [0, Math.sin(i * 45 * Math.PI / 180) * 100],
+                  }}
+                  transition={{ duration: 1.5, delay: 0.5 + i * 0.1 }}
+                  className="absolute top-1/2 left-1/2 w-4 h-4"
+                >
+                  <div className="w-full h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full" />
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 10 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -181,6 +249,33 @@ export const ResultModal: React.FC<ResultModalProps> = ({
           )}
         </div>
 
+        {/* Demo Mode Sign-Up Banner */}
+        {isDemo && (
+          <div className={`w-full my-4 p-4 rounded-xl border-2 border-dashed text-center ${
+            isDark ? 'border-emerald-500/40 bg-emerald-950/30' : 'border-emerald-400 bg-emerald-50'
+          }`}>
+            <div className="text-lg mb-1">🏆</div>
+            <p className={`text-xs font-semibold mb-2 ${
+              isDark ? 'text-emerald-300' : 'text-emerald-700'
+            }`}>
+              You're playing in <strong>Demo Mode</strong>. No real money earned.
+            </p>
+            <p className={`text-[11px] mb-3 ${
+              isDark ? 'text-slate-400' : 'text-slate-600'
+            }`}>
+              Create a free account to play for real KSh prizes and withdraw winnings!
+            </p>
+            {onSignUp && (
+              <button
+                onClick={onSignUp}
+                className="w-full py-2.5 px-4 rounded-xl font-bold text-xs bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-all cursor-pointer shadow-md"
+              >
+                Create Free Account →
+              </button>
+            )}
+          </div>
+        )}
+
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-2.5 w-full">
           <button
@@ -194,6 +289,20 @@ export const ResultModal: React.FC<ResultModalProps> = ({
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Play Next Round</span>
           </button>
+
+          {onShareBettingSlip && (
+            <button
+              onClick={onShareBettingSlip}
+              className={`flex-1 py-3 px-4 rounded-xl border font-bold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer ${
+                isDark
+                  ? 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-300'
+              }`}
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span>Share Slip</span>
+            </button>
+          )}
 
           <button
             onClick={onClaimAndContinue}

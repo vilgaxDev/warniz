@@ -1,13 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X, User, Wallet, History, Settings, LogOut, ArrowUpRight, ArrowDownLeft,
-  CheckCircle2, Clock, Phone, Mail, Award, Flame, Trophy, Plus, ShieldAlert, Edit2, Save, Key, Check, ShieldCheck, FileText, Globe, ChevronDown
+  CheckCircle2, Clock, Phone, Mail, Award, Flame, Trophy, Plus, ShieldAlert, Edit2, Save, Key, Check, ShieldCheck, FileText, Globe, ChevronDown, Eye, EyeOff
 } from 'lucide-react';
-import { UserProfile, TransactionRecord, QuestionHistoryItem, UserState, CountryInfo } from '../types';
+import { UserProfile, TransactionRecord, QuestionHistoryItem, UserState } from '../types';
 import { getAvatarOptionsForCountry } from '../data/userProfileData';
-import { COUNTRIES_DATA } from '../data/countriesData';
-import { CountrySelectModal } from './CountrySelectModal';
+
+// Helper: validate and format international phone numbers
+function validateAndFormatPhoneNumber(phone: string, dialCode: string, countryCode: string): { isValid: boolean; formatted: string; error: string } {
+  // Remove all non-digit characters except +
+  let cleaned = phone.replace(/[^\d+]/g, '');
+
+  // Remove all + signs first to normalize
+  let digitsOnly = cleaned.replace(/\+/g, '');
+
+  // Remove duplicate country codes from digits (e.g., 254254 -> 254)
+  while (digitsOnly.startsWith(dialCode) && digitsOnly.length > dialCode.length && digitsOnly.substring(dialCode.length).startsWith(dialCode)) {
+    digitsOnly = digitsOnly.substring(dialCode.length);
+  }
+
+  // If starting with 0, replace with country code
+  if (digitsOnly.startsWith('0')) {
+    digitsOnly = dialCode + digitsOnly.substring(1);
+  }
+
+  // If starting with country code, keep it
+  if (digitsOnly.startsWith(dialCode)) {
+    // Already has country code, ensure it's properly formatted
+  } 
+  // If it doesn't start with country code, add it
+  else if (!digitsOnly.startsWith(dialCode)) {
+    digitsOnly = dialCode + digitsOnly;
+  }
+
+  // Format with + sign
+  cleaned = '+' + digitsOnly;
+
+  // Country-specific validation
+  if (countryCode === 'KE') {
+    // Kenyan numbers: +254 followed by 9 digits
+    // Supports all Kenyan mobile operators:
+    // - Safaricom: +25470X, +25471X, +25472X, +25474X, +25475X, +25476X, +25477X, +25478X, +25479X
+    // - Airtel: +25410X, +25411X, +25412X, +25413X, +25414X, +25415X, +25416X, +25417X, +25418X, +25419X
+    // - Telkom: +25474X (shared prefix range)
+    const kenyanPattern = /^\+254[71]\d{8}$/;
+    if (!kenyanPattern.test(cleaned)) {
+      return {
+        isValid: false,
+        formatted: cleaned,
+        error: 'Invalid Kenyan phone number. Must be a valid Safaricom (07XX...) or Airtel (01XX...) number. Format: +2547XXXXXXXXX or 07XXXXXXXXX'
+      };
+    }
+  } else {
+    // International validation: must have at least 10 digits total including country code
+    const internationalPattern = /^\+\d{10,15}$/;
+    if (!internationalPattern.test(cleaned)) {
+      return {
+        isValid: false,
+        formatted: cleaned,
+        error: 'Invalid phone number. Must be 10-15 digits including country code.'
+      };
+    }
+  }
+
+  return {
+    isValid: true,
+    formatted: cleaned,
+    error: ''
+  };
+}
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -18,8 +80,8 @@ interface UserProfileModalProps {
   questionHistory: QuestionHistoryItem[];
   onUpdateProfile: (updatedProfile: UserProfile) => void;
   onLogout: () => void;
-  onDeposit: (amount: number) => void;
-  onWithdraw: (amount: number) => void;
+  onOpenDepositModal: () => void;
+  onOpenWithdrawModal: () => void;
   initialTab?: 'profile' | 'wallet' | 'questions' | 'edit' | 'terms' | 'privacy' | 'withdraw';
   theme?: 'dark' | 'light';
 }
@@ -33,8 +95,8 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   questionHistory,
   onUpdateProfile,
   onLogout,
-  onDeposit,
-  onWithdraw,
+  onOpenDepositModal,
+  onOpenWithdrawModal,
   initialTab = 'profile',
   theme = 'dark',
 }) => {
@@ -44,29 +106,9 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   // Transaction filter state
   const [txFilter, setTxFilter] = useState<'all' | 'deposit' | 'withdrawal' | 'quiz_reward'>('all');
 
-  // Deposit/Withdraw Modal internal states
-  const [isDepositOpen, setIsDepositOpen] = useState(false);
-  const [depositAmount, setDepositAmount] = useState('500');
-  const [depositPhone, setDepositPhone] = useState(userProfile.phone || '+254712345678');
-  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
-  const [withdrawAmount, setWithdrawAmount] = useState('200');
-  const [withdrawPhone, setWithdrawPhone] = useState(userProfile.phone || '+254712345678');
-  const [actionFeedback, setActionFeedback] = useState('');
-
   React.useEffect(() => {
-    if (userProfile.phone) {
-      setDepositPhone(userProfile.phone);
-      setWithdrawPhone(userProfile.phone);
-    }
-  }, [userProfile.phone]);
-
-  React.useEffect(() => {
-    if (initialTab === 'withdraw') {
-      setActiveTab('wallet');
-      setIsWithdrawOpen(true);
-    } else if (initialTab) {
+    if (initialTab) {
       setActiveTab(initialTab as any);
-      setIsWithdrawOpen(false);
     }
   }, [initialTab, isOpen]);
 
@@ -75,23 +117,38 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const [editEmail, setEditEmail] = useState(userProfile.email);
   const [editPhone, setEditPhone] = useState(userProfile.phone);
   const [editAvatar, setEditAvatar] = useState(userProfile.avatar);
-  const [editCountryCode, setEditCountryCode] = useState(userProfile.countryCode || 'KE');
-  const [isCountryPickerOpen, setIsCountryPickerOpen] = useState(false);
   const [editSuccessMsg, setEditSuccessMsg] = useState('');
   // Change Password state inside Settings
   const [currentPasswordInput, setCurrentPasswordInput] = useState('');
   const [newPasswordInput, setNewPasswordInput] = useState('');
   const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
   const [passwordChangeFeedback, setPasswordChangeFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [hidePhoneNumber, setHidePhoneNumber] = useState(() => {
+    return localStorage.getItem('hidePhoneNumber') === 'true';
+  });
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  // Save phone visibility preference
+  useEffect(() => {
+    localStorage.setItem('hidePhoneNumber', hidePhoneNumber.toString());
+  }, [hidePhoneNumber]);
+
+  // Function to mask phone number
+  const maskPhoneNumber = (phone: string) => {
+    if (!hidePhoneNumber) return phone;
+    if (!phone) return 'N/A';
+    const cleaned = phone.replace(/[^0-9]/g, '');
+    if (cleaned.length < 4) return '*'.repeat(cleaned.length);
+    return '*'.repeat(cleaned.length - 4) + cleaned.slice(-4);
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPasswordInput.trim()) {
       setPasswordChangeFeedback({ type: 'error', message: 'Current password is required.' });
       return;
     }
-    if (newPasswordInput.length < 4) {
-      setPasswordChangeFeedback({ type: 'error', message: 'New password must be at least 4 characters.' });
+    if (newPasswordInput.length < 6) {
+      setPasswordChangeFeedback({ type: 'error', message: 'New password must be at least 6 characters.' });
       return;
     }
     if (newPasswordInput !== confirmPasswordInput) {
@@ -99,83 +156,139 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       return;
     }
 
-    setPasswordChangeFeedback({
-      type: 'success',
-      message: 'Password changed successfully! Security confirmation email sent.',
-    });
-    setCurrentPasswordInput('');
-    setNewPasswordInput('');
-    setConfirmPasswordInput('');
+    try {
+      const token = localStorage.getItem('player_token') || localStorage.getItem('token');
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
-    setTimeout(() => {
-      setPasswordChangeFeedback(null);
-    }, 4000);
-  };
+      const response = await fetch(`${apiUrl}/api/player/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          current_password: currentPasswordInput,
+          new_password: newPasswordInput,
+        }),
+      });
 
-  const selectedCountry = COUNTRIES_DATA.find((c) => c.code === editCountryCode) || COUNTRIES_DATA[0];
+      if (response.ok) {
+        const data = await response.json();
+        setPasswordChangeFeedback({
+          type: 'success',
+          message: data.message || 'Password changed successfully! Security confirmation email sent.',
+        });
+        setCurrentPasswordInput('');
+        setNewPasswordInput('');
+        setConfirmPasswordInput('');
 
-  const handleSelectCountry = (country: CountryInfo) => {
-    setEditCountryCode(country.code);
-    setEditAvatar(country.flag);
-    if (editPhone.startsWith('+')) {
-      const parts = editPhone.split(' ');
-      const rest = parts.slice(1).join(' ') || '';
-      setEditPhone(`${country.dialCode} ${rest}`);
-    } else {
-      setEditPhone(`${country.dialCode} `);
+        setTimeout(() => {
+          setPasswordChangeFeedback(null);
+        }, 4000);
+      } else {
+        const errorData = await response.json();
+        setPasswordChangeFeedback({
+          type: 'error',
+          message: errorData.error || errorData.message || 'Failed to change password.',
+        });
+      }
+    } catch (error) {
+      setPasswordChangeFeedback({
+        type: 'error',
+        message: 'Error: Failed to connect to server',
+      });
     }
-    setIsCountryPickerOpen(false);
   };
+
+  const selectedCountry = { code: 'KE', name: 'Kenya', flag: '🇰🇪', dialCode: '+254', currency: 'KES', currencyCode: 'KES', paymentMethod: 'M-PESA' };
 
   if (!isOpen) return null;
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdateProfile({
-      ...userProfile,
-      name: editName,
-      email: editEmail,
-      phone: editPhone,
-      avatar: editAvatar,
-      country: selectedCountry.name,
-      countryCode: selectedCountry.code,
-      currencySymbol: selectedCountry.currency,
-    });
-    setEditSuccessMsg('Profile and location updated successfully!');
-    setTimeout(() => {
-      setEditSuccessMsg('');
-      setActiveTab('profile');
-    }, 1200);
+
+    // Validate and format phone number (Kenya only)
+    const dialCode = '+254'.replace('+', '');
+    const validation = validateAndFormatPhoneNumber(editPhone.trim(), dialCode, 'KE');
+    if (!validation.isValid) {
+      setEditSuccessMsg(`Error: ${validation.error}`);
+      setTimeout(() => {
+        setEditSuccessMsg('');
+      }, 3000);
+      return;
+    }
+    const formattedPhone = validation.formatted;
+
+    try {
+      const token = localStorage.getItem('player_token') || localStorage.getItem('token');
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
+      const response = await fetch(`${apiUrl}/api/player/update-profile`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: editName,
+          email: editEmail,
+          phone_number: formattedPhone,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Update local profile state
+        const updatedProfile: UserProfile = {
+          ...userProfile,
+          name: editName,
+          email: editEmail,
+          phone: formattedPhone,
+          avatar: editAvatar,
+          country: 'Kenya',
+          countryCode: 'KE',
+          currencySymbol: 'KES',
+        };
+
+        onUpdateProfile(updatedProfile);
+        setEditSuccessMsg('Profile updated successfully!');
+        setTimeout(() => {
+          setEditSuccessMsg('');
+          setActiveTab('profile');
+        }, 1200);
+      } else {
+        const errorData = await response.json();
+        const errorMessage = errorData.error || errorData.message || 'Failed to update profile';
+        if (errorMessage.includes('Phone number already in use')) {
+          setEditSuccessMsg('Error: This phone number is already in use by another account.');
+        } else if (errorMessage.includes('Email already in use')) {
+          setEditSuccessMsg('Error: This email is already in use by another account.');
+        } else {
+          setEditSuccessMsg(`Error: ${errorMessage}`);
+        }
+        setTimeout(() => {
+          setEditSuccessMsg('');
+        }, 3000);
+      }
+    } catch (error) {
+      setEditSuccessMsg('Error: Failed to connect to server');
+      setTimeout(() => {
+        setEditSuccessMsg('');
+      }, 3000);
+    }
   };
 
   const handleExecuteDeposit = (e: React.FormEvent) => {
     e.preventDefault();
-    const amt = parseFloat(depositAmount);
-    if (isNaN(amt) || amt <= 0) return;
-
-    onDeposit(amt);
-    setActionFeedback(`Payment prompt sent to ${userProfile.phone}. ${selectedCountry.currency} ${amt} deposited!`);
-    setTimeout(() => {
-      setActionFeedback('');
-      setIsDepositOpen(false);
-    }, 1500);
+    onOpenDepositModal();
   };
 
   const handleExecuteWithdraw = (e: React.FormEvent) => {
     e.preventDefault();
-    const amt = parseFloat(withdrawAmount);
-    if (isNaN(amt) || amt <= 0) return;
-    if (amt > userState.walletBalance) {
-      setActionFeedback('Error: Insufficient wallet balance for withdrawal');
-      return;
-    }
-
-    onWithdraw(amt);
-    setActionFeedback(`${selectedCountry.currency} ${amt} withdrawn instantly to ${userProfile.phone}!`);
-    setTimeout(() => {
-      setActionFeedback('');
-      setIsWithdrawOpen(false);
-    }, 1500);
+    onOpenWithdrawModal();
   };
 
   const filteredTransactions = transactions.filter((tx) => {
@@ -196,7 +309,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 12 }}
           className={`w-full max-w-3xl rounded-2xl border flex flex-col max-h-[92vh] overflow-hidden shadow-2xl relative ${
-            isDark ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#0B0E14] border-[#1A2332] text-slate-100' : 'bg-white border-slate-200 text-slate-900'
           }`}
         >
           {/* Header Bar */}
@@ -217,7 +330,19 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   </span>
                 </div>
                 <p className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                  {userProfile.phone} • Joined {userProfile.joinedDate}
+                  <span className="flex items-center gap-1.5">
+                    {maskPhoneNumber(userProfile.phone)}
+                    {userProfile.phone && (
+                      <button
+                        onClick={() => setHidePhoneNumber(!hidePhoneNumber)}
+                        className={`text-xs transition-colors cursor-pointer ${isDark ? 'text-slate-500 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'}`}
+                        aria-label={hidePhoneNumber ? 'Show phone number' : 'Hide phone number'}
+                      >
+                        {hidePhoneNumber ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                      </button>
+                    )}
+                  </span>
+                  {' • Joined '}{userProfile.joinedDate}
                 </p>
               </div>
             </div>
@@ -321,15 +446,15 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
                   <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
-                      onClick={() => setIsDepositOpen(true)}
+                      onClick={onOpenDepositModal}
                       className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Deposit
                     </button>
                     <button
-                      onClick={() => setIsWithdrawOpen(true)}
-                      className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-[#22C55E] hover:bg-[#16a34a] text-black font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-colors"
+                      onClick={onOpenWithdrawModal}
+                      className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl bg-[#EF4444] hover:bg-[#DC2626] text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md transition-colors"
                     >
                       <ArrowUpRight className="w-4 h-4" />
                       Withdraw
@@ -420,7 +545,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
                             tx.type === 'deposit' || tx.type === 'quiz_reward'
                               ? 'bg-[#22C55E]/15 text-[#22C55E]'
-                              : 'bg-emerald-500/15 text-emerald-400'
+                              : 'bg-[#EF4444]/15 text-[#EF4444]'
                           }`}>
                             {tx.type === 'deposit' || tx.type === 'quiz_reward' ? (
                               <ArrowDownLeft className="w-4 h-4" />
@@ -517,50 +642,38 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     </div>
                   )}
 
-                  {/* Country / Location Selector */}
+                  {/* Country / Location - Kenya Only */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className={`block text-xs font-semibold ${isDark ? 'text-slate-100' : 'text-slate-700'}`}>
-                        Country / Region Flag & Location
+                        Country / Region
                       </label>
                       <span className="text-[10px] text-sky-400 font-semibold flex items-center gap-1">
                         <Globe className="w-3 h-3" />
-                        <span>Currency: {selectedCountry.currency}</span>
+                        <span>Currency: KES</span>
                       </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setIsCountryPickerOpen(true)}
-                      className={`w-full p-2.5 rounded-xl border text-xs font-semibold flex items-center justify-between gap-2.5 cursor-pointer transition-all hover:border-emerald-500 ${
-                        isDark
-                          ? 'bg-[#111827] border-[#1A2332] text-slate-100'
-                          : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
-                      }`}
-                    >
+                    <div className={`w-full p-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2.5 ${
+                      isDark
+                        ? 'bg-[#111827] border-[#1A2332] text-slate-100'
+                        : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
+                    }`}>
                       <div className="flex items-center gap-2.5 truncate">
-                        <span className="text-2xl shrink-0 drop-shadow-xs">{selectedCountry.flag}</span>
-                        <span className="font-semibold truncate text-slate-100">{selectedCountry.name}</span>
-                        <span className="text-[11px] font-mono text-emerald-400 shrink-0">({selectedCountry.dialCode})</span>
+                        <span className="text-2xl shrink-0 drop-shadow-xs">🇰🇪</span>
+                        <span className="font-semibold truncate text-slate-100">Kenya</span>
+                        <span className="text-[11px] font-mono text-emerald-400 shrink-0">(+254)</span>
                       </div>
 
                       <div className="flex items-center gap-1.5 shrink-0 text-slate-400">
                         <span className="text-[10px] text-[#22C55E] font-semibold bg-[#22C55E]/10 px-1.5 py-0.5 rounded border border-[#22C55E]/20">
-                          {selectedCountry.currency} ({selectedCountry.currencyCode})
+                          KES (KES)
                         </span>
-                        <ChevronDown className="w-3.5 h-3.5" />
                       </div>
-                    </button>
+                    </div>
 
-                    <div className="mt-1 flex items-center justify-between text-[10px] px-1 text-slate-400">
-                      <span>Payout: <strong className="text-[#22C55E] truncate max-w-[200px]">{selectedCountry.paymentMethod}</strong></span>
-                      <button
-                        type="button"
-                        onClick={() => setIsCountryPickerOpen(true)}
-                        className="text-emerald-400 font-semibold hover:underline cursor-pointer"
-                      >
-                        Browse 200+ Countries 🌍
-                      </button>
+                    <div className="mt-1 text-[10px] px-1 text-slate-400">
+                      <span>Payout: <strong className="text-[#22C55E]">M-PESA</strong></span>
                     </div>
                   </div>
 
@@ -594,30 +707,18 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
                   <div>
                     <label className={`block text-xs font-semibold mb-1.5 ${isDark ? 'text-slate-100' : 'text-slate-700'}`}>
-                      {selectedCountry.name} Mobile Number (with Flag)
+                      Kenya Mobile Number (with Flag)
                     </label>
-                    <div className="flex items-center gap-1.5">
-                      {/* Embedded Country Flag & Dial Code Pill */}
-                      <button
-                        type="button"
-                        onClick={() => setIsCountryPickerOpen(true)}
-                        className={`h-[42px] px-3 rounded-xl border flex items-center gap-1.5 text-xs font-semibold shrink-0 transition-all cursor-pointer hover:border-emerald-500 ${
-                          isDark
-                            ? 'bg-[#111827] border-[#1A2332] text-slate-100 hover:bg-[#151c2d]'
-                            : 'bg-slate-100 border-slate-300 text-slate-800 hover:bg-slate-200 shadow-2xs'
-                        }`}
-                        title="Click to change country flag"
-                      >
-                        <span className="text-lg leading-none">{selectedCountry.flag}</span>
-                        <span className="font-mono text-emerald-400">{selectedCountry.dialCode}</span>
-                        <ChevronDown className="w-3 h-3 opacity-60" />
-                      </button>
-
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <span className="text-sm">🇰🇪</span>
+                      </div>
                       <input
                         type="tel"
                         value={editPhone}
                         onChange={(e) => setEditPhone(e.target.value)}
-                        className={`flex-1 px-3.5 py-2.5 rounded-xl border text-xs font-medium font-mono focus:outline-hidden focus:ring-2 focus:ring-emerald-500 ${
+                        placeholder="+254 712 345 678"
+                        className={`w-full pl-11 pr-3.5 py-2.5 rounded-xl border text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-emerald-500 ${
                           isDark ? 'bg-[#111827] border-[#1A2332] text-slate-100' : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
                         }`}
                       />
@@ -630,11 +731,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         Avatar Icon
                       </label>
                       <span className="text-[10px] text-slate-400">
-                        Flag: <strong className="text-emerald-400">{selectedCountry.name} ({selectedCountry.flag})</strong>
+                        Flag: <strong className="text-emerald-400">Kenya (🇰🇪)</strong>
                       </span>
                     </div>
                     <div className="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar">
-                      {getAvatarOptionsForCountry(selectedCountry.flag).map((av) => (
+                      {getAvatarOptionsForCountry('🇰🇪').map((av) => (
                         <button
                           key={av}
                           type="button"
@@ -653,12 +754,40 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
                   <button
                     type="submit"
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md transition-colors"
+                    className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-colors"
                   >
                     <Save className="w-4 h-4" />
                     <span>Save Profile Details</span>
                   </button>
                 </form>
+
+                {/* Privacy Settings */}
+                <div className="pt-6 border-t border-slate-800">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <h4 className="text-sm font-extrabold text-white">Privacy Settings</h4>
+                  </div>
+                  <p className={`text-xs mb-4 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    Control your personal information visibility in your profile.
+                  </p>
+
+                  <div className="flex items-center justify-between p-3 rounded-xl border border-slate-700 bg-[#111827]">
+                    <div>
+                      <span className="text-xs font-semibold text-slate-100 block">Hide Phone Number</span>
+                      <span className="text-[10px] text-slate-400">Mask your phone number in profile display</span>
+                    </div>
+                    <button
+                      onClick={() => setHidePhoneNumber(!hidePhoneNumber)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors ${
+                        hidePhoneNumber
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      }`}
+                    >
+                      {hidePhoneNumber ? 'Hidden' : 'Visible'}
+                    </button>
+                  </div>
+                </div>
 
                 {/* Dedicated Password Change Section */}
                 <div className="pt-6 border-t border-slate-800">
@@ -709,7 +838,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                         type="password"
                         value={newPasswordInput}
                         onChange={(e) => setNewPasswordInput(e.target.value)}
-                        placeholder="At least 4 characters"
+                        placeholder="At least 6 characters"
                         className={`w-full px-3.5 py-2.5 rounded-xl border text-xs font-semibold focus:outline-hidden focus:border-emerald-500 ${
                           isDark ? 'bg-[#121927] border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-300 text-slate-900 shadow-2xs'
                         }`}
@@ -769,129 +898,12 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
             )}
           </div>
 
-          {/* Deposit Modal Sheet */}
-          {isDepositOpen && (
-            <div className="absolute inset-0 z-30 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className={`w-full max-w-md p-5 sm:p-6 rounded-2xl border ${
-                isDark ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
-              }`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-base flex items-center gap-2 text-slate-100">
-                    <Plus className="w-4 h-4 text-emerald-400" />
-                    <span>Instant Deposit ({selectedCountry.currency})</span>
-                  </h3>
-                  <button onClick={() => setIsDepositOpen(false)} className="text-slate-400 hover:text-white cursor-pointer">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
 
-                {actionFeedback && (
-                  <div className="mb-3 p-3 rounded-xl bg-[#22C55E]/15 border border-[#22C55E]/30 text-[#22C55E] text-xs font-semibold">
-                    {actionFeedback}
-                  </div>
-                )}
-
-                <form onSubmit={handleExecuteDeposit} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 text-slate-100">Deposit Amount ({selectedCountry.currency})</label>
-                    <div className="grid grid-cols-4 gap-2 mb-2">
-                      {['100', '200', '500', '1000'].map((val) => (
-                        <button
-                          key={val}
-                          type="button"
-                          onClick={() => setDepositAmount(val)}
-                          className={`py-1.5 text-xs font-semibold rounded-lg border cursor-pointer ${
-                            depositAmount === val
-                              ? 'bg-emerald-600 text-white border-emerald-600'
-                              : isDark ? 'bg-[#111827] border-[#1A2332] text-slate-400' : 'bg-slate-100 border-slate-200'
-                          }`}
-                        >
-                          +{val}
-                        </button>
-                      ))}
-                    </div>
-                    <input
-                      type="number"
-                      value={depositAmount}
-                      onChange={(e) => setDepositAmount(e.target.value)}
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold ${
-                        isDark ? 'bg-[#111827] border-[#1A2332] text-slate-100' : 'bg-slate-50 border-slate-300 text-slate-900'
-                      }`}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer transition-colors"
-                  >
-                    <span>Send Payment Prompt</span>
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Withdraw Modal Sheet */}
-          {isWithdrawOpen && (
-            <div className="absolute inset-0 z-30 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className={`w-full max-w-md p-5 sm:p-6 rounded-2xl border ${
-                isDark ? 'bg-[#070a0e] black-net border-emerald-950/60 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
-              }`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-base flex items-center gap-2 text-slate-100">
-                    <ArrowUpRight className="w-4 h-4 text-[#22C55E]" />
-                    <span>Instant Withdrawal ({selectedCountry.currency})</span>
-                  </h3>
-                  <button onClick={() => setIsWithdrawOpen(false)} className="text-slate-400 hover:text-white cursor-pointer">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {actionFeedback && (
-                  <div className="mb-3 p-3 rounded-xl bg-[#22C55E]/15 border border-[#22C55E]/30 text-[#22C55E] text-xs font-semibold">
-                    {actionFeedback}
-                  </div>
-                )}
-
-                <form onSubmit={handleExecuteWithdraw} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold mb-1.5 text-slate-100">
-                      Withdraw Amount (Max {selectedCountry.currency} {userState.walletBalance.toLocaleString()})
-                    </label>
-                    <input
-                      type="number"
-                      value={withdrawAmount}
-                      onChange={(e) => setWithdrawAmount(e.target.value)}
-                      max={userState.walletBalance}
-                      className={`w-full px-3.5 py-2.5 rounded-xl border text-sm font-semibold ${
-                        isDark ? 'bg-[#111827] border-[#1A2332] text-slate-100' : 'bg-slate-50 border-slate-300 text-slate-900'
-                      }`}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-3 rounded-xl bg-[#22C55E] hover:bg-[#16a34a] text-black font-semibold text-xs flex items-center justify-center gap-2 shadow-md cursor-pointer"
-                  >
-                    <span>Confirm Instant Payout</span>
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
         </motion.div>
       </div>
     </AnimatePresence>
 
-    {/* Global Country & Flag Selection Modal */}
-    <CountrySelectModal
-      isOpen={isCountryPickerOpen}
-      onClose={() => setIsCountryPickerOpen(false)}
-      selectedCountryCode={editCountryCode}
-      onSelectCountry={handleSelectCountry}
-      theme={theme}
-      title="Select Your Country & Flag"
-    />
+
     </>
   );
 };

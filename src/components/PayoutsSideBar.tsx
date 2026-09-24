@@ -10,43 +10,142 @@ export interface PayoutRecord {
   category: string;
   timeAgo: string;
   avatar: string;
-  status: 'sent' | 'processing';
+  status: 'sent' | 'processing' | 'waiting';
+  type?: string;
+  isCurrentUser?: boolean;
 }
 
 interface PayoutsSideBarProps {
   theme?: 'dark' | 'light';
 }
 
+const isTestBotName = (name: unknown) => {
+  const normalizedName = String(name ?? '').trim().toLowerCase();
+  return normalizedName.includes('test bot') || normalizedName === 'test bo1';
+};
+
 export const PayoutsSideBar: React.FC<PayoutsSideBarProps> = ({ theme = 'dark' }) => {
   const isDark = theme === 'dark';
   const [payouts, setPayouts] = useState<PayoutRecord[]>([]);
-  const [totalDisbursed, setTotalDisbursed] = useState<number>(65450);
+  const [totalDisbursed, setTotalDisbursed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Fetch real DB transactions from backend API
   const fetchRecentPayouts = async () => {
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-      const res = await fetch(`${baseUrl}/api/recent-withdrawals`);
+      const res = await fetch(`${baseUrl}/api/player/recent-withdrawals`);
       if (res.ok) {
         const data = await res.json();
+        
+        // Handle new response format with payouts array and totalDisbursed
         if (data.payouts && Array.isArray(data.payouts)) {
-          setPayouts(data.payouts);
+          let formattedPayouts = data.payouts.map((p: any) => ({
+            id: String(p.id),
+            maskedName: p.player?.name || p.bot_name || 'Unknown',
+            maskedPhone: p.player?.phone_number || '0000000000',
+            amountKsh: parseFloat(p.amount) || 0,
+            category: p.type === 'win' ? 'Quiz Winnings' : p.type === 'loss' ? 'Quiz Loss' : 'Instant Cashout',
+            timeAgo: getTimeAgo(p.created_at),
+            avatar: p.type === 'win' ? '🏆' : p.type === 'loss' ? '❌' : '💰',
+            status: 'sent' as const,
+            type: p.type,
+            isSimulated: (p.player?.is_simulated ?? false) || (p.bot_name ? true : false)
+          })).filter((p: PayoutRecord) => !isTestBotName(p.maskedName));
+          
+          // Add current user if they're in lobby (waiting) - only for real players
+          const token = localStorage.getItem('player_token');
+          if (token) {
+            try {
+              const lobbyRes = await fetch(`${baseUrl}/api/lobby/my-status`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Accept': 'application/json',
+                },
+              });
+              if (lobbyRes.ok) {
+                const lobbyData = await lobbyRes.json();
+                if (lobbyData.in_lobby && lobbyData.status) {
+                  const maskPhone = (phone: string) => {
+                    if (!phone) return '0000000000';
+                    const cleaned = phone.replace(/[^0-9]/g, '');
+                    if (cleaned.length < 4) return '*'.repeat(cleaned.length);
+                    return '*'.repeat(cleaned.length - 4) + cleaned.slice(-4);
+                  };
+                  
+                  const currentUserEntry = {
+                    id: 'current-user',
+                    maskedName: lobbyData.status.name,
+                    maskedPhone: maskPhone(lobbyData.status.phone_number),
+                    amountKsh: lobbyData.status.balance,
+                    category: 'Waiting',
+                    timeAgo: 'Just now',
+                    avatar: '👤',
+                    status: 'waiting' as const,
+                    type: 'waiting',
+                    isCurrentUser: true,
+                    isSimulated: false
+                  };
+                  
+                  // Add current user at the top (only if not already in payouts)
+                  const alreadyInPayouts = formattedPayouts.some((p: PayoutRecord) => 
+                    p.maskedName === currentUserEntry.maskedName
+                  );
+                  
+                  if (!alreadyInPayouts) {
+                    formattedPayouts.unshift(currentUserEntry);
+                  }
+                }
+              }
+            } catch (error) {
+              // Ignore lobby fetch errors
+            }
+          }
+          
+          setPayouts(formattedPayouts);
+        } else if (Array.isArray(data)) {
+          // Handle case where API returns array directly
+          const formattedPayouts = data.map((p: any) => ({
+            id: String(p.id),
+            maskedName: p.player?.name || p.bot_name || 'Unknown',
+            maskedPhone: p.player?.phone_number || '0000000000',
+            amountKsh: parseFloat(p.amount) || 0,
+            category: p.type === 'win' ? 'Quiz Winnings' : p.type === 'loss' ? 'Quiz Loss' : 'Instant Cashout',
+            timeAgo: getTimeAgo(p.created_at),
+            avatar: p.type === 'win' ? '🏆' : p.type === 'loss' ? '❌' : '💰',
+            status: 'sent' as const,
+            type: p.type,
+            isSimulated: (p.player?.is_simulated ?? false) || (p.bot_name ? true : false)
+          })).filter((p: PayoutRecord) => !isTestBotName(p.maskedName));
+          setPayouts(formattedPayouts);
         }
-        if (data.totalDisbursed) {
+        
+        if (data.totalDisbursed !== undefined) {
           setTotalDisbursed(data.totalDisbursed);
         }
       }
-    } catch {
-      // Handle network error
+    } catch (error) {
+      // Silent fail - will retry on next interval
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Helper function to format time ago
+  const getTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (seconds < 60) return 'Just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
   useEffect(() => {
     fetchRecentPayouts();
-    const interval = setInterval(fetchRecentPayouts, 10000);
+    const interval = setInterval(fetchRecentPayouts, 2000); // Update every 2 seconds for faster refresh
     return () => clearInterval(interval);
   }, []);
 
@@ -79,24 +178,7 @@ export const PayoutsSideBar: React.FC<PayoutsSideBarProps> = ({ theme = 'dark' }
           </span>
         </div>
 
-        {/* 24h Summary Metric */}
-        <div className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 ${
-          isDark ? 'bg-[#182030] border-[#222C3E]' : 'bg-slate-50 border-slate-200'
-        }`}>
-          <div>
-            <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">24h Disbursed</div>
-            <div className="text-sm font-bold text-[#10B981]">
-              KSh {totalDisbursed.toLocaleString()}
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Settlement</div>
-            <div className="text-xs font-semibold text-emerald-500 flex items-center justify-end gap-1">
-              <CheckCircle2 className="w-3 h-3 text-[#10B981]" />
-              <span>Instant</span>
-            </div>
-          </div>
-        </div>
+
       </div>
 
       {/* PRIVACY NOTICE SUB-BANNER */}
@@ -124,9 +206,8 @@ export const PayoutsSideBar: React.FC<PayoutsSideBarProps> = ({ theme = 'dark' }
         ) : (
           <AnimatePresence initial={false}>
             {payouts.map((item) => {
-              const cleanCategory = (item.category && !/bot|simulation|test|demo|automated/i.test(item.category))
-                ? item.category
-                : 'Instant Cashout';
+              const cleanCategory = item.category || 'Instant Cashout';
+              const isCurrentUser = item.isCurrentUser;
 
               return (
                 <motion.div
@@ -136,7 +217,9 @@ export const PayoutsSideBar: React.FC<PayoutsSideBarProps> = ({ theme = 'dark' }
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.25 }}
                   className={`p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2.5 ${
-                    isDark
+                    isCurrentUser
+                      ? 'bg-yellow-500/10 border-yellow-500/50'
+                      : isDark
                       ? 'bg-[#141A26] border-[#222C3E] hover:border-emerald-500/40 hover:bg-[#182030]'
                       : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                   }`}
@@ -149,30 +232,54 @@ export const PayoutsSideBar: React.FC<PayoutsSideBarProps> = ({ theme = 'dark' }
                       {item.avatar}
                     </div>
                     <div className="min-w-0">
-                      {/* Masked Name and Phone */}
+                      {/* Masked Name - Phone Hidden */}
                       <div className="flex items-center gap-1.5">
-                        <span className={`font-semibold text-xs truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{item.maskedName}</span>
-                        <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                          ({item.maskedPhone})
+                        <span className={`font-semibold text-xs truncate ${
+                          isCurrentUser 
+                            ? 'text-yellow-500' 
+                            : isDark ? 'text-white' : 'text-slate-900'
+                        }`}>
+                          {isCurrentUser ? 'You' : item.maskedName}
                         </span>
+                        {isCurrentUser && (
+                          <span className="text-[9px] px-1.5 py-0.5 bg-yellow-500 text-yellow-900 rounded font-medium">
+                            Waiting
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
                         <span className="truncate max-w-[140px]">{cleanCategory}</span>
-                        <span>•</span>
-                        <span className="text-slate-500 shrink-0">{item.timeAgo}</span>
+                        {!isCurrentUser && (
+                          <>
+                            <span>•</span>
+                            <span className="text-slate-500 shrink-0">{item.timeAgo}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   {/* Right Column: Amount */}
                   <div className="text-right shrink-0">
-                    <div className="text-xs font-bold text-[#10B981] flex items-center justify-end gap-0.5">
-                      <span>+KSh</span>
-                      <span>{item.amountKsh.toLocaleString()}</span>
+                    <div className={`text-xs font-bold flex items-center justify-end gap-0.5 ${
+                      isCurrentUser 
+                        ? 'text-yellow-500' 
+                        : item.category === 'Quiz Loss' ? 'text-rose-500' : 'text-emerald-500'
+                    }`}>
+                      <span>KES {item.amountKsh.toLocaleString()}</span>
                     </div>
-                    <div className="text-[9px] text-[#10B981] font-semibold uppercase tracking-wider">
-                      ✓ Paid
+                    <div className={`text-[9px] font-semibold uppercase tracking-wider ${
+                      isCurrentUser 
+                        ? 'text-yellow-500' 
+                        : item.category === 'Quiz Loss' ? 'text-rose-500' : 'text-emerald-500'
+                    }`}>
+                      {isCurrentUser ? 'Balance' : item.category === 'Quiz Loss' ? 'Lost' : 'Paid'}
                     </div>
+                    {isCurrentUser && (
+                      <div className="text-[9px] text-yellow-500 font-mono">
+                        {item.maskedPhone}
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               );

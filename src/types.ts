@@ -1,9 +1,14 @@
 export interface Question {
   id: string;
   question: string;
+  question_text?: string; // Backend field name
   options: string[];
   correctIndex: number;
   explanation?: string;
+  category?: string;
+  difficulty?: string;
+  subcategory?: string;
+  topic?: string;
 }
 
 export interface RewardStep {
@@ -18,6 +23,14 @@ export interface QuizCategory {
   badge?: string;
   subtitle: string;
   questions: Question[];
+  gradient?: string;
+  slug?: string;
+  parent_id?: number | null;
+  level?: number;
+  children?: QuizCategory[];
+  description?: string;
+  color?: string;
+  is_active?: boolean;
 }
 
 export interface SpeedMode {
@@ -25,8 +38,10 @@ export interface SpeedMode {
   name: string;
   questionsCount: number;
   durationSeconds: number;
+  timePerQuestion?: number;
   description: string;
   badge?: string;
+  badges?: string[];
 }
 
 export interface CountryInfo {
@@ -37,6 +52,8 @@ export interface CountryInfo {
   currency: string;
   currencyCode: string;
   paymentMethod: string;
+  provider?: string;
+  placeholder?: string;
 }
 
 export type UserRole = 'player' | 'marketer' | 'admin' | 'super_admin';
@@ -44,10 +61,12 @@ export type UserRole = 'player' | 'marketer' | 'admin' | 'super_admin';
 export interface UserProfile {
   id: string;
   name: string;
+  username?: string; // For backward compatibility
   email: string;
   phone: string;
   avatar: string;
   joinedDate: string;
+  joinDate?: string; // For backward compatibility
   isLoggedIn: boolean;
   role?: UserRole;
   questionsAttempted: number;
@@ -59,6 +78,11 @@ export interface UserProfile {
   countryCode?: string;
   currencySymbol?: string;
   emailVerified?: boolean;
+  walletBalance?: number;
+  referralCode?: string;
+  tier?: string;
+  xp?: number;
+  level?: number;
 }
 
 export interface TransactionRecord {
@@ -89,6 +113,8 @@ export interface UserState {
   maxStreak: number;
   soundEnabled: boolean;
   xpPoints: number;
+  totalGamesPlayed?: number;
+  totalCorrectAnswers?: number;
 }
 
 export interface QuizSessionState {
@@ -102,9 +128,11 @@ export interface QuizSessionState {
   accumulatedWinnings: number;
   streakCount: number;
   timerSeconds: number;
+  roundTimerSeconds: number;
+  totalRoundSeconds: number;
   isGameOver: boolean;
   gameOverReason: 'wrong_answer' | 'timeout' | 'cashed_out' | 'completed' | null;
-  floatingEarnings: { id: number; amount: number }[];
+  floatingEarnings: { id: string | number; amount: number }[];
   stakeAmount: number;
   rewardLadder: RewardStep[];
 }

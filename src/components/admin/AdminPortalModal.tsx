@@ -57,7 +57,7 @@ const INITIAL_MANAGED_USERS: MockManagedUser[] = [
   {
     id: 'usr_001',
     name: 'Victor Vance',
-    email: 'superadmin@predicta.co.ke',
+    email: 'superadmin@trivquest.co.ke',
     phone: '+254 700 000 001',
     role: 'super_admin',
     country: 'Kenya',
@@ -69,7 +69,7 @@ const INITIAL_MANAGED_USERS: MockManagedUser[] = [
   {
     id: 'usr_002',
     name: 'David Kiprop',
-    email: 'admin@predicta.co.ke',
+    email: 'admin@trivquest.co.ke',
     phone: '+254 722 111 222',
     role: 'admin',
     country: 'Kenya',
@@ -81,7 +81,7 @@ const INITIAL_MANAGED_USERS: MockManagedUser[] = [
   {
     id: 'usr_003',
     name: 'Sarah Alouch',
-    email: 'marketing@predicta.co.ke',
+    email: 'marketing@trivquest.co.ke',
     phone: '+254 733 444 555',
     role: 'marketer',
     country: 'Kenya',
@@ -92,8 +92,8 @@ const INITIAL_MANAGED_USERS: MockManagedUser[] = [
   },
   {
     id: 'usr_004',
-    name: 'Mwangi Kimani',
-    email: 'mwangi.kimani@chezaquiz.co.ke',
+    name: 'Sample Player',
+    email: 'player@example.com',
     phone: '+254 712 345 678',
     role: 'player',
     country: 'Kenya',
@@ -105,7 +105,7 @@ const INITIAL_MANAGED_USERS: MockManagedUser[] = [
   {
     id: 'usr_005',
     name: 'Chioma Okafor',
-    email: 'chioma.okafor@predicta.africa',
+    email: 'chioma.okafor@trivquest.africa',
     phone: '+234 801 234 5678',
     role: 'player',
     country: 'Nigeria',
@@ -117,7 +117,7 @@ const INITIAL_MANAGED_USERS: MockManagedUser[] = [
   {
     id: 'usr_006',
     name: 'Kofi Mensah',
-    email: 'kofi.mensah@predicta.africa',
+    email: 'kofi.mensah@trivquest.africa',
     phone: '+233 24 123 4567',
     role: 'player',
     country: 'Ghana',
@@ -131,7 +131,7 @@ const INITIAL_MANAGED_USERS: MockManagedUser[] = [
 const INITIAL_PROMO_CODES: PromoCodeItem[] = [
   {
     id: 'pc_1',
-    code: 'PREDICTA254',
+    code: 'TRIVQUEST254',
     discountType: 'fixed_bonus',
     value: 200,
     usesCount: 428,
@@ -353,17 +353,17 @@ export const AdminPortalModal: React.FC<AdminPortalModalProps> = ({
         exit={{ opacity: 0, scale: 0.96, y: 15 }}
         className={`w-full max-w-5xl rounded-3xl border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] my-auto ${
           isDark
-            ? 'bg-[#070a0e] black-net border-emerald-950/60 text-[#F8FAFC]'
-            : 'bg-white border-slate-200 text-slate-900 shadow-emerald-500/5'
+            ? 'bg-[#0B0E14] border-[#1A2332] text-[#F8FAFC]'
+            : 'bg-white border-slate-200 text-slate-900'
         }`}
       >
         {/* Top Header Bar */}
         <div className={`px-5 py-3.5 border-b flex items-center justify-between gap-3 ${
           isSuperAdmin
-            ? 'bg-gradient-to-r from-purple-900/40 via-purple-800/20 to-transparent'
+            ? 'bg-purple-950/40'
             : isMarketer && !isAdmin
-            ? 'bg-gradient-to-r from-amber-900/40 via-amber-800/20 to-transparent'
-            : 'bg-gradient-to-r from-emerald-950/40 via-teal-900/20 to-transparent'
+            ? 'bg-amber-950/40'
+            : isDark ? 'bg-[#121722]' : 'bg-slate-50'
         }`}>
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-black/30 border border-white/20 flex items-center justify-center text-xl shadow-xs">

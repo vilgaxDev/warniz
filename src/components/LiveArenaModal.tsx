@@ -13,7 +13,7 @@ interface LiveArenaModalProps {
   onClose: () => void;
   categories: QuizCategory[];
   speedModes: SpeedMode[];
-  selectedCategoryId: string;
+  selectedCategoryId?: string | null;
   selectedSpeedModeId: string;
   onSelectCategory: (categoryId: string) => void;
   onSelectSpeedMode: (speedModeId: string) => void;
@@ -45,32 +45,32 @@ const STAKE_TIERS: StakeTier[] = [
     id: 'free',
     name: 'Free Practice',
     entryFeeKsh: 0,
-    maxWinningsKsh: 25,
+    maxWinningsKsh: 10,
     multiplier: '1x XP',
     badge: 'FREE PLAY',
   },
   {
-    id: 'casual_20',
+    id: 'casual_10',
     name: 'Casual Pot',
-    entryFeeKsh: 20,
-    maxWinningsKsh: 100,
+    entryFeeKsh: 10,
+    maxWinningsKsh: 50,
     multiplier: '5x Return',
     badge: 'POPULAR',
     isPopular: true,
   },
   {
-    id: 'pro_50',
+    id: 'pro_20',
     name: 'Pro Challenge',
-    entryFeeKsh: 50,
-    maxWinningsKsh: 300,
-    multiplier: '6x Return',
+    entryFeeKsh: 20,
+    maxWinningsKsh: 150,
+    multiplier: '7.5x Return',
     badge: 'HIGH REWARD',
   },
   {
-    id: 'high_100',
+    id: 'high_50',
     name: 'Grand Championship',
-    entryFeeKsh: 100,
-    maxWinningsKsh: 1000,
+    entryFeeKsh: 50,
+    maxWinningsKsh: 500,
     multiplier: '10x Return',
     badge: 'JACKPOT',
   },
@@ -121,7 +121,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
   theme = 'dark',
 }) => {
   const isDark = theme === 'dark';
-  const [selectedStakeId, setSelectedStakeId] = useState<string>('casual_20');
+  const [selectedStakeId, setSelectedStakeId] = useState<string>('casual_10');
   const [activeTab, setActiveTab] = useState<'topics' | 'modes' | 'stakes' | 'promo'>('topics');
   
   // Search state
@@ -141,13 +141,34 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
   const filteredCategories = useMemo(() => {
     if (!searchQuery.trim()) return categories;
     const q = searchQuery.toLowerCase();
-    return categories.filter(
-      (cat) =>
-        cat.name.toLowerCase().includes(q) ||
-        (cat.subtitle && cat.subtitle.toLowerCase().includes(q)) ||
-        (cat.badge && cat.badge.toLowerCase().includes(q)) ||
-        cat.questions.some((qu) => qu.question.toLowerCase().includes(q))
-    );
+    return categories
+      .map((cat) => {
+        // Filter questions within this category
+        const matchingQuestions = cat.questions.filter((qu) => 
+          qu.question.toLowerCase().includes(q) ||
+          (qu.options && qu.options.some((opt) => opt.toLowerCase().includes(q)))
+        );
+        
+        // Also match category-level fields
+        const matchesCategory = 
+          cat.name.toLowerCase().includes(q) ||
+          (cat.subtitle && cat.subtitle.toLowerCase().includes(q)) ||
+          (cat.badge && cat.badge.toLowerCase().includes(q));
+        
+        return {
+          ...cat,
+          questions: matchingQuestions.length > 0 ? matchingQuestions : cat.questions,
+          _searchMatch: matchesCategory || matchingQuestions.length > 0,
+          _questionMatchCount: matchingQuestions.length
+        };
+      })
+      .filter((cat) => cat._searchMatch)
+      .sort((a, b) => {
+        // Prioritize categories with more matching questions
+        const aScore = a._questionMatchCount + (a.name.toLowerCase().includes(q) ? 10 : 0);
+        const bScore = b._questionMatchCount + (b.name.toLowerCase().includes(q) ? 10 : 0);
+        return bScore - aScore;
+      });
   }, [categories, searchQuery]);
 
   const handleApplyPromo = (codeToApply?: string) => {
@@ -210,7 +231,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className={`relative z-10 w-full max-w-xl max-h-[92vh] flex flex-col rounded-2xl shadow-2xl border overflow-hidden ${
             isDark
-              ? 'bg-[#070a0e] black-net text-slate-100 border-emerald-950/60'
+              ? 'bg-[#0B0E14] text-slate-100 border-[#1A2332]'
               : 'bg-white text-slate-900 border-slate-200'
           }`}
         >
@@ -220,10 +241,8 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
           }`}>
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="relative shrink-0">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-emerald-400 p-[1.5px] shadow-sm flex items-center justify-center">
-                  <div className="w-full h-full bg-[#050507] rounded-[10px] flex items-center justify-center">
-                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 fill-amber-400/30" />
-                  </div>
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl border border-[#222C3E] bg-[#182030] flex items-center justify-center">
+                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
                 </div>
                 <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 sm:h-3 sm:w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
@@ -369,15 +388,17 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                   </div>
 
                   <div className="flex items-center justify-between px-0.5">
-                    <span className={`text-[11px] sm:text-xs font-bold uppercase tracking-wider ${
+                    <span className={`text-[11px sm:text-xs font-bold uppercase tracking-wider ${
                       isDark ? 'text-slate-400' : 'text-slate-500'
                     }`}>
                       Featured Topics ({filteredCategories.length})
                     </span>
-                    <span className="text-[10px] sm:text-[11px] text-emerald-400 font-semibold flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      <span>Tap topic to select</span>
-                    </span>
+                    {searchQuery && (
+                      <span className="text-[10px] sm:text-[11px] text-amber-400 font-semibold flex items-center gap-1">
+                        <Search className="w-3 h-3" />
+                        <span>Searching questions...</span>
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -399,6 +420,9 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                     {filteredCategories.map((cat) => {
                       const isSelected = cat.id === selectedCategoryId;
                       const themeInfo = getCategoryTheme(cat.id);
+                      const questionMatchCount = (cat as any)._questionMatchCount || 0;
+                      const isSearching = searchQuery.trim().length > 0;
+                      
                       return (
                         <div
                           key={cat.id}
@@ -441,6 +465,12 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
                             }`}>
                               {cat.subtitle || themeInfo.subtitle}
                             </p>
+                            {isSearching && questionMatchCount > 0 && (
+                              <div className="text-[10px] text-amber-400 font-semibold mt-1 flex items-center gap-1">
+                                <Search className="w-3 h-3" />
+                                <span>{questionMatchCount} matching questions</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
@@ -752,7 +782,7 @@ export const LiveArenaModal: React.FC<LiveArenaModalProps> = ({
           }`}>
             <button
               onClick={handleLaunch}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 active:scale-98 text-white font-extrabold text-sm shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2 cursor-pointer transition-all"
+              className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-98 text-white font-bold text-sm shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>

@@ -1,7 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Search, Sun, Moon, Gift, Bell, Bookmark, Info, Plus, ArrowUpRight,
-  Wallet, LogIn, ChevronDown, Check, X, Sparkles, User
+  Search, Sun, Moon, Gift, Bell, Info, Plus, ArrowUpRight,
+  Wallet, LogIn, ChevronDown, Check, X, Sparkles, User, Target
 } from 'lucide-react';
 import { UserState, UserProfile } from '../types';
 import { ProfileDropdown } from './ProfileDropdown';
@@ -49,7 +50,6 @@ interface WalletBarProps {
   onToggleSound?: () => void;
   onOpenNotifications: () => void;
   unreadCount: number;
-  onOpenLeaderboard: () => void;
   onOpenHowItWorks: () => void;
   onOpenDailyRewards: () => void;
   onDepositClick?: () => void;
@@ -66,6 +66,7 @@ interface WalletBarProps {
   categoryItems?: any[];
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
+  onOpenQuizBets?: () => void;
   siteConfig?: {
     siteName?: string;
     headerAnnouncement?: string;
@@ -73,6 +74,8 @@ interface WalletBarProps {
     headerBadge?: string;
     headerCtaText?: string;
   };
+  onCategoryClick?: (category: string) => void;
+  selectedCategoryId?: string | null;
 }
 
 export const WalletBar: React.FC<WalletBarProps> = ({
@@ -84,7 +87,6 @@ export const WalletBar: React.FC<WalletBarProps> = ({
   onSelectSubcategory,
   onOpenNotifications,
   unreadCount,
-  onOpenLeaderboard,
   onOpenHowItWorks,
   onOpenDailyRewards,
   onDepositClick,
@@ -100,8 +102,12 @@ export const WalletBar: React.FC<WalletBarProps> = ({
   categoryItems,
   theme,
   onToggleTheme,
+  onOpenQuizBets,
   siteConfig,
+  onCategoryClick,
+  selectedCategoryId,
 }) => {
+  const navigate = useNavigate();
   const isDark = theme === 'dark';
   const cfg = siteConfig ?? {
     siteName: 'Trivquest',
@@ -117,14 +123,18 @@ export const WalletBar: React.FC<WalletBarProps> = ({
     }`}>
       {/* ANNOUNCEMENT BAR */}
       {cfg.headerAnnouncementEnabled && cfg.headerAnnouncement && (
-        <div className={`w-full text-[11px] font-bold tracking-wide text-center py-1.5 px-4 truncate border-b flex items-center justify-center gap-2 ${
-          isDark
-            ? 'bg-gradient-to-r from-emerald-950 via-[#101c2b] to-emerald-950 text-emerald-300 border-emerald-500/25'
-            : 'bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 text-emerald-900 border-emerald-200'
-        }`}>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block shrink-0" />
+        <div 
+          onClick={() => onCategoryClick && onCategoryClick('all')}
+          className={`w-full text-[11px] font-semibold tracking-wide text-center py-1.5 px-4 truncate border-b flex items-center justify-center gap-2 cursor-pointer hover:opacity-80 transition-opacity ${
+            isDark
+              ? 'bg-[#101726] text-slate-200 border-[#1E293B]'
+              : 'bg-slate-100 text-slate-700 border-slate-200'
+          }`}
+          title="Click to see all categories"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" />
           <span className="truncate">{cfg.headerAnnouncement}</span>
-          <span className="hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          <span className="hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
             FAST PAYOUTS
           </span>
         </div>
@@ -137,7 +147,7 @@ export const WalletBar: React.FC<WalletBarProps> = ({
           <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
             {/* Logo Mark */}
             <div
-              onClick={() => onSelectSubcategory('all')}
+              onClick={() => navigate('/')}
               className="flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 select-none group"
             >
               <TrivquestLogo size="md" theme={theme} />
@@ -216,6 +226,22 @@ export const WalletBar: React.FC<WalletBarProps> = ({
               </button>
             )}
 
+            {/* Quiz Bets Button (Visible ONLY when logged in) */}
+            {userProfile.isLoggedIn && onOpenQuizBets && (
+              <button
+                type="button"
+                onClick={onOpenQuizBets}
+                className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer ${
+                  isDark
+                    ? 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#182030]'
+                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100'
+                }`}
+                title="Latest Quiz Bets"
+              >
+                <Target className="w-4 h-4" />
+              </button>
+            )}
+
             {/* Desktop Navigation Links */}
             {userProfile.isLoggedIn && (
               <div className="hidden lg:flex items-center gap-3">
@@ -228,17 +254,6 @@ export const WalletBar: React.FC<WalletBarProps> = ({
                   title="Daily Rewards"
                 >
                   <Gift className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={onOpenLeaderboard}
-                  className={`flex items-center gap-1.5 text-xs font-semibold transition-colors cursor-pointer ${
-                    isDark ? 'text-[#94A3B8] hover:text-white' : 'text-slate-700 hover:text-slate-950'
-                  }`}
-                >
-                  <Bookmark className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Leaderboard</span>
                 </button>
 
                 <button
@@ -262,13 +277,13 @@ export const WalletBar: React.FC<WalletBarProps> = ({
                   onClick={() => onSelectNav('wallet')}
                   className={`flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl border text-[11px] sm:text-xs font-bold cursor-pointer transition-all ${
                     isDark
-                      ? 'bg-gradient-to-r from-emerald-950/60 to-[#121f2d] border-emerald-500/40 hover:border-emerald-400 text-emerald-400 shadow-sm shadow-emerald-500/20'
-                      : 'bg-emerald-50 border-emerald-300 hover:bg-emerald-100 text-emerald-800'
+                      ? 'bg-[#121722] border-[#222C3E] text-emerald-400 hover:border-emerald-500/50'
+                      : 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100/80 text-emerald-800'
                   }`}
                 >
                   <Wallet className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="truncate max-w-[85px] sm:max-w-none font-mono">
-                    KSh {userState.walletBalance.toLocaleString()}
+                    KES {userState.walletBalance.toLocaleString()}
                   </span>
                   {onDepositClick && (
                     <button
@@ -277,7 +292,7 @@ export const WalletBar: React.FC<WalletBarProps> = ({
                         e.stopPropagation();
                         onDepositClick();
                       }}
-                      className="hidden sm:block p-0.5 rounded-md bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold transition-colors cursor-pointer ml-0.5 shadow-xs"
+                      className="p-0.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-colors cursor-pointer ml-0.5 shadow-2xs"
                       title="Deposit"
                     >
                       <Plus className="w-3 h-3 stroke-[3]" />
@@ -285,31 +300,42 @@ export const WalletBar: React.FC<WalletBarProps> = ({
                   )}
                 </div>
 
-                {/* Profile Trigger Button */}
+                {/* Profile Trigger Button: Visible on both mobile and desktop */}
                 <button
                   type="button"
-                  onClick={onToggleProfileDropdown}
-                  className={`flex items-center gap-1.5 px-2 py-1 rounded-xl border transition-all cursor-pointer ${
+                  onClick={() => {
+                    if (window.innerWidth < 640 && onOpenMobileProfile) {
+                      onOpenMobileProfile();
+                    } else {
+                      onToggleProfileDropdown();
+                    }
+                  }}
+                  className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl border transition-all cursor-pointer ${
                     isProfileDropdownOpen
                       ? isDark
-                        ? 'bg-[#182030] border-slate-400 text-white'
-                        : 'bg-slate-200 border-slate-400 text-slate-900'
+                        ? 'bg-[#182030] border-emerald-500/60 text-white ring-1 ring-emerald-500/30'
+                        : 'bg-emerald-50 border-emerald-300 text-emerald-950'
                       : isDark
-                        ? 'bg-[#121722] border-[#222C3E] text-white hover:border-slate-400'
+                        ? 'bg-[#121722] border-[#222C3E] text-white hover:border-emerald-500/40 hover:bg-[#182030]'
                         : 'bg-slate-100 border-slate-200 text-slate-900 hover:bg-slate-200'
                   }`}
-                  title="Account Profile"
+                  title={`Logged in as ${userProfile.name || userProfile.phone || 'Player'}`}
                 >
-                  <div className="relative">
+                  <div className="relative shrink-0 flex items-center justify-center">
                     <span className="text-xs sm:text-sm">{userProfile.avatar || '👤'}</span>
-                    <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#10B981] ring-1 ${
+                    <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 ring-1 ${
                       isDark ? 'ring-[#0B0E14]' : 'ring-white'
-                    }`} />
+                    } animate-pulse`} />
                   </div>
-                  <span className="hidden sm:inline text-xs font-bold max-w-[70px] truncate">
-                    {userProfile.name.split(' ')[0]}
-                  </span>
-                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${isProfileDropdownOpen ? 'rotate-180 text-slate-200' : ''}`} />
+                  <div className="flex flex-col text-left leading-tight max-w-[80px] sm:max-w-[110px]">
+                    <span className="text-[11px] sm:text-xs font-bold truncate">
+                      {userProfile.name ? userProfile.name.split(' ')[0] : (userProfile.phone || 'Player')}
+                    </span>
+                    <span className="hidden sm:inline text-[9px] font-semibold text-emerald-400">
+                      {userProfile.id ? `ID #${userProfile.id}` : 'Player'}
+                    </span>
+                  </div>
+                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${isProfileDropdownOpen ? 'rotate-180 text-emerald-400' : ''}`} />
                 </button>
               </div>
             ) : (
@@ -326,13 +352,23 @@ export const WalletBar: React.FC<WalletBarProps> = ({
                   Sign In
                 </button>
 
-                {/* Sign Up Solid Button - High-energy vibrant gradient */}
+                {/* Sign Up Solid Button */}
                 <button
                   type="button"
                   onClick={() => onOpenAuth('signup')}
-                  className="px-3 sm:px-4 py-1.5 rounded-xl font-black text-xs transition-all shadow-md active:scale-95 cursor-pointer whitespace-nowrap bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 text-slate-950 hover:brightness-110 shadow-emerald-500/25"
+                  className="px-3 sm:px-4 py-1.5 rounded-xl font-bold text-xs transition-all shadow-2xs active:scale-95 cursor-pointer whitespace-nowrap bg-emerald-600 hover:bg-emerald-500 text-white"
                 >
                   Sign Up
+                </button>
+
+                {/* Demo Button - Same style as Sign Up */}
+                <button
+                  type="button"
+                  onClick={() => navigate('/viral')}
+                  className="px-3 sm:px-4 py-1.5 rounded-xl font-bold text-xs transition-all shadow-2xs active:scale-95 cursor-pointer whitespace-nowrap flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white"
+                >
+                  <Target className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Demo</span>
                 </button>
               </div>
             )}
@@ -362,10 +398,10 @@ export const WalletBar: React.FC<WalletBarProps> = ({
 
       {/* 2. SUBHEADER SINGLE-LINE POLYMARKET CATEGORY NAV BAR */}
       <SquareCategoryFilter
-        selectedCategoryId={selectedSubcategory}
-        onSelectCategory={onSelectSubcategory}
+        selectedCategoryId={selectedCategoryId || 'all'}
+        onSelectCategory={onCategoryClick || (() => {})}
         theme={theme}
-        items={categoryItems}
+        items={categoryItems && categoryItems.length > 0 ? categoryItems : undefined}
       />
 
     </header>

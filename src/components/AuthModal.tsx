@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   X, LogIn, UserPlus, Phone, Lock, Mail, User, CheckCircle2, ShieldCheck,
   KeyRound, Sparkles, Globe, ArrowLeft, RefreshCw, Check, AlertCircle, Send,
-  ChevronDown, Key, Eye, EyeOff, Zap, Trophy, Flame, Award
+  ChevronDown, Key, Eye, EyeOff, Zap, Trophy, Flame, Award, Gift
 } from 'lucide-react';
 import { UserProfile, CountryInfo } from '../types';
 import { getAvatarOptionsForCountry } from '../data/userProfileData';
@@ -19,23 +19,126 @@ interface AuthModalProps {
   initialMode?: 'signin' | 'signup';
 }
 
-type AuthMode = 'login' | 'register' | 'forgot_password' | 'email_verification';
+type AuthMode = 'login' | 'register' | 'forgot_password' | 'email_verification' | 'verification_login';
 type ForgotStep = 'enter_email' | 'enter_new_password' | 'success';
 
 // Helper: fetch JSON with correct Accept header, throws on HTML error pages
 async function safeFetchJson(url: string, body: Record<string, unknown>): Promise<any> {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const text = await res.text();
-  let json: any;
-  try { json = JSON.parse(text); } catch {
-    throw new Error('Server error – please try again later.');
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const text = await res.text();
+    let json: any;
+    try { json = JSON.parse(text); } catch {
+      throw new Error('Server error – please try again later.');
+    }
+    if (!res.ok) {
+      let errorDetails = null;
+      try {
+        if (json && typeof json === 'object' && json.errors) {
+          // Simple string conversion without using flat()
+          const errorString = JSON.stringify(json.errors);
+          if (errorString) {
+            // Remove quotes and brackets for cleaner message
+            errorDetails = errorString.replace(/["\[\]{}]/g, ' ').replace(/\s+/g, ' ').trim();
+          }
+        }
+      } catch (e) {
+        // If error processing fails, use fallback
+        errorDetails = null;
+      }
+      let fallbackMessage = 'Request failed.';
+      try {
+        if (json && typeof json === 'object') {
+          const message = json.message || json.error;
+          if (message !== undefined && message !== null) {
+            fallbackMessage = String(message);
+          }
+        }
+      } catch (e) {
+        fallbackMessage = 'Request failed.';
+      }
+      // Hide raw technical exception dumps (e.g. PHP/TypeError messages) behind a friendly message,
+      // while keeping the real reason visible in the console for debugging.
+      if (res.status >= 500) {
+        console.error('[safeFetchJson] Server responded with 5xx:', fallbackMessage);
+        errorDetails = null;
+        fallbackMessage = 'Server error – please try again later.';
+      }
+      throw new Error(errorDetails || fallbackMessage);
+    }
+    return json;
+  } catch (error: any) {
+    console.error('[safeFetchJson] Error:', error);
+    throw error;
   }
-  if (!res.ok) throw new Error(json?.message || json?.error || 'Request failed.');
-  return json;
+}
+
+// Helper: validate and format international phone numbers
+function validateAndFormatPhoneNumber(phone: string, dialCode: string, countryCode: string): { isValid: boolean; formatted: string; error: string } {
+  // Remove all non-digit characters except +
+  let cleaned = phone.replace(/[^\d+]/g, '');
+
+  // Remove all + signs first to normalize
+  let digitsOnly = cleaned.replace(/\+/g, '');
+
+  // Remove duplicate country codes from digits (e.g., 254254 -> 254)
+  while (digitsOnly.startsWith(dialCode) && digitsOnly.length > dialCode.length && digitsOnly.substring(dialCode.length).startsWith(dialCode)) {
+    digitsOnly = digitsOnly.substring(dialCode.length);
+  }
+
+  // If starting with 0, replace with country code
+  if (digitsOnly.startsWith('0')) {
+    digitsOnly = dialCode + digitsOnly.substring(1);
+  }
+
+  // If starting with country code, keep it
+  if (digitsOnly.startsWith(dialCode)) {
+    // Already has country code, ensure it's properly formatted
+  } 
+  // If it doesn't start with country code, add it
+  else if (!digitsOnly.startsWith(dialCode)) {
+    digitsOnly = dialCode + digitsOnly;
+  }
+
+  // Format with + sign
+  cleaned = '+' + digitsOnly;
+
+  // Country-specific validation
+  if (countryCode === 'KE') {
+    // Kenyan numbers: +254 followed by 9 digits
+    // Supports all Kenyan mobile operators:
+    // - Safaricom: +25470X, +25471X, +25472X, +25474X, +25475X, +25476X, +25477X, +25478X, +25479X
+    // - Airtel: +25410X, +25411X, +25412X, +25413X, +25414X, +25415X, +25416X, +25417X, +25418X, +25419X
+    // - Telkom: +25474X (shared prefix range)
+    const kenyanPattern = /^\+254(7[0-9]|1[0-9])\d{7}$/;
+    if (!kenyanPattern.test(cleaned)) {
+      return {
+        isValid: false,
+        formatted: cleaned,
+        error: 'Invalid Kenyan phone number. Must be a valid mobile number. Format: +2547XXXXXXXXX or 07XXXXXXXXX'
+      };
+    }
+  } else {
+    // International validation: must have at least 10 digits total including country code
+    const internationalPattern = /^\+\d{10,15}$/;
+    if (!internationalPattern.test(cleaned)) {
+      return {
+        isValid: false,
+        formatted: cleaned,
+        error: 'Invalid phone number. Must be 10-15 digits including country code.'
+      };
+    }
+  }
+
+  return {
+    isValid: true,
+    formatted: cleaned,
+    error: ''
+  };
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -66,8 +169,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   // Login form state
   const [loginInputMode, setLoginInputMode] = useState<'phone' | 'email'>('phone');
   const [loginPhoneLocal, setLoginPhoneLocal] = useState('');
-  const [loginEmailOrPhone, setLoginEmailOrPhone] = useState('mwangi.kimani@chezaquiz.co.ke');
-  const [loginPassword, setLoginPassword] = useState('password123');
+  const [loginEmailOrPhone, setLoginEmailOrPhone] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Register form state
@@ -75,11 +178,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [regEmail, setRegEmail] = useState('');
   const [regPhoneLocal, setRegPhoneLocal] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regReferralCode, setRegReferralCode] = useState('');
   const [regAvatar, setRegAvatar] = useState(activeCountry.flag);
   const [showRegPassword, setShowRegPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptNotifications, setAcceptNotifications] = useState(true);
+
+  // Verification code login state
+  const [verifPhoneLocal, setVerifPhoneLocal] = useState('');
+  const [verifCode, setVerifCode] = useState('');
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
 
   // Forgot password state
   const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotOtpCode, setForgotOtpCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -106,6 +219,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   // 1. Handle Login
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     let loginIdentifier = '';
 
     if (loginInputMode === 'phone') {
@@ -113,9 +227,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         setErrorMsg(`Valid ${activeCountry.name} mobile number is required`);
         return;
       }
-      loginIdentifier = loginPhoneLocal.trim().startsWith('+')
-        ? loginPhoneLocal.trim()
-        : `${activeCountry.dialCode}${loginPhoneLocal.trim()}`;
+
+      // Validate and format phone number
+      const dialCode = activeCountry.dialCode.replace('+', '');
+      const validation = validateAndFormatPhoneNumber(loginPhoneLocal.trim(), dialCode, activeCountry.code);
+      if (!validation.isValid) {
+        setErrorMsg(validation.error);
+        return;
+      }
+      loginIdentifier = validation.formatted;
     } else {
       if (!loginEmailOrPhone.trim()) {
         setErrorMsg('Please enter your username or email address');
@@ -133,32 +253,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setSuccessMsg('Authenticating...');
 
     try {
-      let data: any = null;
-      try {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-        data = await safeFetchJson(`${apiUrl}/api/player/login`, {
-          phone_number: loginIdentifier,
-          password: loginPassword,
-        });
-      } catch (fetchErr) {
-        console.warn('Backend login endpoint unreachable, generating local session:', fetchErr);
-        // Fallback session so player is never locked out of testing in AI Studio
-        data = {
-          access_token: `token_${Date.now()}`,
-          user: {
-            id: 101,
-            name: loginInputMode === 'phone' ? `Player ${loginPhoneLocal.trim().slice(-4) || '254'}` : loginEmailOrPhone.split('@')[0],
-            email: loginInputMode === 'phone' ? `${loginPhoneLocal.replace(/\D/g, '') || 'player'}@chezazone.ke` : loginEmailOrPhone,
-            phone_number: loginIdentifier,
-          },
-        };
-      }
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      const data = await safeFetchJson(`${apiUrl}/api/player/login`, {
+        phone_number: loginIdentifier,
+        password: loginPassword,
+      });
+
+      console.log('[AUTH] Login response:', data);
 
       // Store token & user data
       if (data.access_token) {
         localStorage.setItem('player_token', data.access_token);
       }
-      if (data.user) {
+      if (data.user && typeof data.user === 'object') {
         localStorage.setItem('player_data', JSON.stringify(data.user));
       }
 
@@ -167,16 +274,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       const newProfile: UserProfile = {
         ...userProfile,
         isLoggedIn: true,
-        id: String(data.user?.id || '1'),
-        name: data.user?.name || loginIdentifier,
-        email: data.user?.email || (loginInputMode === 'phone' ? `${loginPhoneLocal.replace(/\D/g, '')}@chezazone.ke` : loginEmailOrPhone),
-        phone: data.user?.phone_number || loginIdentifier,
+        id: String((data.user && typeof data.user === 'object') ? data.user.id : '1'),
+        name: (data.user && typeof data.user === 'object') ? data.user.name : loginIdentifier,
+        email: (data.user && typeof data.user === 'object') ? data.user.email : '',
+        phone: (data.user && typeof data.user === 'object') ? data.user.phone_number : loginIdentifier,
         country: userProfile.country || activeCountry.name,
         countryCode: userProfile.countryCode || activeCountry.code,
         currencySymbol: userProfile.currencySymbol || activeCountry.currency,
         avatar: userProfile.avatar || activeCountry.flag,
-        emailVerified: true,
+        emailVerified: (data.user && typeof data.user === 'object' && data.user.email_verified_at) ? true : true,
+        // Use backend data - only fields that exist in database
+        walletBalance: parseFloat((data.user && typeof data.user === 'object') ? data.user.balance : '0'),
       };
+
+      console.log('[AUTH] Login profile created:', newProfile);
 
       localStorage.setItem('user_profile', JSON.stringify(newProfile));
 
@@ -186,6 +297,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
       }, 500);
     } catch (error: any) {
+      console.error('[AUTH] Login error:', error);
       setErrorMsg(error.message || 'Login failed. Please check your credentials.');
       setSuccessMsg('');
     }
@@ -203,13 +315,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setErrorMsg('Please enter a valid email address');
       return;
     }
-    const fullPhone = `${activeCountry.dialCode}${regPhoneLocal.trim()}`;
-    if (!regPhoneLocal.trim() || regPhoneLocal.trim().length < 5) {
-      setErrorMsg(`Valid ${activeCountry.name} phone number is required for M-Pesa`);
+
+    if (!acceptTerms) {
+      setErrorMsg('You must accept the Terms and Conditions to continue');
       return;
     }
-    if (!regPassword || regPassword.length < 4) {
-      setErrorMsg('Password must be at least 4 characters');
+
+    // Validate and format phone number
+    const dialCode = activeCountry.dialCode.replace('+', '');
+    const validation = validateAndFormatPhoneNumber(regPhoneLocal.trim(), dialCode, activeCountry.code);
+    if (!validation.isValid) {
+      setErrorMsg(validation.error);
+      return;
+    }
+    const fullPhone = validation.formatted;
+
+    if (!regPassword || regPassword.length < 6) {
+      setErrorMsg('Password must be at least 6 characters');
       return;
     }
 
@@ -217,43 +339,145 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setSuccessMsg('Creating your account...');
 
     try {
-      let data: any = null;
-      try {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-        data = await safeFetchJson(`${apiUrl}/api/player/register`, {
-          name: regName.trim(),
-          email: regEmail.trim(),
-          phone_number: fullPhone,
-          password: regPassword,
-        });
-      } catch (fetchErr) {
-        console.warn('Backend register endpoint unreachable, registering local session:', fetchErr);
-        data = {
-          message: 'Account created successfully!',
-          access_token: `token_${Date.now()}`,
-          user: {
-            id: Date.now(),
-            name: regName.trim(),
-            email: regEmail.trim(),
-            phone_number: fullPhone,
-          },
-        };
-      }
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      const data = await safeFetchJson(`${apiUrl}/api/player/register`, {
+        name: regName.trim(),
+        email: regEmail.trim(),
+        phone_number: fullPhone,
+        password: regPassword,
+        referral_code: regReferralCode.trim() || undefined,
+        accept_notifications: acceptNotifications,
+      });
+
+      console.log('[AUTH] Registration response:', data);
 
       setSuccessMsg('Account created successfully! Signing you in...');
 
       const newProfile: UserProfile = {
         ...userProfile,
         isLoggedIn: true,
-        id: String(data.user?.id || Date.now()),
-        name: regName.trim(),
-        email: regEmail.trim(),
-        phone: fullPhone,
+        id: String((data.user && typeof data.user === 'object') ? data.user.id : Date.now()),
+        name: (data.user && typeof data.user === 'object') ? data.user.name : regName.trim(),
+        email: (data.user && typeof data.user === 'object') ? data.user.email : regEmail.trim(),
+        phone: (data.user && typeof data.user === 'object') ? data.user.phone_number : fullPhone,
         country: activeCountry.name,
         countryCode: activeCountry.code,
         currencySymbol: activeCountry.currency,
         avatar: regAvatar || activeCountry.flag,
         emailVerified: true,
+        // Use backend data - only fields that exist in database
+        walletBalance: parseFloat((data.user && typeof data.user === 'object') ? data.user.balance : '0'),
+        referralCode: data.referral_code || '',
+      };
+
+      console.log('[AUTH] New profile created:', newProfile);
+
+      localStorage.setItem('player_token', data.access_token || `token_${Date.now()}`);
+      localStorage.setItem('player_data', JSON.stringify(newProfile));
+      localStorage.setItem('user_profile', JSON.stringify(newProfile));
+
+      setTimeout(() => {
+        onLogin(newProfile);
+        setSuccessMsg('');
+        onClose();
+      }, 500);
+    } catch (error: any) {
+      const errorMessage = error.message || 'Registration failed. Please try again.';
+      if (errorMessage.includes('Phone number already registered') || errorMessage.includes('Phone number already in use')) {
+        setErrorMsg('This phone number is already registered. Please use a different number or login.');
+      } else if (errorMessage.includes('Email already registered') || errorMessage.includes('Email already in use')) {
+        setErrorMsg('This email is already registered. Please use a different email or login.');
+      } else {
+        setErrorMsg(errorMessage);
+      }
+      setSuccessMsg('');
+    }
+  };
+
+  // 3. Handle Verification Code Login
+  const handleSendVerificationCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!verifPhoneLocal.trim()) {
+      setErrorMsg('Phone number is required');
+      return;
+    }
+
+    // Validate and format phone number
+    const dialCode = activeCountry.dialCode.replace('+', '');
+    const validation = validateAndFormatPhoneNumber(verifPhoneLocal.trim(), dialCode, activeCountry.code);
+    if (!validation.isValid) {
+      setErrorMsg(validation.error);
+      return;
+    }
+    const fullPhone = validation.formatted;
+
+    setErrorMsg('');
+    setIsSendingCode(true);
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      const data = await safeFetchJson(`${apiUrl}/api/player/send-verification-code`, {
+        phone_number: fullPhone,
+      });
+
+      setSuccessMsg(`Verification code sent! Code: ${data.verification_code} (expires in 15 minutes)`);
+      setIsSendingCode(false);
+    } catch (error: any) {
+      setErrorMsg(error.message || 'Failed to send verification code');
+      setIsSendingCode(false);
+      setSuccessMsg('');
+    }
+  };
+
+  const handleVerificationCodeLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!verifPhoneLocal.trim()) {
+      setErrorMsg('Phone number is required');
+      return;
+    }
+
+    if (!verifCode.trim()) {
+      setErrorMsg('Verification code is required');
+      return;
+    }
+
+    // Validate and format phone number
+    const dialCode = activeCountry.dialCode.replace('+', '');
+    const validation = validateAndFormatPhoneNumber(verifPhoneLocal.trim(), dialCode, activeCountry.code);
+    if (!validation.isValid) {
+      setErrorMsg(validation.error);
+      return;
+    }
+    const fullPhone = validation.formatted;
+
+    setErrorMsg('');
+    setIsVerifyingCode(true);
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      const data = await safeFetchJson(`${apiUrl}/api/player/login-with-verification`, {
+        phone_number: fullPhone,
+        verification_code: verifCode.trim(),
+      });
+
+      setSuccessMsg('Login successful!');
+
+      const newProfile: UserProfile = {
+        ...userProfile,
+        isLoggedIn: true,
+        id: String((data.user && typeof data.user === 'object') ? data.user.id : Date.now()),
+        name: (data.user && typeof data.user === 'object') ? data.user.name : 'Player',
+        email: (data.user && typeof data.user === 'object') ? data.user.email : '',
+        phone: (data.user && typeof data.user === 'object') ? data.user.phone_number : fullPhone,
+        country: activeCountry.name,
+        countryCode: activeCountry.code,
+        currencySymbol: activeCountry.currency,
+        avatar: activeCountry.flag,
+        emailVerified: true,
+        walletBalance: parseFloat((data.user && typeof data.user === 'object') ? data.user.balance : '0'),
+        referralCode: (data.user && typeof data.user === 'object') ? data.user.referral_code : '',
       };
 
       localStorage.setItem('player_token', data.access_token || `token_${Date.now()}`);
@@ -266,7 +490,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onClose();
       }, 500);
     } catch (error: any) {
-      setErrorMsg(error.message || 'Registration failed. Please try again.');
+      setErrorMsg(error.message || 'Invalid or expired verification code');
+      setIsVerifyingCode(false);
       setSuccessMsg('');
     }
   };
@@ -319,63 +544,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  // Handle Social Login (Google / Facebook)
-  const handleSocialLogin = (provider: 'Google' | 'Facebook') => {
-    setErrorMsg('');
-    setSuccessMsg(`Signing in with ${provider}...`);
-    setTimeout(() => {
-      const demoProfile: UserProfile = {
-        ...userProfile,
-        isLoggedIn: true,
-        id: String(Date.now()),
-        name: provider === 'Google' ? 'Alex Mwangi' : 'Chris Otieno',
-        email: provider === 'Google' ? 'alex.mwangi@gmail.com' : 'chris.otieno@facebook.com',
-        phone: `${activeCountry.dialCode}712987654`,
-        country: activeCountry.name,
-        countryCode: activeCountry.code,
-        currencySymbol: activeCountry.currency,
-        avatar: activeCountry.flag,
-        emailVerified: true,
-      };
-      localStorage.setItem('player_token', `token_${Date.now()}`);
-      localStorage.setItem('player_data', JSON.stringify(demoProfile));
-      localStorage.setItem('user_profile', JSON.stringify(demoProfile));
-      onLogin(demoProfile);
-      setSuccessMsg('');
-      onClose();
-    }, 400);
+  const handleSocialLogin = async (provider: 'Google' | 'Facebook', action: 'login' | 'signup' = 'login') => {
+    if (provider === 'Google') {
+      // Redirect to Google OAuth with action parameter
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      window.location.href = `${apiUrl}/api/auth/google/redirect?action=${action}`;
+    } else {
+      setErrorMsg(`${provider} login is coming soon. Please sign in with your phone number or email.`);
+    }
   };
 
-  // Handle Quick Demo Login
-  const handleQuickDemoLogin = () => {
-    setErrorMsg('');
-    setSuccessMsg('Signing in with demo account...');
-    setTimeout(() => {
-      const demoProfile: UserProfile = {
-        ...userProfile,
-        isLoggedIn: true,
-        id: '777',
-        name: 'Mwangi Kimani',
-        email: 'mwangi.kimani@chezaquiz.co.ke',
-        phone: `${activeCountry.dialCode}712345678`,
-        country: activeCountry.name,
-        countryCode: activeCountry.code,
-        currencySymbol: activeCountry.currency,
-        avatar: activeCountry.flag,
-        emailVerified: true,
-      };
-      localStorage.setItem('player_token', `token_${Date.now()}`);
-      localStorage.setItem('player_data', JSON.stringify(demoProfile));
-      localStorage.setItem('user_profile', JSON.stringify(demoProfile));
-      onLogin(demoProfile);
-      setSuccessMsg('');
-      onClose();
-    }, 300);
-  };
+  // Quick demo login removed - must use API-based login only
+  // const handleQuickDemoLogin = () => { ... };
 
   // Forgot password handlers
   const handleRequestPasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!forgotEmail.trim() || !emailRegex.test(forgotEmail.trim())) {
       setErrorMsg('Please enter a valid email address');
@@ -388,11 +573,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
       const data = await safeFetchJson(`${apiUrl}/api/player/forgot-password`, {
-        phone_number: forgotEmail,
+        email: forgotEmail.trim(),
       });
 
       setForgotStep('enter_new_password');
-      setSuccessMsg(data.message || 'Account found! Please reset your password.');
+      setSuccessMsg(data.message || 'Recovery code sent! Enter the code and your new password.');
+      if (data.otp_code) {
+        setSuccessMsg(prev => prev + ` Your code is: ${data.otp_code}`);
+      }
       setErrorMsg('');
     } catch (error: any) {
       setErrorMsg(error.message || 'Failed to send recovery code');
@@ -402,6 +590,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleResetPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!forgotEmail.trim() || !emailRegex.test(forgotEmail.trim())) {
+      setErrorMsg('Please enter a valid email address');
+      return;
+    }
+    
+    if (!forgotOtpCode || forgotOtpCode.length !== 6) {
+      setErrorMsg('Please enter the 6-digit recovery code');
+      return;
+    }
+    
     if (!newPassword || newPassword.length < 6) {
       setErrorMsg('New password must be at least 6 characters');
       return;
@@ -418,8 +618,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     try {
       const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
       const data = await safeFetchJson(`${apiUrl}/api/player/reset-password`, {
-        phone_number: forgotEmail,
+        email: forgotEmail.trim(),
         password: newPassword,
+        otp_code: forgotOtpCode,
       });
 
       setIsVerifying(false);
@@ -446,8 +647,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className={`w-full max-w-4xl rounded-3xl border shadow-2xl relative overflow-hidden my-auto grid grid-cols-1 md:grid-cols-12 ${
               isDark
-                ? 'bg-[#050507] black-net border-[#262933] text-[#F8FAFC]'
-                : 'bg-white border-slate-200 text-slate-900 shadow-emerald-500/10'
+                ? 'bg-[#0B0E14] border-[#1A2332] text-[#F8FAFC]'
+                : 'bg-white border-slate-200 text-slate-900'
             }`}
           >
             {/* Close Button */}
@@ -488,9 +689,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </p>
               </div>
 
-              {/* Mode Toggle Pills (Sign In / Register) */}
+              {/* Mode Toggle Pills (Sign In / Register / Verification Login) */}
               {mode !== 'forgot_password' && (
-                <div className={`grid grid-cols-2 gap-1 p-1 rounded-2xl mb-5 border ${
+                <div className={`grid grid-cols-3 gap-1 p-1 rounded-2xl mb-5 border ${
                   isDark ? 'bg-[#121722] border-[#222C3E]' : 'bg-slate-100 border-slate-200'
                 }`}>
                   <button
@@ -507,6 +708,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     }`}
                   >
                     Sign In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode('verification_login');
+                      setErrorMsg('');
+                      setSuccessMsg('');
+                    }}
+                    className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                      mode === 'verification_login'
+                        ? isDark ? 'bg-[#1e2738] text-white shadow-sm' : 'bg-white text-slate-950 shadow-sm'
+                        : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-950'
+                    }`}
+                  >
+                    OTP Login
                   </button>
                   <button
                     type="button"
@@ -544,6 +760,41 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               {/* FORM VIEW: SIGN IN */}
               {mode === 'login' ? (
                 <form onSubmit={handleLoginSubmit} className="space-y-3.5">
+                  {/* Interactive Country Selector with Flag */}
+                  <div>
+                    <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Country &amp; Currency
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsCountryPickerOpen(true)}
+                      className={`w-full px-3.5 py-2.5 rounded-2xl border flex items-center justify-between transition-all cursor-pointer group ${
+                        isDark
+                          ? 'bg-[#121722] border-[#222C3E] text-white hover:border-emerald-500/60 hover:bg-[#161D2B]'
+                          : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-emerald-500/60 hover:bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-2xl leading-none shrink-0 drop-shadow-xs">{activeCountry.flag}</span>
+                        <div className="text-left min-w-0">
+                          <div className="text-xs sm:text-sm font-extrabold truncate flex items-center gap-1.5">
+                            <span>{activeCountry.name}</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold">
+                              {activeCountry.dialCode}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate">
+                            {activeCountry.currencyCode || activeCountry.currency} · {activeCountry.paymentMethod || 'Mobile Money / Card'}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0 text-emerald-500 font-bold text-xs">
+                        <span className="hidden sm:inline">Change</span>
+                        <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                      </div>
+                    </button>
+                  </div>
+
                   {/* Phone / Email Mode Toggle */}
                   <div className="flex gap-2 mb-1">
                     <button
@@ -670,7 +921,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     </div>
                   </div>
 
-                  {/* Remember Me & Forgot Password */}
+                  {/* Remember Me & Forgot Password */}                  {/* Remember Me & Forgot Password */}
                   <div className="flex items-center justify-between text-xs pt-1 px-1">
                     <label className={`flex items-center gap-2 cursor-pointer font-medium ${
                       isDark ? 'text-slate-400' : 'text-slate-600'
@@ -700,74 +951,196 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     SIGN IN
                   </button>
 
-                  {/* LOGIN WITH OTHERS DIVIDER */}
-                  <div className="relative flex py-2 items-center">
-                    <div className={`flex-grow border-t ${isDark ? 'border-[#222C3E]' : 'border-slate-200'}`} />
-                    <span className={`shrink mx-4 text-[11px] font-bold uppercase tracking-wider ${
-                      isDark ? 'text-slate-500' : 'text-slate-400'
-                    }`}>
-                      Login with Others
-                    </span>
-                    <div className={`flex-grow border-t ${isDark ? 'border-[#222C3E]' : 'border-slate-200'}`} />
-                  </div>
-
-                  {/* SOCIAL BUTTONS (GOOGLE & FACEBOOK) */}
-                  <div className="space-y-2.5">
-                    {/* Google Button */}
+                  {/* Social Sign In Options */}
+                  <div className="pt-2 grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => handleSocialLogin('Google')}
-                      className={`w-full py-2.5 px-4 rounded-2xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-3 transition-all cursor-pointer active:scale-98 shadow-xs ${
-                        isDark
-                          ? 'bg-[#121722] border-[#222C3E] text-slate-200 hover:bg-[#182030]'
-                          : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-50'
+                      onClick={() => handleSocialLogin('Google', 'login')}
+                      className={`py-2 px-3 rounded-2xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer ${
+                        isDark ? 'bg-[#121722] border-[#222C3E] text-slate-300' : 'bg-white border-slate-200 text-slate-800'
                       }`}
                     >
-                      <svg className="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.69-3.71 3.29-3.71h5.92c.13 0 .26-.01.38-.04.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 2.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.81-.62 1.48-1.38 2.06-2.24V5.38z"/>
                       </svg>
-                      <span>Login with Google</span>
+                      Sign in with Google
                     </button>
-
-                    {/* Facebook Button */}
                     <button
                       type="button"
-                      onClick={() => handleSocialLogin('Facebook')}
-                      className={`w-full py-2.5 px-4 rounded-2xl border text-xs sm:text-sm font-semibold flex items-center justify-center gap-3 transition-all cursor-pointer active:scale-98 shadow-xs ${
-                        isDark
-                          ? 'bg-[#121722] border-[#222C3E] text-slate-200 hover:bg-[#182030]'
-                          : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-50'
+                      onClick={() => handleSocialLogin('Facebook', 'login')}
+                      className={`py-2 px-3 rounded-2xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer ${
+                        isDark ? 'bg-[#121722] border-[#222C3E] text-slate-300' : 'bg-white border-slate-200 text-slate-800'
                       }`}
                     >
-                      <svg className="w-4 h-4 fill-[#1877F2]" viewBox="0 0 24 24">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                      <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.228 2.686.228v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328c-.318 1.699-1.599 2.894-3.328 2.894-1.989 0-3.6-1.611-3.6-3.6V12.073z"/>
                       </svg>
-                      <span>Login with Facebook</span>
+                      Sign in with Facebook
                     </button>
                   </div>
 
-                  {/* 1-Click Instant Demo Login Access */}
-                  <div className="pt-2">
+                  {/* SIGN IN BUTTON ONLY - API-based login required */}
+                </form>
+              ) : mode === 'verification_login' ? (
+                /* FORM VIEW: VERIFICATION CODE LOGIN */
+                <form onSubmit={handleVerificationCodeLogin} className="space-y-3.5">
+                  {/* Interactive Country Selector with Flag */}
+                  <div>
+                    <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Country &amp; Currency
+                    </label>
                     <button
                       type="button"
-                      onClick={handleQuickDemoLogin}
-                      className={`w-full py-2.5 px-3 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+                      onClick={() => setIsCountryPickerOpen(true)}
+                      className={`w-full px-3.5 py-2.5 rounded-2xl border flex items-center justify-between transition-all cursor-pointer group ${
                         isDark
-                          ? 'bg-[#121722] border-emerald-500/30 text-emerald-400 hover:bg-emerald-950/20'
-                          : 'bg-emerald-50/70 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                          ? 'bg-[#121722] border-[#222C3E] text-white hover:border-emerald-500/60 hover:bg-[#161D2B]'
+                          : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-emerald-500/60 hover:bg-white'
                       }`}
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>⚡ 1-Click Instant Demo Login</span>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="text-2xl leading-none shrink-0 drop-shadow-xs">{activeCountry.flag}</span>
+                        <div className="text-left min-w-0">
+                          <div className="text-xs sm:text-sm font-extrabold truncate flex items-center gap-1.5">
+                            <span>{activeCountry.name}</span>
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold">
+                              {activeCountry.dialCode}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate">
+                            {activeCountry.currencyCode || activeCountry.currency} · {activeCountry.paymentMethod || 'Mobile Money / Card'}
+                          </div>
+                        </div>
+                      </div>
+                      <Globe className="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors" />
                     </button>
                   </div>
+
+                  {/* Phone Input */}
+                  <div>
+                    <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Phone Number
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsCountryPickerOpen(true)}
+                        className={`px-3 py-2.5 rounded-2xl border flex items-center gap-1.5 shrink-0 text-xs font-bold transition-colors cursor-pointer ${
+                          isDark
+                            ? 'bg-[#121722] border-[#222C3E] text-white hover:bg-[#182030]'
+                            : 'bg-slate-50 border-slate-200 text-slate-900 hover:bg-slate-100'
+                        }`}
+                      >
+                        <span className="text-base">{activeCountry.flag}</span>
+                        <span>{activeCountry.dialCode}</span>
+                        <ChevronDown className="w-3 h-3 text-slate-400" />
+                      </button>
+
+                      <div className="relative flex-1">
+                        <Phone className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+                        <input
+                          type="tel"
+                          value={verifPhoneLocal}
+                          onChange={(e) => {
+                            setVerifPhoneLocal(e.target.value);
+                            setErrorMsg('');
+                          }}
+                          placeholder="712 345 678"
+                          className={`w-full pl-10 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
+                            isDark
+                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-emerald-500'
+                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-emerald-500'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Send Code Button */}
+                  <button
+                    type="button"
+                    onClick={handleSendVerificationCode}
+                    disabled={isSendingCode}
+                    className="w-full py-2.5 px-4 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md active:scale-98 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSendingCode ? <RefreshCw className="w-4 h-4 animate-spin mx-auto" /> : 'Send Verification Code'}
+                  </button>
+
+                  {/* Verification Code Input */}
+                  <div>
+                    <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Verification Code
+                    </label>
+                    <div className="relative">
+                      <Key className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+                      <input
+                        type="text"
+                        value={verifCode}
+                        onChange={(e) => {
+                          setVerifCode(e.target.value);
+                          setErrorMsg('');
+                        }}
+                        placeholder="Enter 6-digit code"
+                        maxLength={6}
+                        className={`w-full pl-10 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
+                          isDark
+                            ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-emerald-500'
+                            : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-emerald-500'
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Login with Code Button */}
+                  <button
+                    type="submit"
+                    disabled={isVerifyingCode}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md active:scale-98 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                  >
+                    {isVerifyingCode ? <RefreshCw className="w-4 h-4 animate-spin mx-auto" /> : 'Login with Code'}
+                  </button>
                 </form>
               ) : mode === 'register' ? (
                 /* FORM VIEW: SIGN UP / REGISTER */
                 <form onSubmit={handleInitiateRegistration} className="space-y-3">
+                    {/* Interactive Country Selector with Flag */}
+                    <div>
+                      <label className={`block text-[11px] font-bold uppercase tracking-wider mb-1.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                        Country &amp; Currency
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsCountryPickerOpen(true)}
+                        className={`w-full px-3.5 py-2.5 rounded-2xl border flex items-center justify-between transition-all cursor-pointer group ${
+                          isDark
+                            ? 'bg-[#121722] border-[#222C3E] text-white hover:border-emerald-500/60 hover:bg-[#161D2B]'
+                            : 'bg-slate-50 border-slate-200 text-slate-900 hover:border-emerald-500/60 hover:bg-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="text-2xl leading-none shrink-0 drop-shadow-xs">{activeCountry.flag}</span>
+                          <div className="text-left min-w-0">
+                            <div className="text-xs sm:text-sm font-extrabold truncate flex items-center gap-1.5">
+                              <span>{activeCountry.name}</span>
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold">
+                                {activeCountry.dialCode}
+                              </span>
+                            </div>
+                            <div className="text-[10px] text-slate-400 truncate">
+                              {activeCountry.currencyCode || activeCountry.currency} · {activeCountry.paymentMethod || 'Mobile Money / Card'}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0 text-emerald-500 font-bold text-xs">
+                          <span className="hidden sm:inline">Change</span>
+                          <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-emerald-500 transition-colors" />
+                        </div>
+                      </button>
+                    </div>
+
                     {/* Full Name / Username */}
                     <div>
                       <div className="relative">
@@ -836,7 +1209,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                               setRegPhoneLocal(e.target.value);
                               setErrorMsg('');
                             }}
-                            placeholder="712 345 678 (M-Pesa)"
+                            placeholder="712 345 678 "
                             className={`w-full pl-10 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
                               isDark
                                 ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-emerald-500'
@@ -875,33 +1248,100 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       </div>
                     </div>
 
+                    {/* Terms and Conditions */}
+                    <div className="space-y-2">
+                      <label className={`flex items-start gap-2 cursor-pointer ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                        <input
+                          type="checkbox"
+                          checked={acceptTerms}
+                          onChange={(e) => setAcceptTerms(e.target.checked)}
+                          className="mt-0.5 w-4 h-4 rounded border-emerald-500 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                        />
+                        <span className="text-xs">
+                          I accept the <a href="/terms" target="_blank" className="text-emerald-500 hover:text-emerald-400 underline">Terms and Conditions</a> and <a href="/privacy" target="_blank" className="text-emerald-500 hover:text-emerald-400 underline">Privacy Policy</a>
+                        </span>
+                      </label>
+
+                      <label className={`flex items-start gap-2 cursor-pointer ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+                        <input
+                          type="checkbox"
+                          checked={acceptNotifications}
+                          onChange={(e) => setAcceptNotifications(e.target.checked)}
+                          className="mt-0.5 w-4 h-4 rounded border-emerald-500 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                        />
+                        <span className="text-xs">
+                          I agree to receive notifications about game updates, promotions, and rewards
+                        </span>
+                      </label>
+                    </div>
+
+                    {/* Referral Code (Optional) */}
+                    <div>
+                      <div className="relative">
+                        <Zap className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+                        <input
+                          type="text"
+                          value={regReferralCode}
+                          onChange={(e) => {
+                            setRegReferralCode(e.target.value);
+                            setErrorMsg('');
+                          }}
+                          placeholder="Referral Code (Optional)"
+                          className={`w-full pl-10 pr-3.5 py-2.5 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
+                            isDark
+                              ? 'bg-[#121722] border-[#222C3E] text-white placeholder-slate-500 focus:border-emerald-500'
+                              : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-white focus:border-emerald-500'
+                          }`}
+                        />
+                      </div>
+                      <div className={`mt-2 p-2.5 rounded-xl border flex items-center gap-2 ${
+                        isDark
+                          ? 'bg-emerald-500/10 border-emerald-500/30'
+                          : 'bg-emerald-50 border-emerald-200'
+                      }`}>
+                        <Gift className={`w-5 h-5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                        <span className={`text-xs font-bold ${isDark ? 'text-emerald-300' : 'text-emerald-700'}`}>
+                          Enter a friend's referral code to get KES 50 bonus!
+                        </span>
+                      </div>
+                    </div>
+
                     {/* Submit Register Button */}
                     <button
                       type="submit"
                       className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-md active:scale-98 cursor-pointer mt-2"
                     >
-                      CREATE PREDICTA ACCOUNT
+                      CREATE TRIVQUEST ACCOUNT
                     </button>
 
                     {/* Social Sign Up Options */}
                     <div className="pt-2 grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        onClick={() => handleSocialLogin('Google')}
+                        onClick={() => handleSocialLogin('Google', 'signup')}
                         className={`py-2 px-3 rounded-2xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer ${
                           isDark ? 'bg-[#121722] border-[#222C3E] text-slate-300' : 'bg-white border-slate-200 text-slate-800'
                         }`}
                       >
-                        <span className="font-bold text-emerald-500">G</span> Google
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.69-3.71 3.29-3.71h5.92c.13 0 .26-.01.38-.04.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 2.18 4.93l2.85-2.22.81-.62z"/>
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.81-.62 1.48-1.38 2.06-2.24V5.38z"/>
+                        </svg>
+                        Sign up with Google
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleSocialLogin('Facebook')}
+                        onClick={() => handleSocialLogin('Facebook', 'signup')}
                         className={`py-2 px-3 rounded-2xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer ${
                           isDark ? 'bg-[#121722] border-[#222C3E] text-slate-300' : 'bg-white border-slate-200 text-slate-800'
                         }`}
                       >
-                        <span className="font-bold text-slate-400">f</span> Facebook
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                          <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.228 2.686.228v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328c-.318 1.699-1.599 2.894-3.328 2.894-1.989 0-3.6-1.611-3.6-3.6V12.073z"/>
+                        </svg>
+                        Sign up with Facebook
                       </button>
                     </div>
                   </form>
@@ -995,20 +1435,52 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     </form>
                   ) : forgotStep === 'enter_new_password' ? (
                     <form onSubmit={handleResetPasswordSubmit} className="space-y-3">
-                      <input
-                        type={showNewPassword ? 'text' : 'password'}
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="New Password"
-                        className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 text-xs"
-                      />
-                      <input
-                        type={showNewPassword ? 'text' : 'password'}
-                        value={confirmNewPassword}
-                        onChange={(e) => setConfirmNewPassword(e.target.value)}
-                        placeholder="Confirm Password"
-                        className="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 bg-slate-50 text-xs"
-                      />
+                      <div>
+                        <div className="relative">
+                          <Key className="w-4 h-4 absolute left-3.5 top-3.5 text-emerald-500" />
+                          <input
+                            type="text"
+                            value={forgotOtpCode}
+                            onChange={(e) => setForgotOtpCode(e.target.value)}
+                            placeholder="6-Digit Recovery Code"
+                            maxLength={6}
+                            className={`w-full pl-10 pr-3.5 py-3 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
+                              isDark ? 'bg-[#121722] border-[#222C3E] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                            }`}
+                          />
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-emerald-500" />
+                        <input
+                          type={showNewPassword ? 'text' : 'password'}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="New Password"
+                          className={`w-full pl-10 pr-3.5 py-3 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
+                            isDark ? 'bg-[#121722] border-[#222C3E] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3.5 top-3.5 text-slate-400 hover:text-emerald-500 cursor-pointer"
+                        >
+                          {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <Lock className="w-4 h-4 absolute left-3.5 top-3.5 text-emerald-500" />
+                        <input
+                          type={showNewPassword ? 'text' : 'password'}
+                          value={confirmNewPassword}
+                          onChange={(e) => setConfirmNewPassword(e.target.value)}
+                          placeholder="Confirm Password"
+                          className={`w-full pl-10 pr-3.5 py-3 rounded-2xl border text-xs sm:text-sm font-semibold transition-all outline-none ${
+                            isDark ? 'bg-[#121722] border-[#222C3E] text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
 
                       <button
                         type="submit"
@@ -1039,18 +1511,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             {/* RIGHT COLUMN: 3D TRIVIA HERO ARTWORK WITH BLACK NET THEME (5 Cols on MD+) */}
             <div className="hidden md:flex md:col-span-5 p-4 sm:p-5 flex-col items-center justify-between relative overflow-hidden">
-              {/* Outer Black Net Canvas Container */}
-              <div className="w-full h-full rounded-3xl bg-[#080a0f] black-net border border-[#222C3E] p-5 text-white flex flex-col justify-between relative overflow-hidden shadow-xl">
-                
-                {/* Floating Subtle Glows in Background */}
-                <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full bg-emerald-500/10 blur-xl pointer-events-none" />
-                <div className="absolute bottom-0 -left-10 w-36 h-36 rounded-full bg-black/40 blur-xl pointer-events-none" />
+              {/* Outer Container */}
+              <div className="w-full h-full rounded-3xl bg-[#0D131F] border border-[#222C3E] p-5 text-white flex flex-col justify-between relative overflow-hidden shadow-xl">
                 
                 {/* Top Badge: 254 Live Arena */}
                 <div className="flex items-center justify-between z-10">
                   <div className="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[11px] font-extrabold tracking-wider uppercase flex items-center gap-1.5 border border-white/10 shadow-xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                    <span>PREDICTA ARENA</span>
+                    <span>TRIVQUEST ARENA</span>
                   </div>
                   <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center">
                     <Zap className="w-4 h-4 text-emerald-400" />

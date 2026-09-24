@@ -1,5 +1,6 @@
 import { QuizCategory, RewardStep, SpeedMode, NotificationItem } from '../types';
-import { DEMO_QUESTIONS_BY_CATEGORY } from './demoQuestions';
+// Demo questions removed - must use DB questions only
+// import { DEMO_QUESTIONS_BY_CATEGORY } from './demoQuestions';
 
 export const REWARD_LADDER: RewardStep[] = [
   { questionNumber: 1, rewardKsh: 4 },
@@ -56,115 +57,132 @@ export function calculatePotentialWinnings(stakeKsh: number, totalQuestions: num
 
 export const SPEED_MODES: SpeedMode[] = [
   {
-    id: '3min',
-    name: '3 Mins Speed Round',
+    id: 'speed_round',
+    name: '15 Seconds — Speed Round',
     questionsCount: 6,
-    durationSeconds: 12,
-    description: 'Fast-paced, 12s countdown per question. Perfect for quick plays.',
+    durationSeconds: 15,
+    description: 'Ultra-fast 15-second round. Answer all 6 questions before the round timer expires.',
     badge: '6 QUESTIONS',
+    badges: ['6 QUESTIONS', '15s TOTAL'],
   },
   {
-    id: '5min',
-    name: '5 Mins Pro Challenge',
-    questionsCount: 8,
-    durationSeconds: 12,
-    description: 'Balanced trivia round with progressive medium difficulty.',
-    badge: '8 QUESTIONS',
+    id: 'pro_challenge',
+    name: '20 Seconds — Pro Challenge',
+    questionsCount: 9,
+    durationSeconds: 20,
+    description: 'Fast-paced 20-second challenge with 9 questions. Answer all questions before the round timer expires.',
+    badge: '9 QUESTIONS',
+    badges: ['9 QUESTIONS', '20s TOTAL'],
   },
   {
-    id: '10min',
-    name: '10 Mins Tournament',
-    questionsCount: 10,
-    durationSeconds: 12,
-    description: 'Grand championship quiz with maximum XP multipliers & badges.',
-    badge: '10 QUESTIONS',
+    id: 'tournament',
+    name: '30 Seconds — Tournament',
+    questionsCount: 15,
+    durationSeconds: 30,
+    description: 'Intense 30-second championship round with 15 questions. Answer all questions before the round timer expires.',
+    badge: '15 QUESTIONS',
+    badges: ['15 QUESTIONS', '30s TOTAL'],
   },
 ];
 
 export const QUIZ_CATEGORIES: QuizCategory[] = [
   {
+    id: 'basketball',
+    name: 'Basketball',
+    icon: '🏀',
+    subtitle: 'NBA, Players & Basketball History',
+    questions: [], // Must be fetched from DB
+  },
+  {
+    id: 'football',
+    name: 'Football',
+    icon: '⚽',
+    subtitle: 'Soccer, Clubs & International Matches',
+    questions: [], // Must be fetched from DB
+  },
+  {
+    id: 'general_knowledge',
+    name: 'General Knowledge',
+    icon: '🧠',
+    subtitle: 'Science, Facts & World Trivia',
+    questions: [], // Must be fetched from DB
+  },
+  {
     id: 'kenya',
     name: 'Kenya',
     icon: '🇰🇪',
     subtitle: 'Heritage, Culture & Wildlife',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.kenya || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'world_cup',
     name: 'World Cup',
     icon: '⚽',
     subtitle: 'FIFA & Global Football',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.world_cup || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'sports',
     name: 'Sports',
     icon: '🏆',
     subtitle: 'Premier League & Athletics',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.sports || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'tech',
     name: 'Tech',
     icon: '🤖',
     subtitle: 'Silicon Savannah & AI',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.tech || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'finance',
     name: 'Finance',
     icon: '📈',
     subtitle: 'Markets, Banking & CBK',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.finance || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'geopolitics',
     name: 'Geopolitics',
     icon: '🌍',
     subtitle: 'World Wonders & Treaties',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.geopolitics || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'crypto',
     name: 'Crypto',
     icon: '⚡',
     subtitle: 'Blockchain & Digital Assets',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.crypto || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'politics',
     name: 'Politics',
     icon: '🏛️',
     subtitle: 'World Leaders & Civic Affairs',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.politics || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'esports',
     name: 'Esports',
     icon: '🎮',
     subtitle: 'Competitive Gaming & Consoles',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.esports || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'entertainment',
     name: 'Entertainment',
     icon: '🎬',
     subtitle: 'Cinema, Music & Pop Culture',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.entertainment || [],
-  },
-  {
-    id: 'general',
-    name: 'General Trivia',
-    icon: '🧠',
-    subtitle: 'Science & World Facts',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.general || [],
+    questions: [], // Must be fetched from DB
   },
   {
     id: 'trending',
     name: 'Trending',
     icon: '🔥',
     subtitle: 'Viral Facts & Speed Records',
-    questions: DEMO_QUESTIONS_BY_CATEGORY.trending || [],
+    questions: [], // Must be fetched from DB
   },
 ];
 

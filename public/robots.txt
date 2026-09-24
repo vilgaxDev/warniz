@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://trivquest.co.ke/sitemap.xml

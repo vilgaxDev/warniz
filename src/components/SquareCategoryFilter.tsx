@@ -47,6 +47,11 @@ export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
   items,
 }) => {
   const categoryItems = items && items.length > 0 ? items : SQUARE_CATEGORY_ITEMS;
+  
+  // Add "All Categories" option at the beginning
+  const allCategoriesItem = { id: 'all', name: 'All', icon: '🌟', gradient: 'from-violet-500 to-purple-600' };
+  const displayItems = [allCategoriesItem, ...categoryItems];
+  
   const isDark = theme === 'dark';
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -128,7 +133,7 @@ export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
           className="flex items-center gap-1.5 sm:gap-2.5 overflow-x-auto no-scrollbar scroll-smooth px-1 sm:px-4 w-full"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {categoryItems.map((item) => {
+          {displayItems.map((item) => {
             const isSelected =
               selectedCategoryId === item.id ||
               (selectedCategoryId === 'all' && item.id === 'trending');
@@ -141,8 +146,8 @@ export const SquareCategoryFilter: React.FC<SquareCategoryFilterProps> = ({
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer relative group ${
                   isSelected
                     ? isDark
-                      ? 'bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 text-emerald-300 border border-emerald-400/60 shadow-md shadow-emerald-500/20 ring-1 ring-emerald-400/30'
-                      : 'bg-slate-950 text-white border border-slate-950 shadow-md ring-1 ring-slate-900/30'
+                      ? 'bg-emerald-600 text-white border border-emerald-500 shadow-2xs'
+                      : 'bg-slate-950 text-white border border-slate-950 shadow-2xs'
                     : isDark
                     ? 'bg-[#121827]/70 text-slate-300 border border-white/5 hover:border-emerald-500/40 hover:bg-[#162034] hover:text-white'
                     : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-400 hover:bg-slate-50'

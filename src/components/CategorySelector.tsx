@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Clock,
   Play,
@@ -11,6 +12,8 @@ import {
   TrendingUp,
   Activity,
   Layers,
+  Search,
+  X,
 } from 'lucide-react';
 import { QuizCategory, SpeedMode } from '../types';
 import { CategoryTopicBadge, getCategoryTheme } from '../utils/categoryTheme';
@@ -18,7 +21,7 @@ import { CategoryTopicBadge, getCategoryTheme } from '../utils/categoryTheme';
 interface CategorySelectorProps {
   categories: QuizCategory[];
   speedModes: SpeedMode[];
-  selectedCategoryId: string;
+  selectedCategoryId?: string | null;
   selectedSpeedModeId: string;
   onSelectCategory: (categoryId: string) => void;
   onSelectSpeedMode: (speedModeId: string) => void;
@@ -36,28 +39,66 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   onPlayCategory,
   theme = 'dark',
 }) => {
+  const navigate = useNavigate();
   const isDark = theme === 'dark';
+  const [searchQuery, setSearchQuery] = useState('');
   const activeSpeed = speedModes.find((s) => s.id === selectedSpeedModeId) || speedModes[0];
+
+  // Map category ID to URL slug
+  const categoryIdToSlug: Record<string, string> = {
+    'basketball': 'basketball',
+    'football': 'football',
+    'general_knowledge': 'general-knowledge',
+    'kenya': 'kenya',
+    'world_cup': 'world-cup',
+    'sports': 'sports',
+    'tech': 'tech',
+    'finance': 'finance',
+    'geopolitics': 'geopolitics',
+    'crypto': 'crypto',
+    'politics': 'politics',
+    'esports': 'esports',
+    'entertainment': 'entertainment',
+    'trending': 'trending',
+  };
+
+  // Handle category card click - navigate to category page
+  const handleCategoryCardClick = (categoryId: string) => {
+    const slug = categoryIdToSlug[categoryId] || categoryId;
+    navigate(`/category/${slug}`);
+  };
+
+  // Filter categories based on search
+  const filteredCategories = categories.filter(cat => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      cat.name.toLowerCase().includes(q) ||
+      (cat.subtitle && cat.subtitle.toLowerCase().includes(q)) ||
+      (cat.badge && cat.badge.toLowerCase().includes(q)) ||
+      cat.questions.some((qu) => qu.question.toLowerCase().includes(q))
+    );
+  });
 
   const speedModeStyles: Record<
     string,
     { icon: any; color: string; bgSelected: string; borderSelected: string; badgeColor: string }
   > = {
-    '3min': {
+    'speed_round': {
       icon: Zap,
       color: 'text-cyan-400',
       bgSelected: isDark ? 'bg-cyan-950/30' : 'bg-cyan-50',
       borderSelected: 'border-cyan-400 ring-2 ring-cyan-400/40 shadow-cyan-500/20',
       badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30',
     },
-    '5min': {
+    'pro_challenge': {
       icon: Flame,
       color: 'text-amber-400',
       bgSelected: isDark ? 'bg-amber-950/30' : 'bg-amber-50',
       borderSelected: 'border-amber-400 ring-2 ring-amber-400/40 shadow-amber-500/20',
       badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-400/30',
     },
-    '10min': {
+    'tournament': {
       icon: Trophy,
       color: 'text-purple-400',
       bgSelected: isDark ? 'bg-purple-950/30' : 'bg-purple-50',
@@ -68,26 +109,28 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   return (
     <div className="w-full space-y-6 sm:space-y-8 font-sans">
-      {/* 1. SPEED ENGINE MODE SELECTOR - VIBRANT & EYE-CATCHING */}
+      {/* 1. SPEED ENGINE MODE SELECTOR - REAL PRODUCTION UI */}
       <div
         className={`rounded-2xl p-4 sm:p-5 border transition-all ${
           isDark
-            ? 'bg-gradient-to-b from-[#141b2b] via-[#101724] to-[#0d121c] border-[#222E42] shadow-xl'
-            : 'bg-gradient-to-b from-white via-slate-50 to-white border-slate-200 shadow-md'
+            ? 'bg-[#0E131E] border-[#1F2737]'
+            : 'bg-white border-slate-200 shadow-xs'
         }`}
       >
         <div
           className={`flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b ${
-            isDark ? 'border-white/10' : 'border-slate-200'
+            isDark ? 'border-[#1F2737]' : 'border-slate-200'
           }`}
         >
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-emerald-500 flex items-center justify-center text-white shadow-md">
-              <Clock className="w-4 h-4 stroke-[2.5]" />
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center border ${
+              isDark ? 'bg-[#151D2C] border-[#222E42] text-amber-400' : 'bg-amber-50 border-amber-200 text-amber-600'
+            }`}>
+              <Clock className="w-4 h-4 stroke-[2]" />
             </div>
             <div>
               <h2
-                className={`font-black text-sm sm:text-base tracking-tight leading-none ${
+                className={`font-bold text-sm sm:text-base tracking-tight leading-none ${
                   isDark ? 'text-white' : 'text-slate-950'
                 }`}
               >
@@ -104,8 +147,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               <span>Real-Time M-Pesa Multipliers</span>
             </span>
           </div>
@@ -145,7 +188,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                     <div
                       className={`w-6 h-6 rounded-lg flex items-center justify-center ${
                         isSelected
-                          ? 'bg-gradient-to-tr from-emerald-500 to-teal-500 text-white shadow-xs'
+                          ? 'bg-emerald-600 text-white shadow-xs'
                           : isDark
                           ? 'bg-[#182338] text-slate-400'
                           : 'bg-slate-100 text-slate-600'
@@ -198,46 +241,38 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
         </div>
       </div>
 
-      {/* 2. CHOOSE QUIZ TOPICS & ARENAS - EYE-CATCHING, VIBRANT, LIVELY */}
+      {/* 2. CHOOSE QUIZ TOPICS & ARENAS */}
       <div
-        className={`rounded-2xl p-4 sm:p-6 border transition-all relative overflow-hidden ${
+        className={`rounded-2xl p-4 sm:p-6 border transition-all ${
           isDark
-            ? 'bg-gradient-to-b from-[#0e1422] via-[#0b101c] to-[#080d16] border-[#1e293b] shadow-2xl'
-            : 'bg-gradient-to-b from-white via-slate-50/70 to-white border-slate-200 shadow-lg'
+            ? 'bg-[#0E131E] border-[#1F2737]'
+            : 'bg-white border-slate-200 shadow-xs'
         }`}
       >
-        {/* Subtle Ambient Radial Lighting for Liveliness */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
-
         {/* Section Header */}
         <div
-          className={`flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b relative z-10 ${
-            isDark ? 'border-white/10' : 'border-slate-200'
+          className={`flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b ${
+            isDark ? 'border-[#1F2737]' : 'border-slate-200'
           }`}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-500 p-[1.5px] shadow-lg shadow-emerald-500/25 flex items-center justify-center">
-              <div
-                className={`w-full h-full rounded-[14px] flex items-center justify-center ${
-                  isDark ? 'bg-[#090e18]' : 'bg-white'
-                }`}
-              >
-                <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
-              </div>
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${
+              isDark ? 'bg-[#151D2C] border-[#222E42] text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-600'
+            }`}>
+              <Sparkles className="w-4.5 h-4.5" />
             </div>
 
             <div>
               <div className="flex items-center gap-2">
                 <h2
-                  className={`font-black text-base sm:text-xl tracking-tight leading-none ${
+                  className={`font-bold text-base sm:text-lg tracking-tight leading-none ${
                     isDark ? 'text-white' : 'text-slate-950'
                   }`}
                 >
                   Quiz Topics & Arenas
                 </h2>
-                <span className="hidden sm:inline-flex items-center gap-1 text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                  <Activity className="w-2.5 h-2.5 animate-pulse" />
+                <span className="hidden sm:inline-flex items-center gap-1 text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <Activity className="w-2.5 h-2.5" />
                   <span>SPEED LADDER ACTIVE</span>
                 </span>
               </div>
@@ -268,17 +303,47 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           </div>
         </div>
 
+        {/* Search Bar for Question Sets */}
+        <div className={`p-3.5 rounded-xl border flex items-center gap-3 transition-all ${
+          isDark
+            ? 'bg-[#141d2d] border-[#222E42]'
+            : 'bg-slate-50 border-slate-200'
+        }`}>
+          <Search className={`w-4.5 h-4.5 shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search question sets (e.g., Kenya, Football, Crypto, AI, Politics)..."
+            className={`flex-1 bg-transparent outline-none text-sm ${
+              isDark ? 'text-slate-100 placeholder-slate-500' : 'text-slate-900 placeholder-slate-400'
+            }`}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                isDark
+                  ? 'hover:bg-[#222E42] text-slate-400 hover:text-slate-200'
+                  : 'hover:bg-slate-200 text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
         {/* 4-in-a-Row Vibrant Topic Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-4.5 relative z-10">
-          {categories.map((cat) => {
-            const isSelected = cat.id === selectedCategoryId;
+          {filteredCategories.map((cat) => {
+            const isSelected = selectedCategoryId ? cat.id === selectedCategoryId : false;
             const themeInfo = getCategoryTheme(cat.id);
-            const questionPool = cat.questions?.length || 10;
+            const questionPool = cat.questions?.length || 10; // Use actual question count or default to 10
 
             return (
               <div
                 key={cat.id}
-                onClick={() => onSelectCategory(cat.id)}
+                onClick={() => handleCategoryCardClick(cat.id)}
                 className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col justify-between relative group ${
                   isSelected
                     ? isDark
@@ -288,17 +353,12 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                     ? 'bg-[#111726]/90 border-[#1f293d] hover:border-slate-400 hover:bg-[#151d2f] hover:shadow-lg hover:-translate-y-0.5'
                     : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md hover:-translate-y-0.5'
                 }`}
-                style={{
-                  boxShadow: isSelected
-                    ? `0 14px 28px -6px ${themeInfo.glowColor}, 0 6px 12px -4px rgba(0,0,0,0.5)`
-                    : undefined,
-                }}
               >
                 {/* ACTIVE SELECTION BADGE (Top Right) */}
                 {isSelected && (
-                  <div className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-wider shadow-md flex items-center gap-1.5 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 text-slate-950 border border-white/50 animate-pulse">
-                    <Check className="w-3 h-3 stroke-[3.5]" />
-                    <span>SELECTED ARENA</span>
+                  <div className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-2xs flex items-center gap-1.5 bg-emerald-600 text-white border border-emerald-500">
+                    <Check className="w-3 h-3 stroke-[3]" />
+                    <span>Selected Arena</span>
                   </div>
                 )}
 
@@ -326,17 +386,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                       >
                         {cat.name}
                       </h3>
-
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
-                          <Flame className="w-3 h-3 fill-emerald-400" />
-                          <span>{questionPool} Questions</span>
-                        </span>
-                        <span className="text-slate-500 text-[10px]">&bull;</span>
-                        <span className="text-[10px] font-semibold text-amber-400 font-mono">
-                          12s / Q
-                        </span>
-                      </div>
                     </div>
                   </div>
 
@@ -372,7 +421,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                   >
                     <span className="flex items-center gap-1.5 font-bold">
                       <Clock className="w-3 h-3 text-emerald-400" />
-                      <span>{activeSpeed.questionsCount} Qs Sprint</span>
+                      <span>Questions Available</span>
                     </span>
 
                     <span className="font-mono text-emerald-400 font-black">
@@ -386,9 +435,9 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                       e.stopPropagation();
                       onPlayCategory(cat.id);
                     }}
-                    className={`w-full py-2.5 px-3.5 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md ${
+                    className={`w-full py-2.5 px-3.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
                       isSelected
-                        ? 'bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 text-slate-950 hover:brightness-110 shadow-lg shadow-emerald-500/30 scale-[1.02]'
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                         : isDark
                         ? 'bg-[#182338] border border-[#2e3e5c] text-white hover:bg-emerald-600 hover:border-emerald-500 hover:text-white'
                         : 'bg-slate-900 text-white hover:bg-emerald-600'
